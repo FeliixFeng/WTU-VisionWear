@@ -350,15 +350,15 @@ public class ImageServiceImpl implements ImageService {
         }
 
         JsonNode dataNode = responseJson.path("data");
-        String discordImageUrl = dataNode.path("discordImage").asText(null);
-        if (discordImageUrl == null || discordImageUrl.isEmpty()) {
+        String cdnImage = dataNode.path("cdnImage").asText(null);
+        if (cdnImage == null || cdnImage.isEmpty()) {
             throw new RuntimeException("未获取到图片地址");
         }
 
-        // 这里直接返回discordImageUrl，不保存到OSS
+        // 这里直接返回cdnImage，不保存到OSS
         ImageFusionVO.GeneratedImage generatedImage = ImageFusionVO.GeneratedImage.builder()
                 .imageId(null)  // 不保存OSS，imageId为空
-                .imageUrl(discordImageUrl)
+                .imageUrl(cdnImage)
                 .build();
 
 

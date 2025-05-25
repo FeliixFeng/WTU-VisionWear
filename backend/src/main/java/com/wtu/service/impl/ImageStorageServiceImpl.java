@@ -87,25 +87,6 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             throw new RuntimeException("保存URL图片到OSS失败", e);
         }
     }
-/*
-    @Override
-    public String saveImageFromUrl(String imageUrl, Long userId) {
-        // 1. 下载图片
-        // 2. 存储图片（本地、OSS、COS等）
-        // 3. 生成图片ID并返回
-
-        // 示例：下载图片到本地（仅供参考，实际可对接云存储）
-        try (InputStream in = new URL(imageUrl).openStream()) {
-            String fileName = UUID.randomUUID() + ".jpg";
-            Files.copy(in, Paths.get("E:\\" + fileName));
-            // 存数据库、返回图片ID
-            // 这里只返回文件名作为ID示例
-            return fileName;
-        } catch (IOException e) {
-            throw new RuntimeException("图片下载失败: " + e.getMessage(), e);
-        }
-    }*/
-
     @Override
     public String getImageUrl(String imageId) {
         // 直接构建并返回URL

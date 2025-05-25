@@ -355,18 +355,23 @@ public class ImageServiceImpl implements ImageService {
             throw new RuntimeException("未获取到图片地址");
         }
 
-        // 这里直接返回cdnImage，不保存到OSS
-        ImageFusionVO.GeneratedImage generatedImage = ImageFusionVO.GeneratedImage.builder()
-                .imageId(null)  // 不保存OSS，imageId为空
-                .imageUrl(cdnImage)
-                .build();
+        // 假设 data 是你解析出来的 Data 对象
+        String imageUrl = cdnImage;
+        String imageId = imageStorageService.saveImageFromUrl(imageUrl, userId);
+        String ossImageUrl = imageStorageService.getImageUrl(imageId);
+        // 后续用 ossImageUrl 返回给前端或存数据库
 
+        ImageFusionVO.GeneratedImage generatedImage = ImageFusionVO.GeneratedImage.builder()
+                .imageId(imageId)
+                .imageUrl(ossImageUrl)
+                .build();
 
         return ImageFusionVO.builder()
                 .requestId(UUID.randomUUID().toString())
                 .images(Collections.singletonList(generatedImage))
                 .generationTimeMs(0)
                 .build();
+
     }
 
 

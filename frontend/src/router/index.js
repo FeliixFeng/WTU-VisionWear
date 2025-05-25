@@ -13,6 +13,7 @@ import PartialRedrawPage from '../views/PartialRedrawPage.vue'
 import StyleTransferPage from '../views/StyleTransferPage.vue'
 import StyleExtensionPage from '../views/StyleExtensionPage.vue'
 import IntroPage from "../views/IntroPage.vue";
+import MyPicture from '../views/MyPicture.vue';
 import {ElMessage} from "element-plus";
 import { getValidToken } from '../utils/auth' // 注意路径是否正确
 const routes = [
@@ -40,6 +41,7 @@ const routes = [
         { path: 'material', component: MaterialPage },
         { path: 'design', component: DesignPage },
         { path: 'image-processing', component: ImageProcessingPage },
+        { path: 'my-pictures', component: MyPicture },
         { path: 'sketch', component: SketchToImagePage },
         { path: 'redraw', component: PartialRedrawPage },
         { path: 'style-transfer', component: StyleTransferPage },

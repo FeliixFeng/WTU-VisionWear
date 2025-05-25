@@ -25,10 +25,10 @@
             <p>将线稿快速转化为完整图像</p>
           </div>
           
-          <div class="feature-item" @click="navigateTo('/home/redraw')">
+          <div class="feature-item" @click="navigateTo('/home/fashion/option2')">
             <el-icon class="feature-icon"><Brush /></el-icon>
-            <h3>局部重绘</h3>
-            <p>针对图像特定区域进行调整</p>
+            <h3>图片融合</h3>
+            <p>将两张图片融合在一起</p>
           </div>
         </div>
       </div>

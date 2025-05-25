@@ -88,9 +88,6 @@
       <!-- 顶部栏 -->
       <header class="header">
         <div class="nav">
-          <router-link to="/home/render" class="nav-link">
-            <el-icon><Monitor /></el-icon>渲染页面
-          </router-link>
           <router-link to="/home/material" class="nav-link">
             <el-icon><Folder /></el-icon>素材管理
           </router-link>
@@ -100,8 +97,10 @@
           <router-link to="/home/image-processing" class="nav-link">
             <el-icon><PictureRounded /></el-icon>图片处理
           </router-link>
+          <router-link to="/home/my-pictures" class="nav-link">
+            <el-icon><Picture /></el-icon>我的图片
+          </router-link>
         </div>
-        <MyPicture></MyPicture>
         <userIconArea></userIconArea>
       </header>
 
@@ -315,12 +314,12 @@ export default {
 .nav {
   display: flex;
   align-items: center;
+  flex: 1;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  margin-right: 24px;
   color: rgba(255, 255, 255, 0.95);
   text-decoration: none;
   font-size: 15px;
@@ -328,6 +327,10 @@ export default {
   transition: all 0.3s ease;
   padding: 10px 18px;
   border-radius: 10px;
+}
+
+.nav-link:not(:last-child) {
+  margin-right: 24px;
 }
 
 .nav-link:hover {

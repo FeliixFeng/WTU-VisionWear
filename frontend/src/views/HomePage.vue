@@ -31,7 +31,7 @@
             :class="{ active: activeFunction === '选项2' }"
             @click="selectMenu('选项2')"
         >
-          选项2
+          图片融合
         </router-link>
 
         <router-link
@@ -40,7 +40,7 @@
             :class="{ active: activeFunction === '选项3' }"
             @click="selectMenu('选项3')"
         >
-          选项3
+          素材设计
         </router-link>
       </div>
 

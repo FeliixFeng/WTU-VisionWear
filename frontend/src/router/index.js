@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
 import FashionMain from '../views/FashionMain.vue'
 import FashionOption1 from '../views/TextToImage.vue'
-import FashionOption2 from '../views/Fashionoption2.vue'
+import ImageFusion from '../views/Fashionoption2.vue'
 import FashionOption3 from '../views/FashionOption3.vue'
 import RenderPage from '../views/RenderPage.vue'
 import MaterialPage from '../views/MaterialPage.vue'
@@ -35,7 +35,7 @@ const routes = [
           ]
         },
         { path: 'fashion/option1', component: FashionOption1 },
-        { path: 'fashion/option2', component: FashionOption2 },
+        { path: 'fashion/option2', component: ImageFusion },
         { path: 'fashion/option3', component: FashionOption3 },
         { path: 'render', component: RenderPage },
         { path: 'material', component: MaterialPage },

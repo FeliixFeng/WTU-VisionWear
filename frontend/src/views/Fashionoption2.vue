@@ -250,7 +250,7 @@ onMounted(async () => {
       <!-- 左侧输入区域 -->
       <el-aside width="350px" class="input-panel">
         <div class="input-section">
-          <h3>图片输入</h3>
+          <h3>图片融合</h3>
           
           <div class="drag-item">
             <drag @update="sketchChange">款式图</drag>

@@ -5,7 +5,7 @@ import router from '../router'; // 导入路由实例
 
 // 封装 axios 实例
 const request = axios.create({
-    baseURL: 'http://8.155.5.178:8080/api',
+    baseURL: 'http://localhost:8080/api',
     timeout: 1000 * 30,
     headers: {
         'Content-Type': 'application/json'

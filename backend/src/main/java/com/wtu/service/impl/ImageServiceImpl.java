@@ -226,7 +226,8 @@ public class ImageServiceImpl implements ImageService {
     public ImageFusionVO imageFusion(ImageFusionDTO request, Long userId){
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
-
+        log.info("开始图片融合请求: {}, 图片url: {}", requestId, request.getImageUrlList());
+        log.info("图片融合dto: {}", request);
         // 1. 图片URL转Base64
         List<String> base64Images = request.getImageUrlList().stream()
                 .map(imageBase64Util::imageUrlToBase64)
@@ -323,9 +324,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
 
+    // 图片融合查询图片生成结果
     public ImageFusionVO queryImageByJobId(String jobId, Long userId) {
         String apiKey = ttApiKey;
         String fetchUrl = "https://api.ttapi.io/midjourney/v1/fetch";
+        log.info("查询图片融合结果，jobId: {}, userId: {}", jobId, userId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

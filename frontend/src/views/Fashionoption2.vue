@@ -2,7 +2,7 @@
 import drag from './drag.vue';
 import { ref, onMounted } from 'vue'
 import { getValidToken } from "../utils/auth.js";
-import request from "../main.js";
+import request from "../api/request.js";
 import { ElMessage } from 'element-plus';
 
 const textFeature = ref('')
@@ -11,6 +11,7 @@ const referenceUrl = ref('')
 const resultImages = ref([]) // 生成结果图片列表
 const userImages = ref([]) // 用户图片列表
 const isGenerating = ref(false) // 生成状态
+const generationError = ref('') // 添加错误状态
 
 // 获取用户所有图片
 const getAllImage = async () => {
@@ -47,49 +48,170 @@ const referenceChange = (url, style) => {
 // 生成图片
 const generateImage = async () => {
   if (!sketchUrl.value || !referenceUrl.value) {
-    ElMessage.warning('请先上传款式图和参考图');
-    return;
+    ElMessage.warning('请先上传款式图和参考图')
+    return
   }
 
   try {
-    isGenerating.value = true;
+    isGenerating.value = true
+    generationError.value = '' // 清除之前的错误
+    resultImages.value = [] // 清空之前的结果
+    
     const token = getValidToken()
     if (!token) {
       throw new Error('未获取到有效的JWT Token，请重新登录')
     }
 
+    // 创建符合后端ImageFusionDTO格式的请求体
     const requestBody = {
       "imageUrlList": [sketchUrl.value, referenceUrl.value],
-      "dimensions": "",
-      "mode": "",
-      "hookUrl": "",
+      "dimensions": "SQUARE", // 使用默认值，可以根据需要修改
+      "mode": "relax", // 使用默认值，可以根据需要修改
+      "hookUrl": "", // 不使用回调
       "textFeature": textFeature.value // 添加设计特征
     }
 
+    ElMessage.info('正在提交图片融合请求...')
+    console.log('提交融合请求:', requestBody)
+    
     const response = await request({
       method: 'post',
       url: '/image/image-fusion',
       data: requestBody
-    });
+    })
 
     const result = response.data
-
-    if (result.code !== 1) {
-      throw new Error(result.msg || '服务器返回错误码')
+    console.log('融合请求响应:', result)
+    
+    if (result.code !== 1 || !result.data || !result.data.jobId) {
+      throw new Error(result.msg || '提交融合任务失败')
     }
 
-    if (!result.data || !result.data.length) {
-      throw new Error('响应中缺少有效的数据')
+    const jobId = result.data.jobId
+    ElMessage.success(`任务提交成功! JobID: ${jobId}`)
+    console.log('获取到jobId:', jobId)
+
+    // 轮询生成结果
+    try {
+      console.log('开始轮询结果...')
+      const pollResult = await pollGenerationResult(jobId)
+      console.log('轮询完成，结果:', pollResult)
+      
+      if (pollResult && pollResult.images && pollResult.images.length > 0) {
+        // 更新结果图片显示
+        resultImages.value = pollResult.images.map(img => img.imageUrl || '')
+        ElMessage.success(`成功生成 ${resultImages.value.length} 张图片!`)
+        console.log('生成的图片URLs:', resultImages.value)
+        
+        // 刷新用户图片库
+        userImages.value = await getAllImage()
+      } else {
+        console.warn('轮询返回了结果但没有图片:', pollResult)
+        ElMessage.warning('未获取到生成图片，请稍后在图片库中查看')
+      }
+    } catch (pollError) {
+      console.error('轮询过程中出错:', pollError)
+      generationError.value = `轮询失败: ${pollError.message}`
+      ElMessage.error(`获取生成结果失败: ${pollError.message}`)
+      
+      // 尽管轮询失败，仍然尝试刷新图片库，因为图片可能已经生成
+      try {
+        userImages.value = await getAllImage()
+      } catch (e) {
+        console.error('刷新图片库失败:', e)
+      }
     }
-
-    resultImages.value = result.data
-    ElMessage.success('图片生成成功！');
-
   } catch (error) {
-    console.error('生成图片出错:', error)
-    ElMessage.error('生成失败：' + error.message);
+    console.error('生成图片过程中出错:', error)
+    generationError.value = `生成失败: ${error.message}`
+    ElMessage.error(`生成图片失败: ${error.message}`)
   } finally {
-    isGenerating.value = false;
+    isGenerating.value = false
+  }
+}
+
+// 轮询生成结果的函数（如果API是异步的）
+const pollGenerationResult = async (jobId) => {
+  const maxAttempts = 40; // 增加到40次，因为图像融合可能需要更长时间
+  const interval = 3000; // 每3秒查询一次
+  let lastError = null;
+  
+  if (!jobId) {
+    throw new Error('无效的任务ID');
+  }
+  
+  console.log(`开始轮询任务结果，任务ID: ${jobId}`);
+  ElMessage.info('图片融合任务已提交，正在等待处理...');
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      console.log(`轮询尝试 ${attempt + 1}/${maxAttempts}`);
+      
+      // 不要每次都显示消息，避免过多弹窗
+      if (attempt % 5 === 0 && attempt > 0) {
+        ElMessage.info(`正在等待图片融合完成 (${attempt + 1}/${maxAttempts})...`);
+      }
+      
+      const response = await request({
+        method: 'get',
+        url: `/image/image-fusion/result`,
+        params: { jobId }
+      });
+      
+      const result = response.data;
+      console.log('轮询返回结果:', result);
+      
+      // 如果成功获取到结果
+      if (result.code === 1 && result.data && result.data.images && result.data.images.length > 0) {
+        ElMessage.success('图片融合完成！');
+        console.log('生成结果:', result.data);
+        return result.data;
+      }
+      
+      // 如果服务器返回了结果，但没有图片，可能是处理中
+      console.log('尚未得到结果，继续轮询...');
+      await new Promise(resolve => setTimeout(resolve, interval));
+      
+    } catch (error) {
+      // 这里是关键修改：后端在任务未完成时会抛出异常，但这不是真正的错误，而是表示任务仍在队列中
+      console.log(`轮询出错，但这可能只是表示任务仍在队列中: ${error.message}`);
+      
+      // 检查错误信息是否与"任务在队列中"相关
+      // 注意：后端在任务状态为"ON_QUEUE"时会抛出"查询失败: "的异常
+      const errorMsg = error.response?.data?.msg || error.message || '';
+      
+      if (errorMsg.includes('查询失败') || errorMsg.includes('ON_QUEUE')) {
+        console.log('任务仍在队列中或处理中，继续轮询...');
+        
+        // 不要太频繁地显示消息
+        if (attempt % 5 === 0) {
+          ElMessage.info(`任务正在处理中，请耐心等待 (${attempt + 1}/${maxAttempts})...`);
+        }
+        
+        // 继续轮询
+        await new Promise(resolve => setTimeout(resolve, interval));
+        continue;
+      }
+      
+      // 其他类型的错误，可能是真正的错误
+      lastError = error;
+      console.error('轮询发生实际错误:', error);
+      
+      if (attempt === maxAttempts - 1) {
+        // 到达最大尝试次数时才抛出错误
+        throw new Error(`获取结果失败: ${error.message}`);
+      }
+      
+      // 其他情况下继续尝试
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+  }
+  
+  // 如果达到最大尝试次数仍未成功
+  if (lastError) {
+    throw new Error(`获取结果超时: ${lastError.message}`);
+  } else {
+    throw new Error('获取结果超时');
   }
 }
 
@@ -158,6 +280,16 @@ onMounted(async () => {
             >
               {{ isGenerating ? '生成中...' : '一键生成' }}
             </el-button>
+          </div>
+          
+          <!-- 添加错误提示 -->
+          <div v-if="generationError" class="error-message">
+            <el-alert
+              :title="generationError"
+              type="error"
+              show-icon
+              :closable="false"
+            />
           </div>
         </div>
       </el-aside>
@@ -271,6 +403,11 @@ onMounted(async () => {
 
 .generate-btn {
   margin-top: 30px;
+}
+
+/* 添加错误提示样式 */
+.error-message {
+  margin-top: 15px;
 }
 
 /* 中间结果面板 */

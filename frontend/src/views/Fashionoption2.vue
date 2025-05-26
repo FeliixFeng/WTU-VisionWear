@@ -456,7 +456,7 @@ onMounted(async () => {
 
 .result-item img {
   width: 100%;
-  height: 200px;
+  height: 480px;
   object-fit: contain;
   background: #f9f9f9;
 }

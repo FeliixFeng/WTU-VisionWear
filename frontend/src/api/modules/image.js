@@ -51,8 +51,63 @@ export function textToImage(data) {
   });
 }
 
+/**
+ * 获取图片URL
+ * @param {string} imageId - 图片ID
+ * @returns {Promise} - 请求结果
+ */
+export function getImageUrl(imageId) {
+  return request({
+    url: `/image/get-image/${imageId}`,
+    method: 'get'
+  });
+}
+
+/**
+ * 图片融合
+ * @param {Object} data - 融合参数
+ * @returns {Promise} - 请求结果
+ */
+export function imageFusion(data) {
+  return request({
+    url: '/image/image-fusion',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * 获取图片融合结果
+ * @param {string} jobId - 任务ID
+ * @returns {Promise} - 请求结果
+ */
+export function getFusionResult(jobId) {
+  return request({
+    url: '/image/image-fusion/result',
+    method: 'get',
+    params: { jobId }
+  });
+}
+
+/**
+ * 线稿生图
+ * @param {Object} data - 请求参数
+ * @returns {Promise} - 请求结果
+ */
+export function sketchToImage(data) {
+  return request({
+    url: '/image/sketch-to-image',
+    method: 'post',
+    data
+  });
+}
+
 export default {
   uploadImage,
   imageToImage,
-  textToImage
+  textToImage,
+  getImageUrl,
+  imageFusion,
+  getFusionResult,
+  sketchToImage
 }; 

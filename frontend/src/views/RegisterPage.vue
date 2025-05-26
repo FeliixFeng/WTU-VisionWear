@@ -162,8 +162,7 @@ import { ref, onMounted, reactive } from 'vue'
 import { User, Lock, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { auth } from '../api'
-import { handleApiError, handleBusinessError, showSuccess } from '../utils/errorHandler'
+import { useAuthStore } from '../store/modules/auth'
 
 // 新增的props，用于判断是否为弹窗模式
 const props = defineProps({
@@ -177,6 +176,7 @@ const props = defineProps({
 const emit = defineEmits(['switch-to-login'])
 
 const router = useRouter()
+const authStore = useAuthStore() // 使用认证状态
 
 const registerForm = reactive({
   username: '',
@@ -258,32 +258,25 @@ const submitForm = (formName) => {
   })
 }
 
-// 处理注册 - 连接后端API
+// 处理注册 - 使用authStore
 const handleRegister = async () => {
   loading.value = true
   try {
-    // 准备请求数据，按照API文档的格式
+    // 准备请求数据
     const registerData = {
       username: registerForm.username,
       password: registerForm.password,
       email: registerForm.email
     }
 
-    // 发送注册请求到后端API
-    const response = await auth.register(registerData)
-
-    // 使用业务错误处理工具检查响应
-    const error = handleBusinessError(response, '注册失败，请稍后重试');
-    if (error) return; // 如果有错误，handleBusinessError已经显示了错误消息
+    // 使用authStore进行注册
+    const result = await authStore.register(registerData)
 
     // 可以选择将用户信息存储在localStorage中
     localStorage.setItem('userInfo', JSON.stringify({
       username: registerForm.username,
       email: registerForm.email
     }))
-
-    // 显示成功消息
-    showSuccess(response.data.msg || '注册成功！', true)
 
     // 注册成功后根据模式决定跳转到登录页面还是切换到登录弹窗
     if (props.isDialog) {
@@ -292,9 +285,8 @@ const handleRegister = async () => {
       router.push({ name: 'Login' })
     }
   } catch (error) {
-    console.error('注册过程中出错', error)
-    // 使用统一错误处理工具
-    handleApiError(error, '注册请求失败，请稍后重试')
+    console.error('注册失败', error)
+    // 错误已经在service层处理，这里不需要再次显示
   } finally {
     loading.value = false
   }
@@ -321,6 +313,11 @@ const goToLogin = () => {
     router.push({ name: 'Login' })
   }
 }
+
+onMounted(() => {
+  // 初始化认证状态
+  authStore.initAuth()
+})
 </script>
 
 <style scoped>

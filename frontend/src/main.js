@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+import pinia from './store'; // 导入Pinia实例
 
 // 引入 Element Plus 和样式
 import ElementPlus from 'element-plus';
@@ -18,6 +19,9 @@ app.use(ElementPlus);
 
 // 使用路由
 app.use(router);
+
+// 使用Pinia
+app.use(pinia);
 
 // 将 axios 和 request 注入到全局
 app.config.globalProperties.$axios = axios;

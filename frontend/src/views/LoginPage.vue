@@ -122,8 +122,8 @@ import { ref, onMounted } from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { auth } from '../api'
-import { handleApiError, handleBusinessError, showSuccess } from '../utils/errorHandler'
+import { useAuthStore } from '../store/modules/auth'
+import { handleApiError } from '../utils/errorHandler'
 
 // 新增的props，用于判断是否为弹窗模式
 const props = defineProps({
@@ -137,6 +137,7 @@ const props = defineProps({
 const emit = defineEmits(['switch-to-register', 'switch-to-forgot-password'])
 
 const router = useRouter()
+const authStore = useAuthStore() // 使用认证状态
 
 const loginForm = ref({
   username: '',
@@ -175,48 +176,25 @@ const submitForm = (formName) => {
 const handleLogin = async () => {
   loading.value = true
   try {
-    // 使用API模块进行登录
-    const response = await auth.login(loginForm.value)
-    console.log(response.data)  // 调试打印，检查返回的结构
-
-    // 使用业务错误处理工具检查响应
-    const error = handleBusinessError(response, '登录失败');
-    if (error) return; // 如果有错误，handleBusinessError已经显示了错误消息
-
-    // 登录成功，保存 token 和其他信息
-    const {token, userName, userId} = response.data.data
-
-    if (token) {
-      const expireTime = Date.now() + 2 * 60 * 60 * 1000 // 当前时间 + 2 小时
-      localStorage.setItem('token', JSON.stringify({
-        value: token,
-        expire: expireTime
-      }))
-
-      localStorage.setItem('userName', userName) // 保存用户名
-      localStorage.setItem('userId', userId) // 保存用户ID
-
-      // 保存记住我的状态
-      if (rememberMe.value) {
-        localStorage.setItem('rememberMe', 'true')
-        localStorage.setItem('savedUsername', loginForm.value.username)
-      } else {
-        localStorage.removeItem('rememberMe')
-        localStorage.removeItem('savedUsername')
-      }
-
-      // 登录成功后显示成功消息并跳转到首页
-      showSuccess('登录成功，欢迎回来！', true)
-      
-      // 检查是否有重定向参数
-      const redirect = router.currentRoute.value.query.redirect
-      await router.push(redirect || '/home')
+    // 使用authStore进行登录
+    const data = await authStore.login(loginForm.value)
+    
+    // 保存记住我的状态
+    if (rememberMe.value) {
+      localStorage.setItem('rememberMe', 'true')
+      localStorage.setItem('savedUsername', loginForm.value.username)
     } else {
-      ElMessage.error('返回的 token 不存在')
+      localStorage.removeItem('rememberMe')
+      localStorage.removeItem('savedUsername')
     }
+
+    // 检查是否有重定向参数
+    const redirect = router.currentRoute.value.query.redirect
+    await router.push(redirect || '/home')
+    
   } catch (error) {
-    console.error('登录请求出错', error)
-    handleApiError(error, '登录请求失败，请检查网络连接')
+    console.error('登录失败', error)
+    // 错误已经在store层处理，这里不需要再次显示
   } finally {
     loading.value = false
   }
@@ -248,6 +226,9 @@ onMounted(() => {
     rememberMe.value = true
     loginForm.value.username = localStorage.getItem('savedUsername') || ''
   }
+  
+  // 初始化认证状态
+  authStore.initAuth()
 })
 </script>
 

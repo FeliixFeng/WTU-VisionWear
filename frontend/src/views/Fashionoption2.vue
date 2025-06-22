@@ -269,7 +269,7 @@ onMounted(async () => {
               placeholder="请输入对设计的描述或描述提示词提高生成准度"
             />
           </div>
-          
+
           <div class="generate-btn">
             <el-button 
               type="primary" 

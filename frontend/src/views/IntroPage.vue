@@ -476,11 +476,12 @@ const switchToForgotPassword = () => {
 }
 
 .hero-title {
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 800;
   color: #333;
   margin-bottom: 25px;
   line-height: 1.2;
+  white-space: nowrap;
   background: linear-gradient(135deg, #43cea2, #185a9d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -892,7 +893,8 @@ const switchToForgotPassword = () => {
   }
 
   .hero-title {
-    font-size: 36px;
+    font-size: 32px;
+    white-space: nowrap;
   }
 
   .hero-description {
@@ -906,7 +908,8 @@ const switchToForgotPassword = () => {
   }
 
   .hero-title {
-    font-size: 30px;
+    font-size: 26px;
+    white-space: nowrap;
   }
 }
 </style>

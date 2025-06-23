@@ -62,9 +62,9 @@ public class ImageServiceImpl implements ImageService {
     private ImageBase64Util imageBase64Util;
 
     @Value("${vision.doubao.ak}")
-    private String accessKey;
+    private String ak;
     @Value("${vision.doubao.sk}")
-    private String secretKey;
+    private String sk;
 
     // 文本生成图像
     @Override
@@ -73,8 +73,8 @@ public class ImageServiceImpl implements ImageService {
 
         IVisualService visualService = VisualServiceImpl.getInstance("cn-north-1");
         //输入AK和SK进行鉴权
-        visualService.setAccessKey(accessKey);
-        visualService.setSecretKey(secretKey);
+        visualService.setAccessKey(ak);
+        visualService.setSecretKey(sk);
 
         //用工具类，转为JsonObject类型
         JSONObject req = ModelUtils.toJsonObject(request);

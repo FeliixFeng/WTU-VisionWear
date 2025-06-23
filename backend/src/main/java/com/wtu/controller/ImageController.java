@@ -45,7 +45,7 @@ public class ImageController {
 
     @PostMapping("/text-to-image")
     @Operation(summary = "文生图功能")
-    public Result<List<String>> textToImage(@RequestBody @Validated TextToImageDTO request,
+    public Result<List<String>> textToImage(@RequestBody @Valid TextToImageDTO request,
                                             HttpServletRequest httpServletRequest) throws Exception {
 
         //从token 获取当前用户ID
@@ -53,15 +53,7 @@ public class ImageController {
         log.info("收到图像生成请求: {}", request);
 
         // 调用用户服务的textToImage方法生成图像
-        TextToImageVO response = imageService.textToImage(request, userId);
-        List<String> ids = new ArrayList<>();
-
-        //对返回结果中存放imageId的集合迭代循环
-        for (TextToImageVO.GeneratedImage image : response.getImages()) {
-            String imageId = image.getImageId();
-            ids.add(imageId);
-        }
-
+        List<String> ids = imageService.textToImage(request, userId);
         return Result.success(ids);
     }
 

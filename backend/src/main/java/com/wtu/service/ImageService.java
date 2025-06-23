@@ -8,7 +8,6 @@ import com.wtu.DTO.TextToImageDTO;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.ImageToImageVO;
 import com.wtu.VO.SketchToImageVO;
-import com.wtu.VO.TextToImageVO;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public interface ImageService {
      * @param userId  用户ID
      * @return 图像生成响应
      */
-    TextToImageVO textToImage(TextToImageDTO request, Long userId) throws Exception;
+    List<String> textToImage(TextToImageDTO request, Long userId) throws Exception;
 
     /**
      * 图像生成图像 (Image-to-Image)

@@ -1,9 +1,8 @@
 package com.wtu.DTO;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,64 +18,36 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TextToImageDTO {
-    @NotBlank(message = "提示文本不能为空")
-    @Size(min = 3, max = 1000, message = "提示文本长度必须在3到1000个字符之间")
+    @Schema(description = "算法名称，固定为high_aes_general_v30l_zt2i",defaultValue = "high_aes_general_v30l_zt2i")
+    @NotBlank(message = "reqKey为必填项")
+    @JsonProperty("req_key")
+    private String reqKey;
+
+    @Schema(description = "用于生成图像的提示词，中英文均可", example = "一只可爱的猫")
+    @NotBlank(message = "prompt为必填项")
     private String prompt;
 
-    /**
-     * 负面提示词，用于排除不想出现的元素
-     * 默认为null
-     */
-    private String negativePrompt;
+    @Schema(description = "开启文本扩写，建议prompt较短时开启，默认false", defaultValue = "false")
+    @JsonProperty("use_pre_llm")
+    private Boolean usePreLlm = false;
 
-    /**
-     * 生成图像的数量
-     * 默认值: 1
-     */
-    @Min(value = 1, message = "至少生成1张图像")
-    @Max(value = 4, message = "最多生成4张图像")
-    private int samples;
+    @Schema(description = "随机种子，默认-1（随机）", defaultValue = "-1")
+    private Integer seed = -1;
 
-    /**
-     * 图像宽度像素
-     * 默认值: 1024
-     */
-    @Min(value = 512, message = "图像宽度最小为512")
-    @Max(value = 1024, message = "图像宽度最大为1024")
-    private int width;
+    @Schema(description = "影响文本描述的程度，默认2.5，范围[1,10]", defaultValue = "2.5")
+    @DecimalMin(value = "1.0", message = "scale不能小于1")
+    @DecimalMax(value = "10.0", message = "scale不能大于10")
+    private Float scale = 2.5f;
 
-    /**
-     * 图像高度像素
-     * 默认值: 1024
-     */
-    @Min(value = 512, message = "图像高度最小为512")
-    @Max(value = 1024, message = "图像高度最大为1024")
-    private int height;
+    @Schema(description = "生成图像的宽，默认1328，范围[512,2048]", defaultValue = "1328")
+    @Min(value = 512, message = "width不能小于512")
+    @Max(value = 2048, message = "width不能大于2048")
+    private Integer width = 1328;
 
-    /**
-     * 采样步数，影响生成质量和时间
-     * 默认值: 30
-     */
-    @Min(value = 1, message = "步数最小为1")
-    @Max(value = 150, message = "步数最大为150")
-    private int steps;
+    @Schema(description = "生成图像的高，默认1328，范围[512,2048]", defaultValue = "1328", example = "1328")
+    @Min(value = 512, message = "height不能小于512")
+    @Max(value = 2048, message = "height不能大于2048")
+    private Integer height = 1328;
 
-    /**
-     * CFG尺度，控制提示词的相关性强度
-     * 默认值: 7.0
-     */
-    @Min(value = 1, message = "CFG尺度最小为1")
-    @Max(value = 35, message = "CFG尺度最大为35")
-    private double cfgScale;
 
-    /**
-     * 样式预设
-     * 可选值如: "3d-model", "analog-film", "anime", "cinematic", "comic-book",
-     * "digital-art", "enhance", "fantasy-art", "isometric", "line-art",
-     * "low-poly", "modeling-compound", "neon-punk", "origami", "photographic",
-     * "pixel-art", "tile-texture"
-     * 不支持其他值，否则API会返回bad_request错误
-     * 默认值: "" (空字符串)
-     */
-    private String style;
 }

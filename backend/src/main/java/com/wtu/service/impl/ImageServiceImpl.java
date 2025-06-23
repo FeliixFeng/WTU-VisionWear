@@ -1,21 +1,22 @@
 package com.wtu.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tencentcloudapi.aiart.v20221229.AiartClient;
 import com.tencentcloudapi.aiart.v20221229.models.SketchToImageRequest;
 import com.tencentcloudapi.aiart.v20221229.models.SketchToImageResponse;
+import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
-import com.wtu.DTO.ImageFusionDTO;
+import com.volcengine.service.visual.IVisualService;
+import com.volcengine.service.visual.impl.VisualServiceImpl;
 import com.wtu.DTO.ImageToImageDTO;
 import com.wtu.DTO.SketchToImageDTO;
 import com.wtu.DTO.TextToImageDTO;
-import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.ImageToImageVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.VO.TextToImageVO;
@@ -24,19 +25,14 @@ import com.wtu.entity.Image;
 import com.wtu.mapper.ImageMapper;
 import com.wtu.service.ImageService;
 import com.wtu.service.ImageStorageService;
-import com.wtu.utils.ImageBase64Util;
-import com.wtu.utils.TransApi;
-import jakarta.annotation.PostConstruct;
+import com.wtu.utils.ModelUtils;
 import lombok.RequiredArgsConstructor;
-
-import com.tencentcloudapi.common.Credential;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -45,7 +41,10 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,109 +58,49 @@ public class ImageServiceImpl implements ImageService {
     private final ObjectMapper objectMapper;
     private final ImageStorageService imageStorageService;
     private final ImageMapper imageMapper;
-    private final ImageBase64Util imageBase64Util;
 
-    // 百度翻译API
-    private TransApi transApi;
-
-    @Value("${vision.translate.appid}")
-    private String appId;
-
-    @Value("${vision.translate.security-key}")
-    private String securityKey;
-
-    // 初始化翻译API
-    @PostConstruct
-    public void init() {
-        this.transApi = new TransApi(appId, securityKey);
-    }
-
-    // 提取通用的翻译方法
-    private void translatePrompts(Object requestObj) {
-        if (requestObj instanceof TextToImageDTO textRequest) {
-            textRequest.setPrompt(translateToEnglish(textRequest.getPrompt()));
-            if (textRequest.getNegativePrompt() != null && !textRequest.getNegativePrompt().isEmpty()) {
-                textRequest.setNegativePrompt(translateToEnglish(textRequest.getNegativePrompt()));
-            }
-        } else if (requestObj instanceof ImageToImageDTO imageRequest) {
-            imageRequest.setPrompt(translateToEnglish(imageRequest.getPrompt()));
-            if (imageRequest.getNegativePrompt() != null && !imageRequest.getNegativePrompt().isEmpty()) {
-                imageRequest.setNegativePrompt(translateToEnglish(imageRequest.getNegativePrompt()));
-            }
-        }
-    }
-
-    // 提取翻译方法
-    private String translateToEnglish(String text) {
-        try {
-            String result = transApi.getTransResult(text, "zh", "en");
-            JsonNode jsonNode = objectMapper.readTree(result);
-            JsonNode transResult = jsonNode.path("trans_result");
-            if (transResult.isArray() && !transResult.isEmpty()) {
-                return transResult.get(0).path("dst").asText(text);
-            }
-            return text;
-        } catch (Exception e) {
-            log.error("翻译失败，使用原文本", e);
-            return text;
-        }
-    }
-
-
+    @Value("${vision.doubao.ak}")
+    private  String accessKey;
+    @Value("${vision.doubao.sk}")
+    private  String secretKey;
     // 文本生成图像
     @Override
-    public TextToImageVO textToImage(TextToImageDTO request, Long userId) throws Exception {
-        // 翻译提示词
-        translatePrompts(request);
+    public List<String> textToImage(TextToImageDTO request, Long userId) throws Exception {
+        List<String> ids = new ArrayList<>();
 
-        long startTime = System.currentTimeMillis();
-        String requestId = UUID.randomUUID().toString();
-        log.info("开始图像生成请求: {}, 提示: {}", requestId, request.getPrompt());
-
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-            headers.set("Authorization", "Bearer " + config.getApiKey());
-
-            ObjectNode requestBody = createTextToImageRequestBody(request);
-            HttpEntity<String> httpEntity = new HttpEntity<>(objectMapper.writeValueAsString(requestBody), headers);
-
-            String modelEndpoint = "/generation/stable-diffusion-xl-1024-v1-0/text-to-image";
-            String url = config.getBaseUrl() + modelEndpoint;
-
-            String responseBody = restTemplate.postForObject(url, httpEntity, String.class);
-            JsonNode responseJson = objectMapper.readTree(responseBody);
-            List<TextToImageVO.GeneratedImage> generatedImages = parseResponse(responseJson, userId, TextToImageVO.GeneratedImage.class);
-
-            long duration = System.currentTimeMillis() - startTime;
-            log.info("图像生成完成: {}, 耗时: {}ms", requestId, duration);
-
-            return TextToImageVO.builder()
-                    .requestId(requestId)
-                    .images(generatedImages)
-                    .prompt(request.getPrompt())
-                    .generationTimeMs(duration)
-                    .build();
-
-        } catch (HttpStatusCodeException e) {
-            log.error("API请求失败: {}, 状态码: {}", requestId, e.getStatusCode());
-            throw new Exception("调用 Stable Diffusion API 失败: " + e.getResponseBodyAsString(), e);
-        } catch (RestClientException e) {
-            log.error("REST客户端异常: {}", requestId, e);
-            throw new Exception("无法连接到Stable Diffusion API服务", e);
-        } catch (Exception e) {
-            log.error("图像生成过程中发生未预期的错误: {}", requestId, e);
-            throw new Exception("图像生成失败: " + e.getMessage(), e);
+        IVisualService visualService = VisualServiceImpl.getInstance("cn-north-1");
+        //输入AK和SK进行鉴权
+        visualService.setAccessKey(accessKey);
+        visualService.setSecretKey(secretKey);
+        //用工具类，转为JsonObject类型
+        JSONObject req = ModelUtils.toJsonObject(request);
+        //如果用户prompt字数过少，则开启自动文本优化
+        if (request.getPrompt().length() < 10) {
+            req.put("use_pre_llm", "true");
         }
+        log.info("req:{}", req.toString());
+        //发送请求，得到response
+        Object response = visualService.cvProcess(req);
+        //从response中拿出base64编码
+        JSONArray base64Array = ModelUtils.getBase64(response);
+        for (int i = 0; i < base64Array.size(); i++) {
+
+            String valid = base64Array.getString(i);
+            //如果有前缀"," ，则删掉
+            //TODO 这个删前缀的方式可能有bug，也许应该把+1去掉，有待观察
+            if (valid.contains(",")) {
+                valid = valid.substring(valid.indexOf(",") + 1);
+            }
+            //对base64进行解码并上传,得到ImageID,存入ids中
+            ids.add(imageStorageService.saveBase64Image(valid, userId));
+        }
+
+        return ids;
     }
 
     // 图像生成图像
     @Override
     public ImageToImageVO imageToImage(ImageToImageDTO request, Long userId) throws Exception {
-        // 翻译提示词
-        translatePrompts(request);
-
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
         log.info("开始以图生图请求: {}, 源图像Url: {}, 提示: {}", requestId, request.getSourceImageUrl(), request.getPrompt());
@@ -218,57 +157,6 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
-    // 图片融合
-    @Value("${vision.ttapi.api-key}")
-    private String ttApiKey;
-
-    @Override
-    public ImageFusionVO imageFusion(ImageFusionDTO request, Long userId){
-        long startTime = System.currentTimeMillis();
-        String requestId = UUID.randomUUID().toString();
-        log.info("开始图片融合请求: {}, 图片url: {}", requestId, request.getImageUrlList());
-        log.info("图片融合dto: {}", request);
-        // 1. 图片URL转Base64
-        List<String> base64Images = request.getImageUrlList().stream()
-                .map(imageBase64Util::imageUrlToBase64)
-                .collect(Collectors.toList());
-
-        // 2. 组装请求体
-        Map<String, Object> body = new HashMap<>();
-        body.put("imgBase64Array", base64Images);
-        body.put("dimensions", request.getDimensions());
-        body.put("mode", request.getMode());
-        body.put("hookUrl", request.getHookUrl());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("TT-API-KEY", ttApiKey);
-
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(body, headers);
-
-        // 3. 调用blend接口提交任务
-        ResponseEntity<JsonNode> responseEntity = restTemplate.postForEntity(
-                "https://api.ttapi.io/midjourney/v1/blend",
-                httpEntity,
-                JsonNode.class);
-
-        JsonNode responseJson = responseEntity.getBody();
-        if (responseJson == null || !"SUCCESS".equals(responseJson.path("status").asText())) {
-            throw new RuntimeException("图片融合失败: " + (responseJson != null ? responseJson.path("message").asText() : "无响应"));
-        }
-
-        String jobId = responseJson.path("data").path("jobId").asText();
-        log.info("图片融合任务提交成功，jobId={}", jobId);
-
-        // 4. 只返回jobId，前端或调用方后续用jobId查询结果
-        return ImageFusionVO.builder()
-                .requestId(requestId)
-                .jobId(jobId)  // 这里VO需新增jobId字段
-                .generationTimeMs(System.currentTimeMillis() - startTime)
-                .build();
-    }
-
-
     // 线稿生图
     private static final String TENCENT_REGION = "ap-shanghai"; // 根据需求调整地域
 
@@ -321,72 +209,6 @@ public class ImageServiceImpl implements ImageService {
             log.error("线稿生图失败", e);
             throw new Exception("线稿生图失败: " + e.getMessage());
         }
-    }
-
-
-    // 图片融合查询图片生成结果
-    public ImageFusionVO queryImageByJobId(String jobId, Long userId) {
-        String apiKey = ttApiKey;
-        String fetchUrl = "https://api.ttapi.io/midjourney/v1/fetch";
-        log.info("查询图片融合结果，jobId: {}, userId: {}", jobId, userId);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("TT-API-KEY", apiKey);
-
-        Map<String, String> body = new HashMap<>();
-        body.put("jobId", jobId);
-
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-
-        ResponseEntity<JsonNode> response = restTemplate.postForEntity(fetchUrl, request, JsonNode.class);
-        JsonNode responseJson = response.getBody();
-
-        if (responseJson == null) {
-            throw new RuntimeException("无响应");
-        }
-
-        String status = responseJson.path("status").asText();
-        if (!"SUCCESS".equals(status)) {
-            String msg = responseJson.path("message").asText();
-            throw new RuntimeException("查询失败: " + msg);
-        }
-
-        JsonNode dataNode = responseJson.path("data");
-        String cdnImage = dataNode.path("cdnImage").asText(null);
-        if (cdnImage == null || cdnImage.isEmpty()) {
-            throw new RuntimeException("未获取到图片地址");
-        }
-
-        // 假设 data 是你解析出来的 Data 对象
-        String imageUrl = cdnImage;
-        String imageId = imageStorageService.saveImageFromUrl(imageUrl, userId);
-        String ossImageUrl = imageStorageService.getImageUrl(imageId);
-        // 后续用 ossImageUrl 返回给前端或存数据库
-
-        ImageFusionVO.GeneratedImage generatedImage = ImageFusionVO.GeneratedImage.builder()
-                .imageId(imageId)
-                .imageUrl(ossImageUrl)
-                .build();
-
-        return ImageFusionVO.builder()
-                .requestId(UUID.randomUUID().toString())
-                .images(Collections.singletonList(generatedImage))
-                .generationTimeMs(0)
-                .build();
-
-    }
-
-
-    // 辅助方法：生成文件名
-    private String generateFileName(String url, Long userId) {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String randomStr = UUID.randomUUID().toString().substring(0, 8);
-        String extension = url.contains(".png") ? ".png" :
-                url.contains(".jpg") ? ".jpg" :
-                        url.contains(".webp") ? ".webp" : ".png";
-
-        return String.format("midjourney/%d/%s_%s%s", userId, timestamp, randomStr, extension);
     }
 
 
@@ -481,42 +303,6 @@ public class ImageServiceImpl implements ImageService {
 
         log.info("获取到用户 {} 的图像URL: {} 个", userId, imageUrls.size());
         return imageUrls;
-    }
-
-
-
-    // 创建文本到图像的请求体
-    private ObjectNode createTextToImageRequestBody(TextToImageDTO request) {
-        ObjectNode requestBody = objectMapper.createObjectNode();
-
-        // 添加文本提示
-        ArrayNode textPrompts = objectMapper.createArrayNode();
-        ObjectNode positivePrompt = objectMapper.createObjectNode();
-        positivePrompt.put("text", request.getPrompt());
-        positivePrompt.put("weight", 1.0);
-        textPrompts.add(positivePrompt);
-
-        // 添加负面提示（如果有）
-        if (request.getNegativePrompt() != null && !request.getNegativePrompt().isEmpty()) {
-            ObjectNode negativePrompt = objectMapper.createObjectNode();
-            negativePrompt.put("text", request.getNegativePrompt());
-            negativePrompt.put("weight", -1.0);
-            textPrompts.add(negativePrompt);
-        }
-
-        requestBody.set("text_prompts", textPrompts);
-        requestBody.put("cfg_scale", request.getCfgScale());
-        requestBody.put("height", request.getHeight());
-        requestBody.put("width", request.getWidth());
-        requestBody.put("samples", request.getSamples());
-        requestBody.put("steps", request.getSteps());
-        requestBody.put("sampler", "K_DPMPP_2M");
-
-        if (request.getStyle() != null && !request.getStyle().isEmpty()) {
-            requestBody.put("style_preset", request.getStyle());
-        }
-
-        return requestBody;
     }
 
     // 通用响应解析方法，使用泛型来处理不同的VO类型

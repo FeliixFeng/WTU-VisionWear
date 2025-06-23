@@ -8,7 +8,6 @@ import com.wtu.DTO.TextToImageDTO;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.ImageToImageVO;
 import com.wtu.VO.SketchToImageVO;
-import com.wtu.VO.TextToImageVO;
 import com.wtu.result.Result;
 import com.wtu.service.ImageService;
 import com.wtu.service.ImageStorageService;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -166,7 +164,7 @@ public class ImageController {
 
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             // 构建新的文件名称
-            String objectName = UUID.randomUUID().toString() + extension;
+            String objectName = UUID.randomUUID() + extension;
             log.info("生成的对象名称: {}", objectName);
 
             String filePath = aliOssUtil.upload(file.getBytes(), objectName);

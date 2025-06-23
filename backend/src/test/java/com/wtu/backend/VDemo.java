@@ -47,7 +47,7 @@ public class VDemo {
             JSONObject jsonObject = JSON.parseObject(jsonString);
             //API中，图片URL在data中，所以需要拿取jsonObject中的data值，再将data值封装为json类型，然后从data的json类型中拿取URL
             JSONObject data = (JSONObject)jsonObject.get("data");
-            Boolean isSuccess =data.containsKey("binary_data_base64");
+            boolean isSuccess =data.containsKey("binary_data_base64");
             System.out.println("是否有值:"+isSuccess);
             //如果成功，则进行解码
             if(isSuccess){

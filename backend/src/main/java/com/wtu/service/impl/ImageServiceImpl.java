@@ -72,8 +72,10 @@ public class ImageServiceImpl implements ImageService {
         //输入AK和SK进行鉴权
         visualService.setAccessKey(accessKey);
         visualService.setSecretKey(secretKey);
+
         //用工具类，转为JsonObject类型
         JSONObject req = ModelUtils.toJsonObject(request);
+
         //如果用户prompt字数过少，则开启自动文本优化
         if (request.getPrompt().length() < 10) {
             req.put("use_pre_llm", "true");
@@ -84,7 +86,6 @@ public class ImageServiceImpl implements ImageService {
         //从response中拿出base64编码
         JSONArray base64Array = ModelUtils.getBase64(response);
         for (int i = 0; i < base64Array.size(); i++) {
-
             String valid = base64Array.getString(i);
             //如果有前缀"," ，则删掉
             //TODO 这个删前缀的方式可能有bug，也许应该把+1去掉，有待观察

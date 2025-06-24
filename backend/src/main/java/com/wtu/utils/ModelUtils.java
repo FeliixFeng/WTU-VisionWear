@@ -1,5 +1,6 @@
 package com.wtu.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
@@ -90,7 +91,12 @@ public class ModelUtils {
         }
 
     }
-
+    /**
+     * 帮我们创建VisualService实例，不需要再一个个的赋值ak sk了
+     *
+     * @param region 具体数值看火山引擎对应模型给的action
+     * @return VisualService实例
+     */
     public static IVisualService createVisualService(String region) throws Exception {
         YamlPropertiesFactoryBean yamlProperties = new YamlPropertiesFactoryBean();
         yamlProperties.setResources(new ClassPathResource("application-dev.yml"));
@@ -113,5 +119,32 @@ public class ModelUtils {
         visualService.setAccessKey(ak);
         visualService.setSecretKey(sk);
         return visualService;
+    }
+
+    /**
+     * 快速的从Json格式中拿取data数据中的某个字段，
+     *跳过先前手动 拿取data 拿取字段 的逻辑
+     * @param request 整个Json串
+     * @param key 想在data中拿取的字段名称
+     * @param clazz 字段类型
+     * @return 目标字段的值
+     */
+    public static <T> T getFromJsonData(JSONObject request, String key, Class<T> clazz) {
+        if (request.containsKey("data")) {
+            JSONObject data = request.getJSONObject("data");
+            if (data.containsKey(key)) {
+                Object value = data.get(key);
+                if (clazz.isInstance(value)) {
+                    return clazz.cast(value);
+                } else {
+                    // 只有复杂对象才用parseObject
+                    return JSON.parseObject(value.toString(), clazz);
+                }
+            } else {
+                throw  new ServiceException("data数据体中不存在" + key + "字段");
+            }
+        } else {
+            throw new ServiceException("数据不存在data字段!");
+        }
     }
 }

@@ -1,4 +1,5 @@
 package com.wtu.service.impl;
+
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +52,7 @@ public class ImageServiceImpl implements ImageService {
     public List<String> textToImage(TextToImageDTO request, Long userId) throws Exception {
         List<String> ids = new ArrayList<>();
         //用工具类快速构造VisualService
-        IVisualService visualService=ModelUtils.createVisualService("cn-north-1");
+        IVisualService visualService = ModelUtils.createVisualService("cn-north-1");
         //用工具类转为JsonObject类型
         JSONObject req = ModelUtils.toJsonObject(request);
         //如果用户prompt字数过少，则开启自动文本优化
@@ -75,26 +77,33 @@ public class ImageServiceImpl implements ImageService {
 
         List<String> ids = new ArrayList<>();
         JSONObject jsonRequest = ModelUtils.toJsonObject(request);
-        log.info("jsonRequest:{}", jsonRequest.toString());
         //用工具类构造IvisualService实例
         IVisualService visualService = ModelUtils.createVisualService("cn-north-1");
-        //先得到taskID
-        String taskId = (String) visualService.cvSync2AsyncSubmitTask(jsonRequest);
+
+        JSONObject response = (JSONObject) visualService.cvSync2AsyncSubmitTask(jsonRequest);
+
+        //这个方法，需要传的是一整个未被剪切的JsonObject，方法会自动帮我们剪切出data，然后从data中拿取我们想要的数据。
+        String taskId=ModelUtils.getFromJsonData(response, "task_id", String.class);
         //用taskID去申请另一个接口，得到图片
         JSONObject taskRequest = new JSONObject();
-        taskRequest.put("req_key",request.getReqKey());
-        taskRequest.put("task_id",taskId);
+        taskRequest.put("req_key", request.getReqKey());
+        taskRequest.put("task_id", taskId);
 
-        log.info("taskRequest:{}", taskRequest);
-
-        JSONObject taskResponse = (JSONObject)visualService.cvSync2AsyncGetResult(taskRequest);
-        List<String> base64 = ModelUtils.getBase64(taskResponse);
-        for (String s : base64) {
-            //对base64进行解码并上传,得到ImageID,存入ids中
-            ids.add(imageStorageService.saveBase64Image(s, userId));
+        while (true) {
+            //不断循环请求结果，直到状态为Done，再拿取base64
+            JSONObject taskResponse = (JSONObject) visualService.cvSync2AsyncGetResult(taskRequest);
+            String status= ModelUtils.getFromJsonData(taskResponse, "status", String.class);
+            if (status.equals("done")) {
+                //先确保taskResponse有数据
+                List<String> base64 = ModelUtils.getBase64(taskResponse);
+                for (String s : base64) {
+                    //对base64进行解码并上传,得到ImageID,存入ids中
+                    ids.add(imageStorageService.saveBase64Image(s, userId));
+                }
+                return ids;
+            }
         }
 
-        return ids;
     }
 
     // 线稿生图
@@ -156,7 +165,7 @@ public class ImageServiceImpl implements ImageService {
     private String ttApiKey;
 
     @Override
-    public ImageFusionVO imageFusion(ImageFusionDTO request, Long userId){
+    public ImageFusionVO imageFusion(ImageFusionDTO request, Long userId) {
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
         log.info("开始图片融合请求: {}, 图片url: {}", requestId, request.getImageUrlList());
@@ -203,7 +212,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ImageFusionVO queryImageByJobId(String jobId, Long userId){
+    public ImageFusionVO queryImageByJobId(String jobId, Long userId) {
         String apiKey = ttApiKey;
         String fetchUrl = "https://api.ttapi.io/midjourney/v1/fetch";
         log.info("查询图片融合结果，jobId: {}, userId: {}", jobId, userId);
@@ -279,7 +288,6 @@ public class ImageServiceImpl implements ImageService {
         // 发送请求
         return client.SketchToImage(req);
     }
-
 
 
     // 获取用户所有图像URL

@@ -60,6 +60,7 @@ public class ImageController {
             log.info("开始处理以图生图请求: {}", request);
             // 调用用户服务的imageToImage方法生成图像
             List<String> ids = imageService.imageToImage(request, userId);
+            log.info("ids:{}",ids);
             List<String> urls = ids.
                     stream().
                     map(imageStorageService::getImageUrl).

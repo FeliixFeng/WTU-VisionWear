@@ -21,7 +21,7 @@ public class TextToImageDTO {
     @Schema(description = "算法名称，固定为high_aes_general_v30l_zt2i",defaultValue = "high_aes_general_v30l_zt2i")
     @NotBlank(message = "reqKey为必填项")
     @JsonProperty("req_key")
-    private String reqKey;
+    private String reqKey="high_aes_general_v30l_zt2i";
 
     @Schema(description = "用于生成图像的提示词，中英文均可", example = "一只可爱的猫")
     @NotBlank(message = "prompt为必填项")

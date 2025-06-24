@@ -80,7 +80,7 @@ public class ImageServiceImpl implements ImageService {
 
         //如果用户prompt字数过少，则开启自动文本优化
         if (request.getPrompt().length() < 10) {
-            req.put("use_pre_llm", "true");
+            req.put("use_pre_llm", true);
         }
         log.info("req:{}", req.toString());
         //发送请求，得到response

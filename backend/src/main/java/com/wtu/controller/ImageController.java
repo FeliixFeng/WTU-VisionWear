@@ -1,12 +1,9 @@
 package com.wtu.controller;
-
-
 import com.wtu.DTO.ImageFusionDTO;
 import com.wtu.DTO.ImageToImageDTO;
 import com.wtu.DTO.SketchToImageDTO;
 import com.wtu.DTO.TextToImageDTO;
 import com.wtu.VO.ImageFusionVO;
-import com.wtu.VO.ImageToImageVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.result.Result;
 import com.wtu.service.ImageService;
@@ -22,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -41,65 +37,37 @@ public class ImageController {
     private final AliOssUtil aliOssUtil;
 
 
-    @PostMapping("/text-to-image")
+    @PostMapping("/doubao/text-to-image")
     @Operation(summary = "文生图功能")
     public Result<List<String>> textToImage(@RequestBody @Valid TextToImageDTO request,
                                             HttpServletRequest httpServletRequest) throws Exception {
-
         //从token 获取当前用户ID
         Long userId = UserContext.getCurrentUserId(httpServletRequest);
-        log.info("收到图像生成请求: {}", request);
-
         // 调用用户服务的textToImage方法生成图像
         List<String> ids = imageService.textToImage(request, userId);
-        return Result.success(ids);
+        List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
+        log.info("URLS: {}", urls);
+        return Result.success(urls);
     }
 
-    @GetMapping("/get-image/{imageId}")
-    @Operation(summary = "通过imageId获取图片URL")
-    public Result<String> getImage(@PathVariable String imageId) {
-        log.info("获取图像id: {}", imageId);
-        String imageUrl = imageStorageService.getImageUrl(imageId);
-        log.info("获取图像URL: {}", imageUrl);
-
-        if (imageUrl == null) {
-            return Result.error("找不到图片!");
-        }
-
-        return Result.success(imageUrl);
-    }
-
-    @PostMapping("/image-to-image")
+    @PostMapping("/doubao/image-to-image")
     @Operation(summary = "图生图功能")
-    public Result<ImageToImageVO> imageToImage(@RequestBody ImageToImageDTO request,
+    public Result<List<String>> imageToImage(@RequestBody ImageToImageDTO request,
                                              HttpServletRequest httpServletRequest) {
         try {
             Long userId = UserContext.getCurrentUserId(httpServletRequest);
             log.info("当前用户 ID: {}", userId);
-
-            // 参数校验
-            if (request.getSourceImageUrl() == null || request.getSourceImageUrl().isEmpty()) {
-                return Result.error("源图像url不能为空");
-            }
-            if (request.getPrompt() == null || request.getPrompt().isEmpty()) {
-                return Result.error("提示词不能为空");
-            }
-            if (request.getImageStrength() < 0 || request.getImageStrength() > 1) {
-                return Result.error("图像强度必须在0到1之间");
-            }
-
-            // 设置默认值
-            request.setCfgScale(request.getCfgScale() < 0 ? 7.0f : request.getCfgScale());
-            request.setSteps(request.getSteps() < 10 || request.getSteps() > 150 ? 30 : request.getSteps());
-            request.setSamples(Math.max(request.getSamples(), 1));
-
             log.info("开始处理以图生图请求: {}", request);
-
             // 调用用户服务的imageToImage方法生成图像
-            ImageToImageVO response = imageService.imageToImage(request, userId);
+            List<String> ids = imageService.imageToImage(request, userId);
+            List<String> urls = ids.
+                    stream().
+                    map(imageStorageService::getImageUrl).
+                    collect(Collectors.toList());
 
-            log.info("以图生图处理成功: {}", response);
-            return Result.success(response);
+            log.info("URLS: {}", urls);
+
+            return Result.success(urls);
         } catch (Exception e) {
             log.error("以图生图失败", e);
             // 错误信息处理保持不变
@@ -124,6 +92,7 @@ public class ImageController {
             return Result.error("图片融合失败: " + e.getMessage());
         }
     }
+
     @GetMapping("/image-fusion/result")
     @Operation(summary = "获取图片融合结果")
     public Result<ImageFusionVO> getFusionResult(@RequestParam String jobId, HttpServletRequest httpServletRequest) throws Exception {
@@ -151,7 +120,7 @@ public class ImageController {
 
     @PostMapping("/upload")
     @Operation(description = "文件上传")
-    public Result<String> upload(MultipartFile file){
+    public Result<String> upload(MultipartFile file) {
         log.info("文件上传开始: 文件名={}, 大小={}bytes",
                 file.getOriginalFilename(), file.getSize());
 

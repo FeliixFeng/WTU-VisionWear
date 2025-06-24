@@ -1,5 +1,8 @@
 package com.wtu.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,63 +13,49 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageToImageDTO {
-    /**
-     * 源图像url
-     */
-    private String sourceImageUrl;
+    @Schema(description = "服务标识，固定为i2i_portrait_photo", defaultValue = "i2i_portrait_photo")
+    @NotBlank(message = "reqKey为必填项")
+    @JsonProperty("req_key")
+    private String reqKey = "i2i_portrait_photo";
 
-    /**
-     * 提示词
-     */
+    @Schema(description = "图片URL", example = "https://图片1.png")
+    @NotBlank(message = "imageInput为必填项")
+    @JsonProperty("image_input")
+    private String imageInput;
+
+    @Schema(description = "生图提示词", defaultValue = "演唱会现场的合照，闪光灯拍摄")
     private String prompt;
 
-    /**
-     * 负面提示词
-     */
-    private String negativePrompt;
+    @Schema(description = "生成图像的宽，默认1328，范围[512,2048]", defaultValue = "1328")
+    @Min(value = 512, message = "width不能小于512")
+    @Max(value = 2048, message = "width不能大于2048")
+    private Integer width = 1328;
 
-    /**
-     * CFG Scale (提示词引导强度)
-     * 范围通常为1-35，越高越遵循提示词
-     * 默认值: 7.0
-     */
-    private float cfgScale;
+    @Schema(description = "生成图像的高，默认1328，范围[512,2048]", defaultValue = "1328")
+    @Min(value = 512, message = "height不能小于512")
+    @Max(value = 2048, message = "height不能大于2048")
+    private Integer height = 1328;
 
-    /**
-     * 图像强度 (保留原图的程度, 值越低越接近原图)
-     * 范围必须在0到1之间
-     * 默认值: 0.35
-     */
-    private float imageStrength;
+    @Schema(description = "高清处理效果，越高人脸清晰度越高，建议使用默认值", defaultValue = "0.4")
+    @DecimalMin(value = "0.0", message = "gpen不能小于0")
+    @DecimalMax(value = "1.0", message = "gpen不能大于1")
+    private Float gpen = 0.4f;
 
-    /**
-     * 生成图像的数量
-     * 通常范围为1-10
-     * 默认值: 1
-     */
-    private int samples;
+    @Schema(description = "人脸美化效果，越高美颜效果越明显，建议使用默认值", defaultValue = "0.3")
+    @DecimalMin(value = "0.0", message = "skin不能小于0")
+    @DecimalMax(value = "1.0", message = "skin不能大于1")
+    private Float skin = 0.3f;
 
-    /**
-     * 采样步数
-     * 通常范围为10-150，越高质量越好但耗时更长
-     * 默认值: 30
-     */
-    private int steps;
+    @Schema(description = "匀肤效果，越高均匀肤色去除瑕疵效果越明显，建议使用默认值", defaultValue = "0")
+    @DecimalMin(value = "0.0", message = "skinUnifi不能小于0")
+    @DecimalMax(value = "1.0", message = "skinUnifi不能大于1")
+    @JsonProperty("skin_unifi")
+    private Float skinUnifi = 0f;
 
-    /**
-     * 样式预设
-     * 可选值如: "3d-model", "analog-film", "anime", "cinematic", "comic-book",
-     * "digital-art", "enhance", "fantasy-art", "isometric", "line-art",
-     * "low-poly", "modeling-compound", "neon-punk", "origami", "photographic",
-     * "pixel-art", "tile-texture"
-     * 默认值: null (不应用样式预设)
-     */
-    private String style;
+    @Schema(description = "参考模式，可选值：creative(提示词模式)、reference(全参考模式)、reference_char(人物参考模式)")
+    @JsonProperty("gen_mode")
+    private String genMode;
 
-    /**
-     * 随机种子
-     * 为null或负数时使用随机种子，指定正整数时可重现结果
-     * 默认值: null (使用随机种子)
-     */
-    private Long seed;
+    @Schema(description = "随机种子，作为确定扩散初始状态的基础，默认-1（随机）", defaultValue = "-1")
+    private String seed = "-1";
 }

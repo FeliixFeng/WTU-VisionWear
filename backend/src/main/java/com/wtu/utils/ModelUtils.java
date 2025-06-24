@@ -5,7 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.volcengine.service.visual.IVisualService;
+import com.volcengine.service.visual.impl.VisualServiceImpl;
 import com.wtu.exception.ServiceException;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.core.io.ClassPathResource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author gaochen
@@ -50,11 +58,11 @@ public class ModelUtils {
      * 只拿取base64，不进行解码操作
      *
      * @param obj 任意对象,目前只支持JsonObject进行有效拿取
-     * @return base64 JsonArray类型
+     * @return base64 集合类型
      */
-    public static JSONArray getBase64(Object obj) {
+    public static List<String> getBase64(Object obj) {
         JSONObject jsonObject = toJsonObject(obj);
-
+        List<String> base64Array = new ArrayList<String>();
         if (!jsonObject.containsKey("data")) {
             throw new ServiceException("源对象data数据为空，无法拿取base64");
         } else {
@@ -63,7 +71,16 @@ public class ModelUtils {
 
                 JSONObject JsonData = (JSONObject) data;
                 if (JsonData.containsKey("binary_data_base64")) {
-                    return (JSONArray) JsonData.get("binary_data_base64");
+                    JSONArray array = (JSONArray) JsonData.get("binary_data_base64");
+                    for (int i = 0; i < array.size(); i++) {
+                        String valid = array.getString(i);
+                        //如果有前缀"," ，则删掉
+                        if (valid.contains(",")) {
+                            valid = valid.substring(valid.indexOf(",") + 1);
+                        }
+                        base64Array.add(valid);
+                    }
+                    return base64Array;
                 } else {
                     throw new ServiceException("未找到base64编码");
                 }
@@ -72,5 +89,29 @@ public class ModelUtils {
             }
         }
 
+    }
+
+    public static IVisualService createVisualService(String region) throws Exception {
+        YamlPropertiesFactoryBean yamlProperties = new YamlPropertiesFactoryBean();
+        yamlProperties.setResources(new ClassPathResource("application-dev.yml"));
+        Properties properties = yamlProperties.getObject();
+        String ak = (String) properties.get("vision.doubao.ak");
+        String sk = (String) properties.get("vision.doubao.sk");
+        IVisualService visualService = VisualServiceImpl.getInstance(region);
+        visualService.setAccessKey(ak);
+        visualService.setSecretKey(sk);
+        return visualService;
+    }
+
+    public static IVisualService createVisualService() throws Exception {
+        YamlPropertiesFactoryBean yamlProperties = new YamlPropertiesFactoryBean();
+        yamlProperties.setResources(new ClassPathResource("application-dev.yml"));
+        Properties properties = yamlProperties.getObject();
+        String ak = (String) properties.get("vision.doubao.ak");
+        String sk = (String) properties.get("vision.doubao.sk");
+        IVisualService visualService = VisualServiceImpl.getInstance();
+        visualService.setAccessKey(ak);
+        visualService.setSecretKey(sk);
+        return visualService;
     }
 }

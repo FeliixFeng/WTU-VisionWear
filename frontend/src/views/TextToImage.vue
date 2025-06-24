@@ -157,7 +157,7 @@
               <div class="image-wrapper">
                 <el-image
                     :src="imageUrl"
-                    fit="contain"
+                    fit="cover"
                     :preview-src-list="[imageUrl]"
                     class="generated-image"
                 >
@@ -446,7 +446,7 @@ onMounted(() => {
 /* 图片占位符样式 */
 .placeholder-image {
   width: 100%;
-  height: 480px;
+  aspect-ratio: 1/1;
   background-color: rgba(106, 152, 233, 0.05);
   border-radius: 8px;
   display: flex;
@@ -476,6 +476,11 @@ onMounted(() => {
   width: 100%;
 }
 
+.loading-container :deep(.el-skeleton-item--image) {
+  aspect-ratio: 1/1;
+  width: 100%;
+}
+
 .loading-text {
   margin-top: 15px;
   text-align: center;
@@ -489,7 +494,7 @@ onMounted(() => {
 /* 错误样式 */
 .error-container {
   width: 100%;
-  height: 480px;
+  aspect-ratio: 1/1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -499,15 +504,19 @@ onMounted(() => {
 .image-wrapper {
   width: 100%;
   position: relative;
+  aspect-ratio: 1/1;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* 生成的图片样式 */
 .generated-image {
   width: 100%;
-  height: 480px;
+  height: 100%;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: var(--el-box-shadow-light);
+  object-fit: cover;
 }
 
 .image-error {

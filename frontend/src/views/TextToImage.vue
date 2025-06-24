@@ -264,13 +264,15 @@ const generateImageId = async () => {
     // 准备请求体数据
     const requestBody = {
       prompt: formData.prompt,
-      negativePrompt: formData.negativePrompt,
-      samples: formData.samples,
+      req_key: "high_aes_general_v30l_zt2i",
+      // negativePrompt: formData.negativePrompt,
+      // samples: formData.samples,
       width: formData.width,
       height: formData.height,
-      steps: formData.steps,
-      cfgScale: formData.cfgScale,
-      style: formData.style
+      
+      // steps: formData.steps,
+      // cfgScale: formData.cfgScale,
+      // style: formData.style
     }
 
     console.log('请求参数:', requestBody)
@@ -278,7 +280,7 @@ const generateImageId = async () => {
     // 发送请求
     const response = await request({
       method: 'post',
-      url: '/image/text-to-image',
+      url: '/image/doubao/text-to-image',
       data: requestBody
     });
 
@@ -315,39 +317,6 @@ const generateImageId = async () => {
   }
 }
 
-// 获取图片URL的函数
-const getImageUrl = async (id) => {
-  try {
-    // 获取token
-    const token = getValidToken()
-    if (!token) {
-      throw new Error('未登录，请先登录！')
-    }
-
-    console.log('获取图片URL，图片ID:', id)
-
-    // 使用axios发送请求
-    const response = await request({
-      method: 'get',
-      url: `/image/get-image/${id}`
-    });
-
-    console.log('获取图片URL响应:', response.data)
-
-    const imageResult = response.data
-    //注意这里是code等于1成功
-    if (imageResult.code !== 1 || !imageResult.data) {
-      throw new Error(imageResult.msg || '获取图片链接失败，请稍后重试')
-    }
-
-    // 返回图片URL
-    return imageResult.data
-  } catch (error) {
-    console.error('获取图片URL出错:', error)
-    throw error
-  }
-}
-
 // 综合函数：生成图片并获取URL
 const generateImage = async () => {
   // 表单验证
@@ -364,11 +333,11 @@ const generateImage = async () => {
 
   try {
     // 第一步：生成图片获取ID
-    const id = await generateImageId()
-    imageId.value = id
+    // const id = await generateImageId()
+    // imageId.value = id
 
     // 第二步：通过ID获取图片URL
-    const url = await getImageUrl(id)
+    const url = await generateImageId()
     imageUrl.value = url
 
     ElNotification({

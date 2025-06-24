@@ -1,4 +1,4 @@
-import request from '../request';
+import request from "../request"
 
 /**
  * 上传图片
@@ -6,23 +6,25 @@ import request from '../request';
  * @returns {Promise} - 请求结果
  */
 export function uploadImage(formData) {
-  return request({
-    url: '/image/upload',
-    method: 'post',
-    data: formData,
-    // 确保请求正确处理formData
-    transformRequest: [function (data) {
-      // 如果是FormData实例，直接返回，不做转换
-      if (data instanceof FormData) {
-        return data;
-      }
-      // 其他情况按默认处理
-      return JSON.stringify(data);
-    }],
-    headers: {
-      // 不要手动设置Content-Type，让浏览器自动处理
-    }
-  });
+	return request({
+		url: "/image/upload",
+		method: "post",
+		data: formData,
+		// 确保请求正确处理formData
+		transformRequest: [
+			function (data) {
+				// 如果是FormData实例，直接返回，不做转换
+				if (data instanceof FormData) {
+					return data
+				}
+				// 其他情况按默认处理
+				return JSON.stringify(data)
+			},
+		],
+		headers: {
+			// 不要手动设置Content-Type，让浏览器自动处理
+		},
+	})
 }
 
 /**
@@ -31,11 +33,11 @@ export function uploadImage(formData) {
  * @returns {Promise} - 请求结果
  */
 export function imageToImage(data) {
-  return request({
-    url: '/image/image-to-image',
-    method: 'post',
-    data
-  });
+	return request({
+		url: "/image/image-to-image",
+		method: "post",
+		data,
+	})
 }
 
 /**
@@ -44,11 +46,11 @@ export function imageToImage(data) {
  * @returns {Promise} - 请求结果
  */
 export function textToImage(data) {
-  return request({
-    url: '/image/text-to-image',
-    method: 'post',
-    data
-  });
+	return request({
+		url: "image/doubao/text-to-image",
+		method: "post",
+		data,
+	})
 }
 
 /**
@@ -57,10 +59,10 @@ export function textToImage(data) {
  * @returns {Promise} - 请求结果
  */
 export function getImageUrl(imageId) {
-  return request({
-    url: `/image/get-image/${imageId}`,
-    method: 'get'
-  });
+	return request({
+		url: `/image/get-image/${imageId}`,
+		method: "get",
+	})
 }
 
 /**
@@ -69,11 +71,11 @@ export function getImageUrl(imageId) {
  * @returns {Promise} - 请求结果
  */
 export function imageFusion(data) {
-  return request({
-    url: '/image/image-fusion',
-    method: 'post',
-    data
-  });
+	return request({
+		url: "/image/image-fusion",
+		method: "post",
+		data,
+	})
 }
 
 /**
@@ -82,11 +84,11 @@ export function imageFusion(data) {
  * @returns {Promise} - 请求结果
  */
 export function getFusionResult(jobId) {
-  return request({
-    url: '/image/image-fusion/result',
-    method: 'get',
-    params: { jobId }
-  });
+	return request({
+		url: "/image/image-fusion/result",
+		method: "get",
+		params: { jobId },
+	})
 }
 
 /**
@@ -95,19 +97,19 @@ export function getFusionResult(jobId) {
  * @returns {Promise} - 请求结果
  */
 export function sketchToImage(data) {
-  return request({
-    url: '/image/sketch-to-image',
-    method: 'post',
-    data
-  });
+	return request({
+		url: "/image/sketch-to-image",
+		method: "post",
+		data,
+	})
 }
 
 export default {
-  uploadImage,
-  imageToImage,
-  textToImage,
-  getImageUrl,
-  imageFusion,
-  getFusionResult,
-  sketchToImage
-}; 
+	uploadImage,
+	imageToImage,
+	textToImage,
+	getImageUrl,
+	imageFusion,
+	getFusionResult,
+	sketchToImage,
+}

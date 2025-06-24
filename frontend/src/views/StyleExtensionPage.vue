@@ -11,35 +11,37 @@
         <!-- 左侧表单区域 -->
         <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <el-form :model="formData" label-position="top" :rules="rules" ref="formRef" class="form-content">
-            <el-row :gutter="16">
+            <el-row :gutter="20">
               <!-- 源图像上传部分 -->
               <el-col :span="12">
                 <!-- 注意：移除了prop="sourceImage"属性，改为直接检查sourceImageUrl -->
-                <el-form-item label="源图像 *" required>
-                  <el-upload
-                      class="image-uploader"
-                      :show-file-list="false"
-                      :before-upload="beforeImageUpload"
-                      :http-request="uploadImage"
-                      :disabled="isLoading"
-                  >
-                    <img v-if="sourceImageUrl" :src="sourceImageUrl" class="uploaded-image" />
-                    <div v-else-if="uploadLoading" class="upload-loading">
-                      <el-icon class="is-loading"><Loading /></el-icon>
-                      <span>上传中...</span>
-                    </div>
-                    <div v-else class="upload-placeholder">
-                      <el-icon class="upload-icon"><Plus /></el-icon>
-                      <span>上传源图像 (必填)</span>
-                    </div>
-                  </el-upload>
+                <el-form-item label="源图像 *" required class="source-image-item">
+                  <div class="image-container">
+                    <el-upload
+                        class="image-uploader"
+                        :show-file-list="false"
+                        :before-upload="beforeImageUpload"
+                        :http-request="uploadImage"
+                        :disabled="isLoading"
+                    >
+                      <img v-if="sourceImageUrl" :src="sourceImageUrl" class="uploaded-image" />
+                      <div v-else-if="uploadLoading" class="upload-loading">
+                        <el-icon class="is-loading"><Loading /></el-icon>
+                        <span>上传中...</span>
+                      </div>
+                      <div v-else class="upload-placeholder">
+                        <el-icon class="upload-icon"><Plus /></el-icon>
+                        <span>点击上传源图像</span>
+                      </div>
+                    </el-upload>
+                  </div>
                   
                   <div class="upload-actions">
                     <div v-if="sourceImageUrl" class="form-success">
                       <el-icon><Check /></el-icon> 图片已上传成功
                     </div>
                     <div class="select-from-existing">
-                      <el-button type="text" @click="openImageSelector">
+                      <el-button type="primary" size="small" @click="openImageSelector">
                         <el-icon><Picture /></el-icon> 从已有图片中选择
                       </el-button>
                     </div>
@@ -51,7 +53,7 @@
 
               <!-- 参数设置 -->
               <el-col :span="12">
-                <el-form-item label="样式预设">
+                <el-form-item label="样式预设" class="style-item">
                   <el-select v-model="formData.style" placeholder="请选择样式预设" style="width: 100%">
                     <el-option
                         v-for="style in styleOptionsMap"
@@ -62,7 +64,7 @@
                   </el-select>
                 </el-form-item>
 
-                <el-form-item label="参考模式">
+                <el-form-item label="参考模式" class="mode-item">
                   <el-select v-model="formData.genMode" placeholder="请选择参考模式" style="width: 100%">
                     <el-option label="提示词模式" value="creative" />
                     <el-option label="全参考模式" value="reference" />
@@ -73,7 +75,8 @@
               </el-col>
             </el-row>
 
-            <el-form-item label="提示词 *" prop="prompt" required>
+            <!-- 提示词输入框，占据整行 -->
+            <el-form-item label="提示词 *" prop="prompt" required class="prompt-item">
               <el-input
                   v-model="formData.prompt"
                   type="textarea"
@@ -85,7 +88,7 @@
 
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="高清处理效果">
+                <el-form-item label="高清处理效果" class="slider-item">
                   <el-tooltip content="越高人脸清晰度越高，范围0-1" placement="top">
                     <el-slider
                         v-model="formData.gpen"
@@ -100,39 +103,7 @@
               </el-col>
 
               <el-col :span="12">
-                <el-form-item label="人脸美化效果">
-                  <el-tooltip content="越高美颜效果越明显，范围0-1" placement="top">
-                    <el-slider
-                        v-model="formData.skin"
-                        :min="0"
-                        :max="1"
-                        :step="0.01"
-                        :format-tooltip="value => value.toFixed(2)"
-                    ></el-slider>
-                  </el-tooltip>
-                  <div class="slider-value">{{ formData.skin.toFixed(2) }}</div>
-                </el-form-item>
-              </el-col>
-            </el-row>
-
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="匀肤效果">
-                  <el-tooltip content="越高均匀肤色去除瑕疵效果越明显，范围0-1" placement="top">
-                    <el-slider
-                        v-model="formData.skinUnifi"
-                        :min="0"
-                        :max="1"
-                        :step="0.01"
-                        :format-tooltip="value => value.toFixed(2)"
-                    ></el-slider>
-                  </el-tooltip>
-                  <div class="slider-value">{{ formData.skinUnifi.toFixed(2) }}</div>
-                </el-form-item>
-              </el-col>
-
-              <el-col :span="12">
-                <el-form-item label="图像尺寸">
+                <el-form-item label="图像尺寸" class="size-item">
                   <el-select v-model="formData.size" placeholder="选择图像尺寸" style="width: 100%">
                     <el-option label="512 × 512" :value="{ width: 512, height: 512 }" />
                     <el-option label="768 × 768" :value="{ width: 768, height: 768 }" />
@@ -148,7 +119,7 @@
                   type="primary"
                   :loading="isLoading"
                   @click="generateImage"
-                  style="width: 100%"
+                  style="width: 100%; height: 44px; font-size: 16px; margin-top: 10px;"
               >
                 {{ isLoading ? '生成中...' : '生成图片' }}
               </el-button>
@@ -206,7 +177,7 @@
               <div class="image-wrapper">
                 <el-image
                     :src="resultImage.imageUrl"
-                    fit="contain"
+                    fit="cover"
                     class="generated-image"
                 >
                   <template #error>
@@ -216,13 +187,6 @@
                     </div>
                   </template>
                 </el-image>
-
-                <div class="image-info">
-                  <div class="info-item">
-                    <span class="info-label">尺寸:</span>
-                    <span>{{ resultImage.width }} × {{ resultImage.height }}</span>
-                  </div>
-                </div>
               </div>
 
               <div class="image-actions">
@@ -368,8 +332,6 @@ const rules = {
 const formData = reactive({
   prompt: '',
   gpen: 0.4,          // 高清处理效果
-  skin: 0.3,          // 人脸美化效果
-  skinUnifi: 0,       // 匀肤效果
   genMode: 'creative', // 参考模式
   style: '',          // 风格（会添加到prompt中）
   seed: '-1',         // 随机种子
@@ -619,8 +581,8 @@ const generateImage = async () => {
       width: formData.size.width,
       height: formData.size.height,
       gpen: formData.gpen,
-      skin: formData.skin,
-      skin_unifi: formData.skinUnifi,
+      skin: 0.3,  // 使用默认值
+      skin_unifi: 0,  // 使用默认值
       gen_mode: formData.genMode,
       seed: formData.seed
     }
@@ -823,6 +785,7 @@ onMounted(async () => {
 /* 表单内容 */
 .form-content {
   padding-right: 5px;
+  width: 100%;
 }
 
 /* 滑块值显示 */
@@ -830,13 +793,28 @@ onMounted(async () => {
   text-align: center;
   color: var(--el-text-color-secondary);
   font-size: 12px;
-  margin-top: 0;
+  margin-top: 2px;
+}
+
+/* 源图像表单项样式 */
+.source-image-item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 图片容器 */
+.image-container {
+  width: 90%;
+  margin: 0 auto 5px;
+  aspect-ratio: 1/1;
+  position: relative;
 }
 
 /* 上传样式 */
 .image-uploader {
   display: flex;
   justify-content: center;
+  align-items: center;
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
   cursor: pointer;
@@ -844,7 +822,12 @@ onMounted(async () => {
   overflow: hidden;
   transition: border-color 0.3s;
   width: 100%;
-  height: 140px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .image-uploader:hover {
@@ -879,7 +862,7 @@ onMounted(async () => {
 .uploaded-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 /* 上传成功的提示样式 */
@@ -889,7 +872,6 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-top: 4px;
 }
 
 /* 上传操作区样式 */
@@ -897,12 +879,8 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
-}
-
-/* 图片选择器样式 */
-.select-from-existing {
-  text-align: right;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 /* 结果容器样式 */
@@ -989,6 +967,7 @@ onMounted(async () => {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  aspect-ratio: 1/1;
 }
 
 .image-wrapper:hover {
@@ -999,10 +978,10 @@ onMounted(async () => {
 /* 生成的图片样式 */
 .generated-image {
   width: 100%;
-  height: 450px;
+  height: 100%;
+  object-fit: cover;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: var(--el-box-shadow-light);
 }
 
 .image-error {
@@ -1203,6 +1182,11 @@ onMounted(async () => {
     margin-top: 10px;
   }
 
+  .image-container {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
   .placeholder-image,
   .generated-image {
     height: 400px;
@@ -1210,6 +1194,10 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
+  .image-container {
+    max-width: 100%;
+  }
+  
   .image-actions {
     flex-direction: column;
     width: 100%;
@@ -1235,5 +1223,79 @@ onMounted(async () => {
 .el-row :deep(.el-slider) {
   margin-top: 8px;
   margin-bottom: 0;
+}
+
+/* 表单项样式优化 */
+.source-image-item:deep(.el-form-item__label) {
+  padding-bottom: 8px;
+  font-weight: 500;
+}
+
+.style-item, .mode-item {
+  margin-bottom: 15px;
+}
+
+.style-item:deep(.el-form-item__label),
+.mode-item:deep(.el-form-item__label) {
+  padding-bottom: 8px;
+  font-weight: 500;
+}
+
+/* 提示词输入框样式 */
+.prompt-item {
+  margin: 10px 0 15px;
+  width: 100% !important;
+}
+
+.prompt-item:deep(.el-form-item__content) {
+  width: 100% !important;
+  display: block;
+}
+
+.prompt-item:deep(.el-textarea) {
+  width: 100% !important;
+  display: block;
+}
+
+.prompt-item:deep(.el-textarea__inner) {
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: all 0.3s;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* 滑块项样式 */
+.slider-item:deep(.el-form-item__label),
+.size-item:deep(.el-form-item__label) {
+  padding-bottom: 8px;
+  font-weight: 500;
+}
+
+.slider-item {
+  margin-bottom: 15px;
+}
+
+.size-item {
+  margin-bottom: 15px;
+}
+
+/* 选择图片按钮样式 */
+.select-image-item {
+  display: none;
+}
+
+.select-image-btn {
+  display: none;
+}
+
+/* 选择已有图片按钮 */
+.select-from-existing {
+  text-align: right;
+}
+
+.select-from-existing .el-button {
+  font-size: 12px;
 }
 </style>

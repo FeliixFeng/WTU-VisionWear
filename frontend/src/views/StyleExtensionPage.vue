@@ -33,10 +33,19 @@
                       <span>上传源图像 (必填)</span>
                     </div>
                   </el-upload>
-                  <div class="form-tip" v-if="!sourceImageUrl">请上传源图像，这是生成图片的基础</div>
-                  <div class="form-success" v-else>
-                    <el-icon><Check /></el-icon> 图片已上传成功
+                  
+                  <div class="upload-actions">
+                    <div v-if="sourceImageUrl" class="form-success">
+                      <el-icon><Check /></el-icon> 图片已上传成功
+                    </div>
+                    <div class="select-from-existing">
+                      <el-button type="text" @click="openImageSelector">
+                        <el-icon><Picture /></el-icon> 从已有图片中选择
+                      </el-button>
+                    </div>
                   </div>
+                  
+                  <div class="form-tip" v-if="!sourceImageUrl">请上传源图像，这是生成图片的基础</div>
                 </el-form-item>
               </el-col>
 
@@ -198,7 +207,6 @@
                 <el-image
                     :src="resultImage.imageUrl"
                     fit="contain"
-                    :preview-src-list="[resultImage.imageUrl]"
                     class="generated-image"
                 >
                   <template #error>
@@ -231,14 +239,67 @@
       </el-row>
     </el-card>
   </div>
+  
+  <!-- 图片选择对话框 -->
+  <el-dialog
+    v-model="imageSelectorVisible"
+    title="选择已有图片"
+    width="70%"
+    destroy-on-close
+  >
+    <div v-if="userImages.length === 0" class="no-images">
+      <el-empty description="暂无图片" />
+    </div>
+    <div v-else class="image-grid">
+      <div 
+        v-for="(image, index) in userImages" 
+        :key="index" 
+        class="image-item"
+        :class="{ 'selected': selectedImageIndex === index }"
+        @click="selectImage(index, image)"
+      >
+        <!-- 所有图片URL都是完整的https链接 -->
+        <el-image 
+          :src="image" 
+          fit="cover" 
+          class="grid-image"
+          lazy
+        >
+          <template #placeholder>
+            <div class="image-loading">
+              <el-icon class="is-loading"><Loading /></el-icon>
+            </div>
+          </template>
+          <template #error>
+            <div class="image-error">
+              <el-icon><Picture /></el-icon>
+              <div>加载失败</div>
+            </div>
+          </template>
+        </el-image>
+        <div v-if="selectedImageIndex === index" class="selected-indicator">
+          <el-icon><Check /></el-icon>
+        </div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="imageSelectorVisible = false">取消</el-button>
+        <el-button type="primary" @click="confirmImageSelection" :disabled="selectedImageIndex === -1">
+          确认选择
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElNotification } from 'element-plus'
 import { Plus, Picture, Loading, Download, CopyDocument, Check } from '@element-plus/icons-vue'
 import { getValidToken } from "../utils/auth.js"
 import { image } from "../api"  // 导入image API模块而不是直接使用request
+import { getAllUserImages } from "../api/modules/user.js"  // 导入获取用户图片的API
 
 // 样式预设选项
 const styleOptions = [
@@ -280,6 +341,12 @@ const resultImage = ref(null)
 const errorMessage = ref('')
 const generationTime = ref(null)
 const uploadLoading = ref(false)
+
+// 图片选择对话框相关状态
+const imageSelectorVisible = ref(false)
+const userImages = ref([])
+const selectedImageIndex = ref(-1)
+const isLoadingImages = ref(false)
 
 // 支持的图片尺寸常量
 const SUPPORTED_DIMENSIONS = [
@@ -633,6 +700,97 @@ const copyImageUrl = () => {
         ElMessage.error('复制失败，请手动复制')
       })
 }
+
+// 打开图片选择对话框
+const openImageSelector = async () => {
+  imageSelectorVisible.value = true
+  selectedImageIndex.value = -1
+  
+  // 无论是否已有图片，都重新获取一次
+  isLoadingImages.value = true
+  try {
+    const response = await getAllUserImages()
+    
+    if (response.data && response.data.code === 1) {
+      // 确保返回的是数组
+      if (Array.isArray(response.data.data)) {
+        userImages.value = response.data.data
+      } else if (response.data.data) {
+        // 如果不是数组但有数据，尝试转换
+        try {
+          const dataArray = JSON.parse(response.data.data)
+          if (Array.isArray(dataArray)) {
+            userImages.value = dataArray
+          } else {
+            userImages.value = [response.data.data]
+          }
+        } catch (e) {
+          // 如果无法解析为JSON，则当作单个字符串处理
+          userImages.value = [response.data.data]
+        }
+      } else {
+        userImages.value = []
+      }
+    } else {
+      ElMessage.warning('获取图片列表失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取图片列表失败')
+  } finally {
+    isLoadingImages.value = false
+  }
+}
+
+// 选择图片
+const selectImage = (index, imageUrl) => {
+  selectedImageIndex.value = index
+}
+
+// 确认图片选择
+const confirmImageSelection = () => {
+  if (selectedImageIndex.value >= 0 && selectedImageIndex.value < userImages.value.length) {
+    const selectedImage = userImages.value[selectedImageIndex.value];
+    
+    // 直接使用完整URL
+    sourceImageUrl.value = selectedImage;
+    
+    imageSelectorVisible.value = false;
+    ElMessage.success('已选择图片');
+  } else {
+    console.warn('无效的图片选择:', selectedImageIndex.value);
+  }
+}
+
+// 在组件挂载后获取用户图片
+onMounted(async () => {
+  try {
+    const response = await getAllUserImages()
+    
+    if (response.data && response.data.code === 1) {
+      // 确保返回的是数组
+      if (Array.isArray(response.data.data)) {
+        userImages.value = response.data.data
+      } else if (response.data.data) {
+        // 如果不是数组但有数据，尝试转换
+        try {
+          const dataArray = JSON.parse(response.data.data)
+          if (Array.isArray(dataArray)) {
+            userImages.value = dataArray
+          } else {
+            userImages.value = [response.data.data]
+          }
+        } catch (e) {
+          // 如果无法解析为JSON，则当作单个字符串处理
+          userImages.value = [response.data.data]
+        }
+      } else {
+        userImages.value = []
+      }
+    }
+  } catch (error) {
+    // 静默处理错误
+  }
+})
 </script>
 
 <style scoped>
@@ -732,6 +890,19 @@ const copyImageUrl = () => {
   align-items: center;
   gap: 4px;
   margin-top: 4px;
+}
+
+/* 上传操作区样式 */
+.upload-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* 图片选择器样式 */
+.select-from-existing {
+  text-align: right;
 }
 
 /* 结果容器样式 */
@@ -837,11 +1008,13 @@ const copyImageUrl = () => {
 .image-error {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  color: var(--el-text-color-secondary);
-  font-size: 14px;
-  height: 200px;
+  justify-content: center;
+  height: 100%;
+  background-color: #f5f7fa;
+  color: #909399;
+  font-size: 12px;
+  padding: 10px;
 }
 
 .image-error .el-icon {
@@ -923,6 +1096,94 @@ const copyImageUrl = () => {
 
 .form-check-list li.is-invalid {
   color: #F56C6C;
+}
+
+/* 图片选择器样式 */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* 调试信息样式 */
+.debug-info {
+  grid-column: 1 / -1;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #606266;
+}
+
+.debug-info p {
+  margin: 2px 0;
+}
+
+.image-item {
+  position: relative;
+  height: 150px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.image-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.image-item.selected {
+  border-color: #409EFF;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+.grid-image {
+  width: 100%;
+  height: 100%;
+}
+
+.image-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: #f5f7fa;
+}
+
+.image-url {
+  font-size: 10px;
+  color: #c0c4cc;
+  margin-top: 5px;
+  word-break: break-all;
+  text-align: center;
+}
+
+.selected-indicator {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #409EFF;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-images {
+  padding: 40px 0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 
 /* 响应式样式 */

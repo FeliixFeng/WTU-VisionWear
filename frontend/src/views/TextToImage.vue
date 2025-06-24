@@ -11,39 +11,20 @@
         <!-- 输入表单 -->
         <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
           <el-form :model="formData" label-position="top" :rules="rules" ref="formRef" class="form-content">
-            <el-form-item label="提示词" prop="prompt">
+            <el-form-item label="提示词" prop="prompt" class="form-item-spacious">
               <el-input
                   v-model="formData.prompt"
                   type="textarea"
-                  :rows="4"
+                  :rows="5"
                   placeholder="请输入您想要生成的图片描述，例如：一幅美丽的山水画，有高山流水和朝霞"
               ></el-input>
             </el-form-item>
 
-            <el-form-item label="负面提示词">
-              <el-input
-                  v-model="formData.negativePrompt"
-                  type="textarea"
-                  :rows="3"
-                  placeholder="请输入您不希望出现在图片中的元素，例如：模糊，扭曲，低质量"
-              ></el-input>
-            </el-form-item>
+            <div class="form-spacer"></div>
 
             <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="生成数量">
-                  <el-input-number
-                      v-model="formData.samples"
-                      :min="1"
-                      :max="4"
-                      :step="1"
-                      controls-position="right"
-                  ></el-input-number>
-                </el-form-item>
-              </el-col>
-
-              <el-col :span="12">
-                <el-form-item label="风格">
+              <el-col :span="24">
+                <el-form-item label="风格" class="form-item-spacious">
                   <el-select v-model="formData.style" placeholder="请选择风格" style="width: 100%">
                     <el-option label="默认" value=""></el-option>
                     <el-option label="模拟胶片" value="analog-film"></el-option>
@@ -68,9 +49,11 @@
               </el-col>
             </el-row>
 
+            <div class="form-spacer"></div>
+
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="宽度">
+                <el-form-item label="宽度" class="form-item-spacious">
                   <el-select v-model="formData.width" style="width: 100%">
                     <el-option label="512px" :value="512"></el-option>
                     <el-option label="768px" :value="768"></el-option>
@@ -80,7 +63,7 @@
               </el-col>
 
               <el-col :span="12">
-                <el-form-item label="高度">
+                <el-form-item label="高度" class="form-item-spacious">
                   <el-select v-model="formData.height" style="width: 100%">
                     <el-option label="512px" :value="512"></el-option>
                     <el-option label="768px" :value="768"></el-option>
@@ -90,38 +73,26 @@
               </el-col>
             </el-row>
 
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="迭代步数">
-                  <el-slider
-                      v-model="formData.steps"
-                      :min="20"
-                      :max="50"
-                      :step="1"
-                      show-input
-                  ></el-slider>
-                </el-form-item>
-              </el-col>
+            <div class="form-spacer"></div>
 
-              <el-col :span="12">
-                <el-form-item label="提示词相关性">
-                  <el-slider
-                      v-model="formData.cfgScale"
-                      :min="1"
-                      :max="30"
-                      :step="0.5"
-                      show-input
-                  ></el-slider>
-                </el-form-item>
-              </el-col>
-            </el-row>
+            <el-form-item label="提示词相关性" class="form-item-spacious">
+              <el-slider
+                  v-model="formData.cfgScale"
+                  :min="1"
+                  :max="30"
+                  :step="0.5"
+                  show-input
+              ></el-slider>
+            </el-form-item>
 
-            <el-form-item>
+            <div class="form-spacer"></div>
+
+            <el-form-item class="form-item-spacious">
               <el-button
                   type="primary"
                   :loading="isLoading"
                   @click="generateImage"
-                  style="width: 100%"
+                  style="width: 100%; height: 46px; font-size: 16px;"
               >
                 {{ isLoading ? '生成中...' : '生成图片' }}
               </el-button>
@@ -228,13 +199,10 @@ const formRef = ref(null)
 // 表单数据
 const formData = reactive({
   prompt: '',
-  negativePrompt: '',
-  samples: 1,
+  style: '',
   width: 1024,
   height: 1024,
-  steps: 30,
-  cfgScale: 7,
-  style: ''
+  cfgScale: 7
 })
 
 // 表单验证规则
@@ -261,18 +229,21 @@ const generateImageId = async () => {
 
     console.log('Token获取成功:', token.substring(0, 10) + '...')
 
-    // 准备请求体数据
+    // 准备请求体数据 - 调整为匹配后端API参数
     const requestBody = {
       prompt: formData.prompt,
       req_key: "high_aes_general_v30l_zt2i",
-      // negativePrompt: formData.negativePrompt,
-      // samples: formData.samples,
       width: formData.width,
       height: formData.height,
-      
-      // steps: formData.steps,
-      // cfgScale: formData.cfgScale,
-      // style: formData.style
+      // 如果prompt较短，开启文本扩写
+      use_pre_llm: formData.prompt.length < 10,
+      // 添加scale参数，从cfgScale映射到后端的scale范围(1-10)
+      scale: Math.min(10, Math.max(1, formData.cfgScale / 3))
+    }
+
+    // 如果选择了风格且不是默认风格，将风格添加到提示词中
+    if (formData.style) {
+      requestBody.prompt += `, ${formData.style} style`;
     }
 
     console.log('请求参数:', requestBody)
@@ -332,11 +303,6 @@ const generateImage = async () => {
   errorMessage.value = ''
 
   try {
-    // 第一步：生成图片获取ID
-    // const id = await generateImageId()
-    // imageId.value = id
-
-    // 第二步：通过ID获取图片URL
     const url = await generateImageId()
     imageUrl.value = url
 
@@ -420,7 +386,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(106, 152, 233, 0.15);
-  margin-bottom: 5px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
 }
 
 .card-header h2 {
@@ -432,7 +399,30 @@ onMounted(() => {
 
 /* 表单内容 */
 .form-content {
-  padding-right: 10px;
+  padding-right: 20px;
+  padding-left: 10px;
+}
+
+/* 表单间距和样式 */
+.form-item-spacious :deep(.el-form-item__label) {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+}
+
+.form-item-spacious :deep(.el-input__wrapper),
+.form-item-spacious :deep(.el-textarea__inner),
+.form-item-spacious :deep(.el-select) {
+  box-shadow: 0 0 0 1px rgba(106, 152, 233, 0.2) inset;
+}
+
+.form-item-spacious :deep(.el-slider__runway) {
+  margin: 16px 0;
+}
+
+.form-spacer {
+  height: 20px;
 }
 
 /* 结果容器样式 */
@@ -456,7 +446,7 @@ onMounted(() => {
 /* 图片占位符样式 */
 .placeholder-image {
   width: 100%;
-  height: 480px; /* 增加高度 */
+  height: 480px;
   background-color: rgba(106, 152, 233, 0.05);
   border-radius: 8px;
   display: flex;
@@ -499,7 +489,7 @@ onMounted(() => {
 /* 错误样式 */
 .error-container {
   width: 100%;
-  height: 480px; /* 增加高度 */
+  height: 480px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -514,7 +504,7 @@ onMounted(() => {
 /* 生成的图片样式 */
 .generated-image {
   width: 100%;
-  height: 480px; /* 增加高度 */
+  height: 480px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: var(--el-box-shadow-light);

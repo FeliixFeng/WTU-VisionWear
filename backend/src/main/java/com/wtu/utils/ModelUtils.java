@@ -137,8 +137,17 @@ public class ModelUtils {
                 if (clazz.isInstance(value)) {
                     return clazz.cast(value);
                 } else {
-                    // 只有复杂对象才用parseObject
-                    return JSON.parseObject(value.toString(), clazz);
+                    // 处理JSONObject转String的特殊情况
+                    if (clazz == String.class && value instanceof JSONObject) {
+                        return (T) value.toString();
+                    }
+                    // 处理其他类型转换
+                    try {
+                        return JSON.parseObject(value.toString(), clazz);
+                    } catch (Exception e) {
+                        throw new ServiceException("无法将" + value.getClass().getSimpleName() + "转换为" + clazz.getSimpleName() + 
+                            "，值为：" + value);
+                    }
                 }
             } else {
                 throw  new ServiceException("data数据体中不存在" + key + "字段");

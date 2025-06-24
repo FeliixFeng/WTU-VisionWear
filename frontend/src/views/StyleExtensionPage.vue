@@ -53,17 +53,13 @@
                   </el-select>
                 </el-form-item>
 
-                <el-form-item label="图像强度">
-                  <el-tooltip content="保留原图的程度，值越低越接近原图，范围0-1" placement="top">
-                    <el-slider
-                        v-model="formData.imageStrength"
-                        :min="0"
-                        :max="1"
-                        :step="0.01"
-                        :format-tooltip="value => value.toFixed(2)"
-                    ></el-slider>
-                  </el-tooltip>
-                  <div class="slider-value">{{ formData.imageStrength.toFixed(2) }}</div>
+                <el-form-item label="参考模式">
+                  <el-select v-model="formData.genMode" placeholder="请选择参考模式" style="width: 100%">
+                    <el-option label="提示词模式" value="creative" />
+                    <el-option label="全参考模式" value="reference" />
+                    <el-option label="人物参考模式" value="reference_char" />
+                  </el-select>
+                  <div class="form-tip">不同模式对源图像的参考程度不同</div>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -78,37 +74,62 @@
               <div class="form-tip">提示词越详细，生成的图像效果越好</div>
             </el-form-item>
 
-            <el-form-item label="负面提示词">
-              <el-input
-                  v-model="formData.negativePrompt"
-                  type="textarea"
-                  :rows="1"
-                  placeholder="描述您不希望出现在图片中的元素"
-              ></el-input>
-            </el-form-item>
-
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="采样步数">
-                  <el-slider
-                      v-model="formData.steps"
-                      :min="10"
-                      :max="150"
-                      :step="1"
-                  ></el-slider>
-                  <div class="slider-value">{{ formData.steps }}</div>
+                <el-form-item label="高清处理效果">
+                  <el-tooltip content="越高人脸清晰度越高，范围0-1" placement="top">
+                    <el-slider
+                        v-model="formData.gpen"
+                        :min="0"
+                        :max="1"
+                        :step="0.01"
+                        :format-tooltip="value => value.toFixed(2)"
+                    ></el-slider>
+                  </el-tooltip>
+                  <div class="slider-value">{{ formData.gpen.toFixed(2) }}</div>
                 </el-form-item>
               </el-col>
 
               <el-col :span="12">
-                <el-form-item label="提示词相关性">
-                  <el-slider
-                      v-model="formData.cfgScale"
-                      :min="1"
-                      :max="35"
-                      :step="0.5"
-                  ></el-slider>
-                  <div class="slider-value">{{ formData.cfgScale }}</div>
+                <el-form-item label="人脸美化效果">
+                  <el-tooltip content="越高美颜效果越明显，范围0-1" placement="top">
+                    <el-slider
+                        v-model="formData.skin"
+                        :min="0"
+                        :max="1"
+                        :step="0.01"
+                        :format-tooltip="value => value.toFixed(2)"
+                    ></el-slider>
+                  </el-tooltip>
+                  <div class="slider-value">{{ formData.skin.toFixed(2) }}</div>
+                </el-form-item>
+              </el-col>
+            </el-row>
+
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="匀肤效果">
+                  <el-tooltip content="越高均匀肤色去除瑕疵效果越明显，范围0-1" placement="top">
+                    <el-slider
+                        v-model="formData.skinUnifi"
+                        :min="0"
+                        :max="1"
+                        :step="0.01"
+                        :format-tooltip="value => value.toFixed(2)"
+                    ></el-slider>
+                  </el-tooltip>
+                  <div class="slider-value">{{ formData.skinUnifi.toFixed(2) }}</div>
+                </el-form-item>
+              </el-col>
+
+              <el-col :span="12">
+                <el-form-item label="图像尺寸">
+                  <el-select v-model="formData.size" placeholder="选择图像尺寸" style="width: 100%">
+                    <el-option label="512 × 512" :value="{ width: 512, height: 512 }" />
+                    <el-option label="768 × 768" :value="{ width: 768, height: 768 }" />
+                    <el-option label="1024 × 1024" :value="{ width: 1024, height: 1024 }" />
+                    <el-option label="1328 × 1328" :value="{ width: 1328, height: 1328 }" />
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -218,7 +239,6 @@ import { ElMessage, ElNotification } from 'element-plus'
 import { Plus, Picture, Loading, Download, CopyDocument, Check } from '@element-plus/icons-vue'
 import { getValidToken } from "../utils/auth.js"
 import { image } from "../api"  // 导入image API模块而不是直接使用request
-import { handleApiError, handleBusinessError, showSuccess } from '../utils/errorHandler' // 导入错误处理工具
 
 // 样式预设选项
 const styleOptions = [
@@ -259,27 +279,18 @@ const sourceImageUrl = ref('')
 const resultImage = ref(null)
 const errorMessage = ref('')
 const generationTime = ref(null)
-const requestId = ref('')
 const uploadLoading = ref(false)
 
 // 支持的图片尺寸常量
 const SUPPORTED_DIMENSIONS = [
-  {width: 1024, height: 1024}, // 最常用的尺寸
-  {width: 1152, height: 896},
-  {width: 1216, height: 832},
-  {width: 1344, height: 768},
-  {width: 1536, height: 640},
-  {width: 640, height: 1536},
-  {width: 768, height: 1344},
-  {width: 832, height: 1216},
-  {width: 896, height: 1152}
+  {width: 512, height: 512},
+  {width: 768, height: 768},
+  {width: 1024, height: 1024},
+  {width: 1328, height: 1328}
 ]
 
 // 表单验证规则
 const rules = {
-  sourceImage: [
-    { required: true, message: '请上传源图像', trigger: 'change' }
-  ],
   prompt: [
     { required: true, message: '请输入提示词', trigger: 'blur' },
     { min: 3, message: '提示词至少需要3个字符', trigger: 'blur' }
@@ -289,13 +300,13 @@ const rules = {
 // 表单数据，与DTO结构对应
 const formData = reactive({
   prompt: '',
-  negativePrompt: '',
-  cfgScale: 7.0,
-  imageStrength: 0.35,
-  steps: 30,
-  style: '',
-  seed: -1,
-  sourceImage: null // 用于表单验证
+  gpen: 0.4,          // 高清处理效果
+  skin: 0.3,          // 人脸美化效果
+  skinUnifi: 0,       // 匀肤效果
+  genMode: 'creative', // 参考模式
+  style: '',          // 风格（会添加到prompt中）
+  seed: '-1',         // 随机种子
+  size: { width: 1328, height: 1328 } // 图像尺寸
 })
 
 // 计算表单是否有效
@@ -468,34 +479,22 @@ const uploadImage = async (options) => {
 
     console.log('上传响应:', response)
 
-    // 使用业务错误处理工具检查响应
-    const error = handleBusinessError(response, '图片上传失败');
-    if (error) return; // 如果有错误，handleBusinessError已经显示了错误消息
-
-    // 没有错误，继续处理成功情况
-    sourceImageUrl.value = response.data.data
+    if (response.data && response.data.code === 1) {
+      sourceImageUrl.value = response.data.data
       
-    // 添加调试日志
-    console.log('上传成功，获取到的图片URL:', sourceImageUrl.value)
+      // 添加调试日志
+      console.log('上传成功，获取到的图片URL:', sourceImageUrl.value)
 
-    // 关键修复：设置sourceImage值并主动清除验证错误
-    formData.sourceImage = "uploaded"  // 设置为非空值
-
-    // 延迟一下再验证，确保DOM更新
-    setTimeout(() => {
-      if (formRef.value) {
-        // 清除sourceImage字段的验证错误
-        formRef.value.clearValidate('sourceImage')
-      }
-    }, 100)
-
-    // 显示成功消息
-    showSuccess('图片上传成功，请继续填写其他参数')
+      // 显示成功消息
+      ElMessage.success('图片上传成功，请继续填写其他参数')
+    } else {
+      const errorMsg = response.data?.msg || '上传图片失败'
+      ElMessage.error(errorMsg)
+    }
   } catch (error) {
     console.error('上传错误:', error)
-
-    // 使用统一错误处理工具
-    handleApiError(error, '图片上传失败，请重试')
+    const errorMsg = error.response?.data?.msg || '上传图片时发生错误'
+    ElMessage.error(errorMsg)
   } finally {
     uploadLoading.value = false
   }
@@ -503,7 +502,7 @@ const uploadImage = async (options) => {
 
 // 生成图像
 const generateImage = async () => {
-  // 先检查是否上传了源图片 - 直接使用sourceImageUrl值判断
+  // 先检查是否上传了源图片
   if (!sourceImageUrl.value) {
     ElMessage.warning({
       message: '请先上传源图片',
@@ -514,7 +513,7 @@ const generateImage = async () => {
     return
   }
 
-  // 检查提示词是否填写 - 单独检查这个必填项
+  // 检查提示词是否填写
   if (!formData.prompt || formData.prompt.trim().length < 3) {
     ElMessage.warning({
       message: '请填写有效的提示词(至少3个字符)',
@@ -524,8 +523,6 @@ const generateImage = async () => {
     })
     return
   }
-
-  // 不再使用formRef.validate进行验证，而是直接判断关键参数
 
   isLoading.value = true
   resultImage.value = null
@@ -541,57 +538,70 @@ const generateImage = async () => {
 
     console.log('Token获取成功:', token.substring(0, 10) + '...')
 
-    // 准备请求体数据并进行参数检查
+    // 处理风格参数 - 如果有风格，添加到提示词中
+    let prompt = formData.prompt.trim()
+    if (formData.style) {
+      prompt = `${prompt}, ${formData.style} style`
+    }
+
+    // 准备请求体数据并进行参数映射
     const requestBody = {
-      sourceImageUrl: sourceImageUrl.value, // 修正参数名称，使用sourceImageUrl
-      prompt: formData.prompt.trim(), // 去除空格
-      negativePrompt: formData.negativePrompt,
-      cfgScale: formData.cfgScale,
-      imageStrength: formData.imageStrength,
-      samples: 1, // 固定只生成一张图
-      steps: formData.steps,
-      style: formData.style,
-      seed: null // 始终使用随机种子
+      req_key: "i2i_portrait_photo", // 固定值
+      image_input: sourceImageUrl.value, // 源图像URL
+      prompt: prompt, // 包含风格的提示词
+      width: formData.size.width,
+      height: formData.size.height,
+      gpen: formData.gpen,
+      skin: formData.skin,
+      skin_unifi: formData.skinUnifi,
+      gen_mode: formData.genMode,
+      seed: formData.seed
     }
 
     // 日志输出请求参数（便于调试）
     console.log('请求参数:', JSON.stringify(requestBody))
 
     // 发送请求
+    const startTime = Date.now()
     const response = await image.imageToImage(requestBody)
+    const endTime = Date.now()
+    generationTime.value = endTime - startTime
 
     console.log('响应状态:', response.status)
-    console.log('响应数据:', JSON.stringify(response.data))
+    console.log('响应数据:', JSON.stringify(response))
 
-    // 使用业务错误处理工具检查响应
-    const error = handleBusinessError(response, '图片生成失败');
-    if (error) {
-      errorMessage.value = error.message;
-      return;
-    }
-
-    // 没有错误，继续处理成功情况
-    // 按照VO结构处理返回数据
-    const result = response.data.data
-    requestId.value = result.requestId
-    generationTime.value = result.generationTimeMs
-
-    // 显示第一张生成的图片
-    if (result.images && result.images.length > 0) {
-      resultImage.value = result.images[0]
-      
-      // 使用成功通知
-      showSuccess('图片已成功生成', true)
+    // 检查响应结构
+    if (response && response.data && response.data.code === 1) {
+      // 后端返回的是包含URLs的数组
+      const urls = response.data.data
+      if (urls && urls.length > 0) {
+        // 创建结果对象
+        resultImage.value = {
+          imageUrl: urls[0],
+          width: formData.size.width,
+          height: formData.size.height,
+          imageId: urls[0].substring(urls[0].lastIndexOf('/') + 1) // 从URL提取图片ID
+        }
+        
+        // 使用成功通知
+        ElNotification({
+          title: '生成成功',
+          message: '风格延伸图片已成功生成',
+          type: 'success',
+          position: 'bottom-right'
+        })
+      } else {
+        errorMessage.value = '没有生成任何图像'
+        ElMessage.warning(errorMessage.value)
+      }
     } else {
-      errorMessage.value = '没有生成任何图像'
-      ElMessage.warning(errorMessage.value)
+      errorMessage.value = response?.data?.msg || '响应格式不正确'
+      ElMessage.error(errorMessage.value)
     }
   } catch (error) {
     console.error('API调用错误:', error)
-
-    // 使用统一错误处理工具
-    const errorResult = handleApiError(error, '图片生成失败，请稍后重试')
-    errorMessage.value = errorResult.message
+    errorMessage.value = error.message || '图片生成失败，请稍后重试'
+    ElMessage.error(errorMessage.value)
   } finally {
     isLoading.value = false
   }

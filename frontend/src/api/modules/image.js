@@ -34,7 +34,7 @@ export function uploadImage(formData) {
  */
 export function imageToImage(data) {
 	return request({
-		url: "/image/image-to-image",
+		url: "/image/doubao/image-to-image",
 		method: "post",
 		data,
 	})

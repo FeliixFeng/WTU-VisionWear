@@ -58,14 +58,28 @@ export async function imageToImage(params) {
       return Promise.reject('提示词不能为空');
     }
     
-    // 设置默认值
+    // 处理风格参数 - 如果有风格，添加到提示词中
+    let prompt = params.prompt;
+    if (params.style) {
+      prompt = `${prompt}, ${params.style} style`;
+    }
+    
+    // 设置默认值并映射参数名称
     const requestParams = {
-      imageStrength: 0.35,
-      cfgScale: 7.0,
-      steps: 30,
-      samples: 1,
-      ...params
+      req_key: "i2i_portrait_photo", // 固定值，与后端一致
+      image_input: params.sourceImageUrl, // 映射sourceImageUrl到imageInput
+      prompt: prompt, // 包含风格的提示词
+      width: params.width || 1024,
+      height: params.height || 1024,
+      // 其他可能需要的参数
+      gpen: params.gpen || 0.4,
+      skin: params.skin || 0.3,
+      skin_unifi: params.skinUnifi || 0,
+      gen_mode: params.genMode || 'creative',
+      seed: params.seed || '-1'
     };
+    
+    console.log('发送到后端的参数:', requestParams);
     
     const response = await image.imageToImage(requestParams);
     

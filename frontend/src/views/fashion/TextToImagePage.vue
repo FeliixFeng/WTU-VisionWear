@@ -190,8 +190,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElNotification } from 'element-plus'
 import { Picture, Loading, Download, CopyDocument } from '@element-plus/icons-vue'
-import {getValidToken} from "../utils/auth.js";
-import request from "../main.js";
+import {getValidToken} from "../../utils/auth.js";
+import request from "../../main.js";
 
 // 表单引用
 const formRef = ref(null)

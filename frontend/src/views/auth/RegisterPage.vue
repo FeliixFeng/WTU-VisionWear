@@ -1,11 +1,12 @@
+<!-- RegisterPage.vue -->
 <template>
-  <div class="login-container" :class="{'dialog-mode': isDialog}">
-    <div class="login-box">
+  <div class="register-container" :class="{'dialog-mode': isDialog}">
+    <div class="register-box">
       <div class="logo-area">
         <div class="logo-circle">
           <div class="logo-inner">
             <div class="deep-learning-design">
-              <!-- 居中的神经网络图 -->
+              <!-- 神经网络图 -->
               <div class="neural-network">
                 <!-- 输入层节点 -->
                 <div class="node input-node n1"></div>
@@ -34,19 +35,16 @@
                   <div class="connection c7"></div>
                   <div class="connection c8"></div>
                   <div class="connection c9"></div>
+
+                  <!-- 隐藏层到输出层连接 -->
                   <div class="connection c10"></div>
                   <div class="connection c11"></div>
                   <div class="connection c12"></div>
-
-                  <!-- 隐藏层到输出层连接 -->
                   <div class="connection c13"></div>
                   <div class="connection c14"></div>
                   <div class="connection c15"></div>
                   <div class="connection c16"></div>
                   <div class="connection c17"></div>
-                  <div class="connection c18"></div>
-                  <div class="connection c19"></div>
-                  <div class="connection c20"></div>
                 </div>
 
                 <!-- 激活动画 -->
@@ -64,66 +62,107 @@
         <p class="brand-slogan">AI定义时尚，科技塑造未来</p>
       </div>
 
-      <!-- 优化分隔区域，移除突兀的文字 -->
+      <!-- 优化分隔区域 -->
       <div class="separator">
         <span class="separator-line"></span>
       </div>
 
       <el-form
-          :model="loginForm"
-          ref="loginFormRef"
+          :model="registerForm"
+          ref="registerFormRef"
           :rules="rules"
-          class="login-form"
+          class="register-form"
           label-position="top"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item label="用户名" prop="username" class="compact-form-item">
           <el-input
-              v-model="loginForm.username"
-              placeholder="请输入用户名"
+              v-model="registerForm.username"
+              placeholder="请输入用户名（3-20个字符）"
               :prefix-icon="User"
               class="input-field" />
         </el-form-item>
 
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="邮箱" prop="email" class="compact-form-item">
+          <el-input
+              v-model="registerForm.email"
+              placeholder="请输入邮箱"
+              :prefix-icon="Message"
+              class="input-field" />
+        </el-form-item>
+
+        <el-form-item label="密码" prop="password" class="compact-form-item">
           <el-input
               type="password"
-              v-model="loginForm.password"
-              placeholder="请输入密码"
+              v-model="registerForm.password"
+              placeholder="请输入密码（6-20个字符）"
               :prefix-icon="Lock"
-              class="input-field"
-              @keyup.enter="handleLogin" />
+              class="input-field" />
+        </el-form-item>
+
+        <el-form-item label="确认密码" prop="confirmPassword" class="compact-form-item">
+          <el-input
+              type="password"
+              v-model="registerForm.confirmPassword"
+              placeholder="请再次输入密码"
+              :prefix-icon="Lock"
+              class="input-field" />
         </el-form-item>
 
         <div class="form-options">
-          <el-checkbox v-model="rememberMe">记住我</el-checkbox>
-          <el-link type="primary" :underline="false" @click="goToForgotPassword">忘记密码?</el-link>
+          <el-checkbox v-model="acceptTerms" @change="validateTerms">我已阅读并同意</el-checkbox>
+          <el-link type="primary" :underline="false" @click="showTerms">用户协议</el-link>
         </div>
 
-        <el-form-item>
+        <el-form-item class="button-item">
           <el-button
               type="primary"
-              @click="submitForm('loginFormRef')"
-              class="login-button"
+              @click="submitForm('registerFormRef')"
+              class="register-button"
               :loading="loading">
-            {{ loading ? '登录中...' : '登录' }}
+            {{ loading ? '注册中...' : '立即注册' }}
           </el-button>
         </el-form-item>
       </el-form>
 
-      <div class="login-footer">
-        <p>还没有账号? <el-link type="primary" :underline="false" @click="goToRegister">立即注册</el-link></p>
+      <div class="register-footer">
+        <p>已有账号? <el-link type="primary" :underline="false" @click="goToLogin">立即登录</el-link></p>
       </div>
     </div>
+
+    <!-- 用户协议对话框 -->
+    <el-dialog
+        v-model="termsDialogVisible"
+        title="用户协议"
+        width="60%"
+        center>
+      <div class="terms-content">
+        <h3>DeepWear 用户协议</h3>
+        <p>欢迎使用 DeepWear 平台。通过注册 DeepWear 账号，您同意以下条款：</p>
+        <ol>
+          <li>您提供的个人信息真实、准确、完整且不侵犯他人合法权益。</li>
+          <li>您将对账号安全负责，保护好您的账号信息。</li>
+          <li>您在使用本平台时应遵守相关法律法规。</li>
+          <li>我们将按照隐私政策收集、使用和保护您的个人信息。</li>
+          <li>平台保留在必要时修改服务条款的权利。</li>
+        </ol>
+        <p>如对协议有任何疑问，请联系我们的客服。</p>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="termsDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="acceptAndCloseTerms">同意并继续</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { User, Lock } from '@element-plus/icons-vue'
+import { ref, onMounted, reactive } from 'vue'
+import { User, Lock, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '../store/modules/auth'
-import { handleApiError } from '../utils/errorHandler'
+import { useAuthStore } from '../../store/modules/auth'
 
 // 新增的props，用于判断是否为弹窗模式
 const props = defineProps({
@@ -133,107 +172,156 @@ const props = defineProps({
   }
 })
 
-// 新增的emit，用于弹窗模式下切换到注册组件
-const emit = defineEmits(['switch-to-register', 'switch-to-forgot-password'])
+// 新增的emit，用于弹窗模式下切换到登录组件
+const emit = defineEmits(['switch-to-login'])
 
 const router = useRouter()
 const authStore = useAuthStore() // 使用认证状态
 
-const loginForm = ref({
+const registerForm = reactive({
   username: '',
+  email: '',
   password: '',
+  confirmPassword: ''
 })
-const rememberMe = ref(false)
+
+const acceptTerms = ref(false)
+const termsDialogVisible = ref(false)
 const loading = ref(false)
+
+// 验证邮箱格式
+const validateEmail = (rule, value, callback) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (value === '') {
+    callback(new Error('请输入邮箱地址'))
+  } else if (!emailRegex.test(value)) {
+    callback(new Error('请输入有效的邮箱地址'))
+  } else {
+    callback()
+  }
+}
+
+// 验证确认密码
+const validateConfirmPassword = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请再次输入密码'))
+  } else if (value !== registerForm.password) {
+    callback(new Error('两次输入密码不一致'))
+  } else {
+    callback()
+  }
+}
+
+// 验证用户协议
+const validateTerms = () => {
+  if (!acceptTerms.value) {
+    ElMessage.warning('请阅读并同意用户协议')
+    return false
+  }
+  return true
+}
 
 const rules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
   ],
+  email: [
+    { required: true, validator: validateEmail, trigger: 'blur' }
+  ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, validator: validateConfirmPassword, trigger: 'blur' }
   ]
 }
 
 // 表单引用
-const loginFormRef = ref(null)
+const registerFormRef = ref(null)
 
+// 提交表单
 const submitForm = (formName) => {
-  if (!loginFormRef.value) return
+  if (!registerFormRef.value) return
 
-  loginFormRef.value.validate((valid) => {
+  // 验证用户协议
+  if (!validateTerms()) return
+
+  registerFormRef.value.validate(async (valid) => {
     if (valid) {
-      handleLogin()
+      await handleRegister()
     } else {
-      ElMessage.warning('请正确填写登录信息')
+      ElMessage.warning('请正确填写注册信息')
       return false
     }
   })
 }
 
-const handleLogin = async () => {
+// 处理注册 - 使用authStore
+const handleRegister = async () => {
   loading.value = true
   try {
-    // 使用authStore进行登录
-    const data = await authStore.login(loginForm.value)
-    
-    // 保存记住我的状态
-    if (rememberMe.value) {
-      localStorage.setItem('rememberMe', 'true')
-      localStorage.setItem('savedUsername', loginForm.value.username)
-    } else {
-      localStorage.removeItem('rememberMe')
-      localStorage.removeItem('savedUsername')
+    // 准备请求数据
+    const registerData = {
+      username: registerForm.username,
+      password: registerForm.password,
+      email: registerForm.email
     }
 
-    // 检查是否有重定向参数
-    const redirect = router.currentRoute.value.query.redirect
-    await router.push(redirect || '/home')
-    
+    // 使用authStore进行注册
+    const result = await authStore.register(registerData)
+
+    // 可以选择将用户信息存储在localStorage中
+    localStorage.setItem('userInfo', JSON.stringify({
+      username: registerForm.username,
+      email: registerForm.email
+    }))
+
+    // 注册成功后根据模式决定跳转到登录页面还是切换到登录弹窗
+    if (props.isDialog) {
+      emit('switch-to-login')
+    } else {
+      router.push({ name: 'Login' })
+    }
   } catch (error) {
-    console.error('登录失败', error)
-    // 错误已经在store层处理，这里不需要再次显示
+    console.error('注册失败', error)
+    // 错误已经在service层处理，这里不需要再次显示
   } finally {
     loading.value = false
   }
 }
 
-// 跳转到注册页面或触发切换到注册弹窗的事件
-const goToRegister = () => {
-  if (props.isDialog) {
-    // 弹窗模式下，触发事件通知父组件切换为注册弹窗
-    emit('switch-to-register')
-  } else {
-    // 独立页面模式下，使用路由导航
-    router.push({ name: 'Register' })
-  }
+// 显示用户协议
+const showTerms = () => {
+  termsDialogVisible.value = true
 }
-const goToForgotPassword = () => {
+
+// 同意并关闭用户协议
+const acceptAndCloseTerms = () => {
+  acceptTerms.value = true
+  termsDialogVisible.value = false
+}
+
+// 跳转到登录页或切换到登录弹窗
+const goToLogin = () => {
   if (props.isDialog) {
-    // 弹窗模式下，触发事件通知父组件切换为忘记密码弹窗
-    emit('switch-to-forgot-password')
+    // 弹窗模式下，触发事件通知父组件切换为登录弹窗
+    emit('switch-to-login')
   } else {
     // 独立页面模式下，使用路由导航
-    router.push({ name: 'ForgotPasswordPage' })
+    router.push({ name: 'Login' })
   }
 }
 
 onMounted(() => {
-  // 检查是否有保存的用户名
-  if (localStorage.getItem('rememberMe') === 'true') {
-    rememberMe.value = true
-    loginForm.value.username = localStorage.getItem('savedUsername') || ''
-  }
-  
   // 初始化认证状态
   authStore.initAuth()
 })
 </script>
 
 <style scoped>
-.login-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -244,21 +332,21 @@ onMounted(() => {
 }
 
 /* 弹窗模式下的样式修改 */
-.login-container.dialog-mode {
+.register-container.dialog-mode {
   min-height: auto;
   background: none;
   animation: none;
   padding: 0;
 }
 
-.dialog-mode .login-box {
+.dialog-mode .register-box {
   width: 100%;
   box-shadow: none;
   padding: 20px;
   transform: none;
 }
 
-.dialog-mode .login-box:hover {
+.dialog-mode .register-box:hover {
   transform: none;
   box-shadow: none;
 }
@@ -281,34 +369,34 @@ onMounted(() => {
   }
 }
 
-.login-box {
-  width: 380px; /* 调整容器宽度 */
+.register-box {
+  width: 380px;
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  padding: 35px; /* 调整内边距 */
+  padding: 30px; /* 减小内边距 */
   transition: all 0.3s ease;
 }
 
-.login-box:hover {
+.register-box:hover {
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   transform: translateY(-5px);
 }
 
 .logo-area {
   text-align: center;
-  margin-bottom: 25px; /* 增加底部间距 */
+  margin-bottom: 18px; /* 减小底部间距 */
 }
 
 .logo-circle {
-  width: 85px; /* 轻微缩小logo */
-  height: 85px;
+  width: 75px; /* 缩小logo尺寸 */
+  height: 75px;
   background: linear-gradient(135deg, #43cea2, #185a9d);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 15px;
+  margin: 0 auto 12px;
   box-shadow: 0 5px 20px rgba(24, 90, 157, 0.4);
   position: relative;
   overflow: hidden;
@@ -336,25 +424,25 @@ onMounted(() => {
 /* 背景网格 */
 .grid-background {
   position: absolute;
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background:
       linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 8px 8px;
+  background-size: 7px 7px;
   border-radius: 50%;
   opacity: 0.8;
   z-index: 1;
 }
 
-/* 神经网络结构 - 修正居中 */
+/* 神经网络结构 - 居中 */
 .neural-network {
   position: absolute;
-  width: 65px;
-  height: 65px;
+  width: 55px;
+  height: 55px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -364,8 +452,8 @@ onMounted(() => {
 /* 节点样式 */
 .node {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
@@ -374,27 +462,27 @@ onMounted(() => {
 
 /* 输入层节点 - 居中对齐 */
 .input-node {
-  left: 10px;
+  left: 8px;
 }
-.n1 { top: 15px; }
-.n2 { top: 30px; }
-.n3 { top: 45px; }
+.n1 { top: 13px; }
+.n2 { top: 26px; }
+.n3 { top: 39px; }
 
 /* 隐藏层节点 - 居中对齐 */
 .hidden-node {
-  left: 30px;
+  left: 25px;
 }
-.n4 { top: 10px; }
-.n5 { top: 22px; }
-.n6 { top: 37px; }
-.n7 { top: 50px; }
+.n4 { top: 8px; }
+.n5 { top: 19px; }
+.n6 { top: 31px; }
+.n7 { top: 43px; }
 
 /* 输出层节点 - 居中对齐 */
 .output-node {
-  left: 50px;
+  left: 42px;
 }
-.n8 { top: 23px; }
-.n9 { top: 38px; }
+.n8 { top: 19px; }
+.n9 { top: 32px; }
 
 /* 连接线容器 */
 .connections {
@@ -417,115 +505,115 @@ onMounted(() => {
 
 /* 输入到隐藏层连接 - 重新调整 */
 .c1 {
-  width: 22px;
-  top: 18px;
-  left: 14px;
+  width: 19px;
+  top: 15px;
+  left: 12px;
   transform: rotate(-20deg);
 }
 .c2 {
-  width: 20px;
-  top: 18px;
-  left: 14px;
+  width: 17px;
+  top: 15px;
+  left: 12px;
   transform: rotate(10deg);
 }
 .c3 {
-  width: 24px;
-  top: 18px;
-  left: 14px;
+  width: 20px;
+  top: 15px;
+  left: 12px;
   transform: rotate(40deg);
 }
 .c4 {
-  width: 21px;
-  top: 33px;
-  left: 14px;
+  width: 18px;
+  top: 28px;
+  left: 12px;
   transform: rotate(-30deg);
 }
 .c5 {
-  width: 19px;
-  top: 33px;
-  left: 14px;
+  width: 16px;
+  top: 28px;
+  left: 12px;
   transform: rotate(0deg);
 }
 .c6 {
-  width: 21px;
-  top: 33px;
-  left: 14px;
+  width: 18px;
+  top: 28px;
+  left: 12px;
   transform: rotate(25deg);
 }
 .c7 {
-  width: 24px;
-  top: 48px;
-  left: 14px;
+  width: 20px;
+  top: 41px;
+  left: 12px;
   transform: rotate(-40deg);
 }
 .c8 {
-  width: 21px;
-  top: 48px;
-  left: 14px;
+  width: 18px;
+  top: 41px;
+  left: 12px;
   transform: rotate(-15deg);
 }
 .c9 {
-  width: 19px;
-  top: 48px;
-  left: 14px;
+  width: 16px;
+  top: 41px;
+  left: 12px;
   transform: rotate(15deg);
 }
 
 /* 隐藏层到输出层连接 - 重新调整 */
 .c10 {
-  width: 22px;
-  top: 13px;
-  left: 34px;
+  width: 19px;
+  top: 11px;
+  left: 29px;
   transform: rotate(25deg);
 }
 .c11 {
-  width: 21px;
-  top: 13px;
-  left: 34px;
+  width: 18px;
+  top: 11px;
+  left: 29px;
   transform: rotate(40deg);
 }
 .c12 {
-  width: 20px;
-  top: 25px;
-  left: 34px;
+  width: 17px;
+  top: 21px;
+  left: 29px;
   transform: rotate(-5deg);
 }
 .c13 {
-  width: 20px;
-  top: 25px;
-  left: 34px;
+  width: 17px;
+  top: 21px;
+  left: 29px;
   transform: rotate(15deg);
 }
 .c14 {
-  width: 21px;
-  top: 40px;
-  left: 34px;
+  width: 18px;
+  top: 34px;
+  left: 29px;
   transform: rotate(-15deg);
 }
 .c15 {
-  width: 20px;
-  top: 40px;
-  left: 34px;
+  width: 17px;
+  top: 34px;
+  left: 29px;
   transform: rotate(5deg);
 }
 .c16 {
-  width: 22px;
-  top: 53px;
-  left: 34px;
+  width: 19px;
+  top: 45px;
+  left: 29px;
   transform: rotate(-30deg);
 }
 .c17 {
-  width: 21px;
-  top: 53px;
-  left: 34px;
+  width: 18px;
+  top: 45px;
+  left: 29px;
   transform: rotate(-45deg);
 }
 
 /* 激活动画 - 重新调整位置 */
 .activation {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
@@ -535,20 +623,20 @@ onMounted(() => {
 }
 
 .a1 {
-  top: 22px;
-  left: 20px;
+  top: 19px;
+  left: 17px;
   animation-delay: 0s;
 }
 
 .a2 {
-  top: 35px;
-  left: 40px;
+  top: 30px;
+  left: 34px;
   animation-delay: 2s;
 }
 
 .a3 {
-  top: 30px;
-  left: 30px;
+  top: 25px;
+  left: 25px;
   animation-delay: 4s;
 }
 
@@ -571,7 +659,7 @@ onMounted(() => {
 }
 
 .brand-name {
-  font-size: 26px; /* 稍微调小字体 */
+  font-size: 24px; /* 调小字体 */
   font-weight: 600;
   color: #333;
   margin: 0;
@@ -579,16 +667,16 @@ onMounted(() => {
 
 .brand-slogan {
   color: #666;
-  font-size: 14px;
-  margin-top: 5px;
+  font-size: 13px; /* 调小字体 */
+  margin-top: 4px; /* 减少间距 */
 }
 
-/* 新的分隔线样式 */
+/* 分隔线样式 */
 .separator {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 20px 0 25px;
+  margin: 15px 0 18px; /* 减少上下间距 */
   position: relative;
 }
 
@@ -599,18 +687,25 @@ onMounted(() => {
   background: linear-gradient(to right, rgba(67, 206, 162, 0.1), rgba(24, 90, 157, 0.6), rgba(67, 206, 162, 0.1));
 }
 
-.login-form {
-  margin-top: 15px;
+.register-form {
+  margin-top: 10px; /* 减少顶部间距 */
 }
 
-.el-form-item {
-  margin-bottom: 18px; /* 减小表单项间距 */
+.compact-form-item {
+  margin-bottom: 12px !important; /* 更紧凑的表单项间距 */
 }
 
-/* 优化输入框 */
+/* 表单标签样式 */
+:deep(.el-form-item__label) {
+  padding-bottom: 4px !important; /* 减少标签和输入框之间的间距 */
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+}
+
+/* 输入框样式 */
 .input-field {
-  border-radius: 6px; /* 增加圆角 */
-  height: 42px; /* 统一高度 */
+  border-radius: 6px;
+  height: 38px; /* 减小高度 */
   font-size: 14px;
 }
 
@@ -620,43 +715,75 @@ onMounted(() => {
 
 .form-options {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
-  font-size: 14px;
+  gap: 5px;
+  margin-bottom: 15px; /* 减少底部间距 */
+  font-size: 13px; /* 减小字体 */
 }
 
-/* 优化登录按钮 */
-.login-button {
+.button-item {
+  margin-bottom: 0 !important; /* 移除按钮下方间距 */
+  margin-top: 5px; /* 减少顶部间距 */
+}
+
+/* 注册按钮 */
+.register-button {
   width: 100%;
-  height: 42px; /* 与输入框统一高度 */
-  border-radius: 6px; /* 增加圆角 */
+  height: 38px; /* 减小高度 */
+  border-radius: 6px;
   font-size: 15px;
   letter-spacing: 1px;
   background: linear-gradient(135deg, #43cea2, #185a9d);
   border: none;
   transition: all 0.3s ease;
-  margin-top: 5px;
 }
 
-.login-button:hover {
+.register-button:hover {
   background: linear-gradient(135deg, #36b57b, #144e84);
   box-shadow: 0 5px 15px rgba(67, 206, 162, 0.4);
   transform: translateY(-2px);
 }
 
-.login-footer {
+.register-footer {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 15px; /* 减少顶部间距 */
   color: #666;
-  font-size: 14px;
+  font-size: 13px; /* 减小字体 */
+}
+
+/* 用户协议对话框样式 */
+.terms-content {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.terms-content h3 {
+  margin-top: 0;
+  color: #185a9d;
+}
+
+.terms-content p {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.terms-content ol {
+  padding-left: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.terms-content li {
+  margin-bottom: 8px;
+  line-height: 1.5;
 }
 
 /* 响应式设计 */
 @media screen and (max-width: 480px) {
-  .login-box {
+  .register-box {
     width: 90%;
-    padding: 30px;
+    padding: 20px;
   }
 }
 </style>

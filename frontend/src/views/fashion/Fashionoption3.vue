@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted,ref } from 'vue';
-import {getValidToken} from "../utils/auth.js";
-import request from "../main.js";
+import {getValidToken} from "../../utils/auth.js";
+import request from "../../main.js";
 
 const pictures= ref([])
 

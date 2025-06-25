@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import '../styles/fontClass/iconfont.css'
+import '../../styles/fontClass/iconfont.css'
 
 export default {
   name: 'UserPanel',

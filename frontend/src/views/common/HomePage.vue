@@ -101,7 +101,7 @@
             <el-icon><Picture /></el-icon>我的图片
           </router-link>
         </div>
-        <userIconArea></userIconArea>
+        <UserProfileComponent></UserProfileComponent>
       </header>
 
       <!-- 展示图像区域 -->
@@ -111,8 +111,8 @@
 </template>
 
 <script>
-import UserIconArea from './userIconArea.vue';
-import MyPicture from './MyPicture.vue';
+import UserProfileComponent from '../user/UserProfileComponent.vue';
+import MyPicture from '../user/MyPicture.vue';
 import { ref } from 'vue';
 import {
   Grid, Edit, Brush,
@@ -123,7 +123,7 @@ import {
 export default {
   components: {
     MyPicture,
-    UserIconArea,
+    UserProfileComponent,
     Grid, Edit, Brush,
     PictureFilled, Picture, Monitor,
     Folder, SetUp, PictureRounded, Search

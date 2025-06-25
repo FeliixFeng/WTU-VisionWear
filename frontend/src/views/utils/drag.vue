@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { image } from "../api"
+import { image } from "../../api"
 const pictureUrl = ref('')
 const upload = ref(null)
 const inp = ref(null)

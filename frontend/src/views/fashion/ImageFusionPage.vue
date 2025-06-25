@@ -1,8 +1,8 @@
 <script setup>
-import drag from './drag.vue';
+import drag from '../utils/drag.vue';
 import { ref, onMounted } from 'vue'
-import { getValidToken } from "../utils/auth.js";
-import request from "../api/request.js";
+import { getValidToken } from "../../utils/auth.js";
+import request from "../../main.js";
 import { ElMessage } from 'element-plus';
 
 const textFeature = ref('')

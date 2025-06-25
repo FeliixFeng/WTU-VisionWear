@@ -261,9 +261,9 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElNotification } from 'element-plus'
 import { Plus, Picture, Loading, Download, CopyDocument, Check } from '@element-plus/icons-vue'
-import { getValidToken } from "../utils/auth.js"
-import { image } from "../api"  // 导入image API模块而不是直接使用request
-import { getAllUserImages } from "../api/modules/user.js"  // 导入获取用户图片的API
+import { getValidToken } from "../../utils/auth.js"
+import { image } from "../../api"  // 导入image API模块而不是直接使用request
+import { getAllUserImages } from "../../api/modules/user.js"  // 导入获取用户图片的API
 
 // 样式预设选项
 const styleOptions = [

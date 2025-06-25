@@ -34,11 +34,11 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { getValidToken } from "../utils/auth.js";
-import request from "../main.js";
+import { getValidToken } from "../../utils/auth.js";
+import request from "../../main.js";
 import { ElMessage } from 'element-plus';
 import { DocumentCopy, Download } from '@element-plus/icons-vue';
-import '../styles/download/font/iconfont.css'
+import '../../styles/download/font/iconfont.css'
 const images = ref([]);
 const mageIndex = ref(0);
 const pageSize = 8;

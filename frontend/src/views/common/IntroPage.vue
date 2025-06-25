@@ -6,7 +6,7 @@
         <el-row class="nav-row" justify="space-between" align="middle">
           <el-col :span="8">
             <div class="logo">
-              <span class="logo-text">DeepWear</span>
+              <span class="logo-text">VisionWear</span>
               <span class="logo-tagline">AI时尚先锋</span>
             </div>
           </el-col>
@@ -37,7 +37,7 @@
             <div class="hero-content">
               <div class="badge">时尚科技</div>
               <h1 class="hero-title">AI定义时尚，创意塑造风格</h1>
-              <p class="hero-description">DeepWear将前沿AI技术与时尚设计完美融合，为您打造个性化穿搭方案与独特风格体验。</p>
+              <p class="hero-description">VisionWear将前沿AI技术与时尚设计完美融合，为您打造个性化穿搭方案与独特风格体验。</p>
               <div class="hero-features">
                 <div class="feature-item"><i class="el-icon-brush"></i> 智能设计方案</div>
                 <div class="feature-item"><i class="el-icon-refresh"></i> 个性化穿搭</div>
@@ -104,7 +104,7 @@
           <div class="content-text">
             <h2 class="section-title">智能时尚的新时代</h2>
             <p class="section-description">
-              DeepWear 利用最先进的人工智能技术，结合对时尚潮流的深入理解，为每位用户提供量身定制的时尚体验。
+              VisionWear 利用最先进的人工智能技术，结合对时尚潮流的深入理解，为每位用户提供量身定制的时尚体验。
               无论您是追求个性风格还是希望跟上最新潮流，我们的平台都能满足您的需求。
             </p>
             <div class="stats-row">
@@ -163,7 +163,7 @@
     <!-- 简化的页脚 -->
     <div class="footer">
       <div class="container">
-        <p>&copy; {{ new Date().getFullYear() }} DeepWear. 保留所有权利。</p>
+        <p>&copy; {{ new Date().getFullYear() }} VisionWear. 保留所有权利。</p>
       </div>
     </div>
 
@@ -224,9 +224,9 @@
 <script setup>
 import {ref} from 'vue'
 // 导入您修改后的登录和注册页面组件
-import LoginPage from './LoginPage.vue'
-import RegisterPage from './RegisterPage.vue'
-import ForgotPasswordPage from "./ForgotPasswordPage.vue";
+import LoginPage from '../auth/LoginPage.vue'
+import RegisterPage from '../auth/RegisterPage.vue'
+import ForgotPasswordPage from "../auth/ForgotPasswordPage.vue";
 
 // 弹窗状态
 const loginDialogVisible = ref(false)

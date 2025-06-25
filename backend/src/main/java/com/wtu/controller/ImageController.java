@@ -71,6 +71,7 @@ public class ImageController {
     }
 
     @PostMapping("/doubao/styleConversion")
+    @Operation(summary = "图片风格转换功能")
     public Result<String> styleConversion(@RequestBody StyleConversionDTO request,
                                              HttpServletRequest httpServletRequest) throws Exception {
 

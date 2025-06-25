@@ -21,7 +21,7 @@ public class StyleConversionDTO {
     @NotBlank(message = "图片Base64编码不难为空")
     private String imageBase64;
 
-    @Schema(description = "漫画类型，可选值：jzcartoon（剪纸风）、watercolor_cartoon（水彩风）", required = true,
+    @Schema(description = "漫画类型，可选值：jzcartoon（剪纸风）、watercolor_cartoon（水彩风）",
             defaultValue = "jzcartoon")
     @NotBlank(message = "漫画类型不能为空")
     private String type;

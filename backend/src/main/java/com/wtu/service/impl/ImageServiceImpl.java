@@ -17,6 +17,7 @@ import com.wtu.DTO.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.entity.Image;
+import com.wtu.exception.ServiceException;
 import com.wtu.mapper.ImageMapper;
 import com.wtu.service.ImageService;
 import com.wtu.service.ImageStorageService;
@@ -91,7 +92,7 @@ public class ImageServiceImpl implements ImageService {
             //不断循环请求结果，直到状态为Done，再拿取base64
             JSONObject taskResponse = (JSONObject) visualService.cvSync2AsyncGetResult(taskRequest);
             String status= ModelUtils.getFromJsonData(taskResponse, "status", String.class);
-            if (status.equals("done")) {
+            if ("done".equals(status)) {
                 //先确保taskResponse有数据
                 List<String> base64 = ModelUtils.getBase64(taskResponse);
                 for (String s : base64) {
@@ -244,8 +245,7 @@ public class ImageServiceImpl implements ImageService {
         }
 
         // 假设 data 是你解析出来的 Data 对象
-        String imageUrl = cdnImage;
-        String imageId = imageStorageService.saveImageFromUrl(imageUrl, userId);
+        String imageId = imageStorageService.saveImageFromUrl(cdnImage, userId);
         String ossImageUrl = imageStorageService.getImageUrl(imageId);
         // 后续用 ossImageUrl 返回给前端或存数据库
 
@@ -307,6 +307,11 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String styleConversion(StyleConversionDTO request, Long userId) throws Exception {
+
+        if(request.getImageBase64().isBlank()){
+            throw new ServiceException("图片编码不能为空");
+        }
+
         IVisualService visualService = ModelUtils.createVisualService("cn-north-1");
         ImageStyleConversionRequest requestJson = new ImageStyleConversionRequest();
         requestJson.setImageBase64(request.getImageBase64());

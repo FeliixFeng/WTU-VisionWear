@@ -7,6 +7,9 @@ import com.wtu.VO.SketchToImageVO;
 
 import java.util.List;
 
+/**
+ * @author 高琛
+ */
 public interface ImageService {
     /**
      * 文本生成图像 (Text-to-Image)

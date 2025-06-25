@@ -13,7 +13,7 @@
     </div>
 
     <!-- 导航栏 -->
-    <div class="nav-container" :class="{ 'nav-scrolled': isScrolled }">
+    <div class="nav-container" :class="{ 'nav-scrolled': navScrolled }">
       <div class="container">
         <el-row class="nav-row" justify="space-between" align="middle">
           <el-col :span="8">
@@ -134,6 +134,49 @@
       </div>
     </div>
 
+    <!-- AI功能演示区域 -->
+    <div class="demo-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">AI时尚魔法，一键体验</h2>
+          <p class="section-subtitle">看看我们的AI如何为您打造完美穿搭</p>
+          <div class="title-decoration"></div>
+        </div>
+
+        <div class="demo-container">
+          <div class="demo-step" v-for="(step, index) in demoSteps" :key="index">
+            <div class="step-number">{{ index + 1 }}</div>
+            <div class="step-icon">{{ step.icon }}</div>
+            <h3 class="step-title">{{ step.title }}</h3>
+            <p class="step-description">{{ step.description }}</p>
+            <div class="step-animation">
+              <div class="animation-dot" :style="{ animationDelay: index * 0.5 + 's' }"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-showcase">
+          <div class="showcase-item active">
+            <div class="showcase-content">
+              <h4>智能风格分析</h4>
+              <p>上传您的照片，AI立即分析您的体型、肤色和个人风格偏好</p>
+              <div class="progress-demo">
+                <div class="progress-bar-demo" style="width: 85%;">
+                  <span class="progress-text">风格分析中... 85%</span>
+                </div>
+              </div>
+            </div>
+            <div class="showcase-visual">
+              <div class="ai-brain">
+                <div class="brain-pulse"></div>
+                <span class="brain-icon">🧠</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 特点展示区域 -->
     <div class="features-section" ref="featuresSection">
       <div class="container">
@@ -169,6 +212,19 @@
             <div class="stat-progress">
               <div class="progress-bar" :style="{ width: stat.progress + '%' }"></div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 合作伙伴区域 -->
+    <div class="partners-section">
+      <div class="container">
+        <h3 class="partners-title">全球时尚品牌信赖之选</h3>
+        <div class="partners-grid">
+          <div class="partner-item" v-for="(partner, index) in partners" :key="index">
+            <div class="partner-logo">{{ partner.name }}</div>
+            <div class="partner-glow"></div>
           </div>
         </div>
       </div>
@@ -225,14 +281,19 @@
             <div class="testimonial-card">
               <div class="testimonial-quote">"</div>
               <div class="testimonial-content">
+                <div class="rating-stars">
+                  <span v-for="i in 5" :key="i" class="star">⭐</span>
+                </div>
                 <p class="testimonial-text">{{ item.text }}</p>
                 <div class="testimonial-author">
                   <div class="author-avatar">
                     <img :src="item.avatar" :alt="item.name" />
+                    <div class="verified-badge">✓</div>
                   </div>
                   <div class="author-info">
                     <p class="author-name">{{ item.name }}</p>
                     <p class="author-role">{{ item.role }}</p>
+                    <p class="review-date">{{ item.date }}</p>
                   </div>
                 </div>
               </div>
@@ -240,6 +301,29 @@
             </div>
           </el-carousel-item>
         </el-carousel>
+      </div>
+    </div>
+
+    <!-- FAQ区域 -->
+    <div class="faq-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">常见问题</h2>
+          <p class="section-subtitle">快速了解VisionWear</p>
+          <div class="title-decoration"></div>
+        </div>
+
+        <div class="faq-container">
+          <div class="faq-item" v-for="(faq, index) in faqs" :key="index" @click="toggleFaq(index)">
+            <div class="faq-question">
+              <span>{{ faq.question }}</span>
+              <div class="faq-icon" :class="{ 'active': faq.open }">+</div>
+            </div>
+            <div class="faq-answer" :class="{ 'open': faq.open }">
+              <p>{{ faq.answer }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -328,20 +412,71 @@ import {ref, onMounted, onUnmounted} from 'vue'
 // 导入您修改后的登录和注册页面组件
 import LoginPage from '../auth/LoginPage.vue'
 import RegisterPage from '../auth/RegisterPage.vue'
-import ForgotPasswordPage from "../auth/ForgotPasswordPage.vue";
+import ForgotPasswordPage from "../auth/ForgotPasswordPage.vue"
 
-// 弹窗状态
+// 所有状态变量
 const loginDialogVisible = ref(false)
 const registerDialogVisible = ref(false)
 const forgotPasswordDialogVisible = ref(false)
-
-// 滚动状态
-const isScrolled = ref(false)
-
-// 动画数据
+const navScrolled = ref(false)
 const animatedStats = ref([0, 0, 0])
 
-// 轮播图数据
+// 所有数据
+const demoSteps = ref([
+  {
+    icon: '📸',
+    title: '上传照片',
+    description: '简单上传您的照片，AI开始分析'
+  },
+  {
+    icon: '🤖',
+    title: 'AI分析',
+    description: '智能识别体型、肤色、风格偏好'
+  },
+  {
+    icon: '🎨',
+    title: '生成方案',
+    description: '个性化穿搭方案即时生成'
+  },
+  {
+    icon: '✨',
+    title: '完美呈现',
+    description: '获得专属的时尚搭配建议'
+  }
+])
+
+const partners = ref([
+  { name: 'ZARA' },
+  { name: 'H&M' },
+  { name: 'UNIQLO' },
+  { name: 'Nike' },
+  { name: 'Adidas' },
+  { name: 'Gucci' }
+])
+
+const faqs = ref([
+  {
+    question: 'VisionWear的AI技术准确度如何？',
+    answer: '我们的AI经过数百万时尚数据训练，准确度达到95%以上，能够精准理解您的个人风格和偏好。',
+    open: false
+  },
+  {
+    question: '使用VisionWear需要付费吗？',
+    answer: '我们提供免费的基础功能，包括基本的穿搭建议。高级功能如个性化定制、专业搭配师咨询等需要升级会员。',
+    open: false
+  },
+  {
+    question: '我的个人数据安全吗？',
+    answer: '我们采用银行级别的数据加密技术，严格遵守数据保护法规，您的所有个人信息都将得到最高级别的保护。',
+    open: false
+  },
+  {
+    question: '支持哪些设备使用？',
+    answer: 'VisionWear支持所有主流设备，包括手机、平板、电脑，同时提供iOS和Android原生应用。',
+    open: false
+  }
+])
+
 const carouselImages = ref([
   {
     src: 'https://img.freepik.com/free-photo/full-length-portrait-smiling-pretty-woman-isolated-white-wall_171337-9592.jpg',
@@ -375,7 +510,6 @@ const carouselImages = ref([
   }
 ])
 
-// 特性数据
 const features = ref([
   {
     icon: '👔',
@@ -399,41 +533,52 @@ const features = ref([
   }
 ])
 
-// 统计数据
 const stats = ref([
   { icon: '👥', number: 5000, label: '用户选择', progress: 85 },
   { icon: '⭐', number: 98, label: '满意度', progress: 98 },
   { icon: '🕒', number: 24, label: '小时客户支持', progress: 100 }
 ])
 
-// 用户评价数据
 const testimonials = ref([
   {
     name: '张小姐',
     role: '时尚博主',
     avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    text: 'VisionWear彻底改变了我的穿衣方式！AI推荐的搭配总是令人惊艳，省去了我大量选择服装的时间。'
+    text: 'VisionWear彻底改变了我的穿衣方式！AI推荐的搭配总是令人惊艳，省去了我大量选择服装的时间。',
+    date: '2024年12月'
   },
   {
     name: '李先生',
     role: '企业经理',
     avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-    text: '作为一个对时尚了解不多的人，VisionWear为我提供了专业级别的穿搭建议，让我在各种场合都能得体亮相。'
+    text: '作为一个对时尚了解不多的人，VisionWear为我提供了专业级别的穿搭建议，让我在各种场合都能得体亮相。',
+    date: '2024年11月'
   },
   {
     name: '王女士',
     role: '服装设计师',
     avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
-    text: '平台的AI算法非常智能，能够精准捕捉最新的时尚趋势，作为设计师的我都从中获得了很多灵感！'
+    text: '平台的AI算法非常智能，能够精准捕捉最新的时尚趋势，作为设计师的我都从中获得了很多灵感！',
+    date: '2024年12月'
+  },
+  {
+    name: '刘先生',
+    role: '创业者',
+    avatar: 'https://randomuser.me/api/portraits/men/75.jpg',
+    text: '界面简洁易用，AI推荐很精准。现在我的衣橱利用率提高了80%，每天穿搭都很有自信！',
+    date: '2025年1月'
   }
 ])
 
-// 滚动事件处理
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 50
+// 所有方法
+const toggleFaq = (index) => {
+  faqs.value[index].open = !faqs.value[index].open
 }
 
-// 数字动画
+const handleScroll = () => {
+  navScrolled.value = window.scrollY > 50
+}
+
 const animateNumbers = () => {
   stats.value.forEach((stat, index) => {
     let current = 0
@@ -450,35 +595,30 @@ const animateNumbers = () => {
   })
 }
 
-// 显示登录弹窗
 const showLoginDialog = () => {
   loginDialogVisible.value = true
   registerDialogVisible.value = false
   forgotPasswordDialogVisible.value = false
 }
 
-// 显示注册弹窗
 const showRegisterDialog = () => {
   registerDialogVisible.value = true
   loginDialogVisible.value = false
   forgotPasswordDialogVisible.value = false
 }
 
-// 切换到登录
 const switchToLogin = () => {
   loginDialogVisible.value = true
   registerDialogVisible.value = false
   forgotPasswordDialogVisible.value = false
 }
 
-// 切换到注册
 const switchToRegister = () => {
   registerDialogVisible.value = true
   loginDialogVisible.value = false
   forgotPasswordDialogVisible.value = false
 }
 
-// 显示忘记密码弹窗
 const switchToForgotPassword = () => {
   forgotPasswordDialogVisible.value = true
   loginDialogVisible.value = false
@@ -808,6 +948,7 @@ onUnmounted(() => {
 
 .hero-content {
   animation: slide-in-left 1s ease-out;
+  padding-right: 30px;
 }
 
 .badge-container {
@@ -1091,6 +1232,203 @@ onUnmounted(() => {
   line-height: 1.5;
 }
 
+/* AI功能演示区域 */
+.demo-section {
+  padding: 120px 0;
+  background: linear-gradient(135deg, rgba(67, 206, 162, 0.02), rgba(24, 90, 157, 0.02));
+  position: relative;
+  overflow: hidden;
+}
+
+.demo-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(67,206,162,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.3;
+}
+
+.demo-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  margin-bottom: 80px;
+  position: relative;
+  z-index: 2;
+}
+
+.demo-step {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.demo-step:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.step-number {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 5px 15px rgba(67, 206, 162, 0.4);
+}
+
+.step-icon {
+  font-size: 50px;
+  margin-bottom: 20px;
+  animation: bounce-gentle 3s infinite ease-in-out;
+}
+
+.step-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.step-description {
+  color: #666;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.step-animation {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.animation-dot {
+  width: 8px;
+  height: 8px;
+  background: #43cea2;
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.demo-showcase {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 2;
+}
+
+.showcase-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 40px;
+  align-items: center;
+}
+
+.showcase-content h4 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.showcase-content p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.progress-demo {
+  background: #f0f0f0;
+  border-radius: 25px;
+  height: 30px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-demo {
+  height: 100%;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 3s ease;
+  animation: progress-shimmer 2s infinite;
+}
+
+.progress-text {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.showcase-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ai-brain {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(67, 206, 162, 0.2), rgba(24, 90, 157, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: brain-float 4s infinite ease-in-out;
+}
+
+.brain-pulse {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 2px solid rgba(67, 206, 162, 0.3);
+  border-radius: 50%;
+  animation: pulse-ring 2s infinite ease-out;
+}
+
+.brain-pulse::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  border: 1px solid rgba(67, 206, 162, 0.2);
+  border-radius: 50%;
+  animation: pulse-ring 2s infinite 0.5s ease-out;
+}
+
+.brain-icon {
+  font-size: 40px;
+  z-index: 2;
+}
+
 /* 特性展示区域 */
 .features-section {
   padding: 120px 0;
@@ -1309,6 +1647,68 @@ onUnmounted(() => {
   animation: progress-glow 3s infinite;
 }
 
+/* 合作伙伴区域 */
+.partners-section {
+  padding: 60px 0;
+  background: white;
+  border-top: 1px solid rgba(67, 206, 162, 0.1);
+  border-bottom: 1px solid rgba(67, 206, 162, 0.1);
+}
+
+.partners-title {
+  text-align: center;
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 40px;
+  font-weight: 500;
+}
+
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 40px;
+  align-items: center;
+}
+
+.partner-item {
+  text-align: center;
+  position: relative;
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.partner-item:hover {
+  transform: translateY(-5px);
+}
+
+.partner-logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #999;
+  transition: all 0.3s ease;
+  letter-spacing: 2px;
+}
+
+.partner-item:hover .partner-logo {
+  color: #43cea2;
+}
+
+.partner-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(67, 206, 162, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.partner-item:hover .partner-glow {
+  opacity: 1;
+}
+
 /* 内容区域 */
 .content-section {
   padding: 120px 0;
@@ -1440,6 +1840,22 @@ onUnmounted(() => {
   font-family: serif;
 }
 
+.rating-stars {
+  margin-bottom: 20px;
+}
+
+.star {
+  font-size: 16px;
+  margin-right: 2px;
+  animation: star-twinkle 2s infinite ease-in-out;
+}
+
+.star:nth-child(1) { animation-delay: 0s; }
+.star:nth-child(2) { animation-delay: 0.2s; }
+.star:nth-child(3) { animation-delay: 0.4s; }
+.star:nth-child(4) { animation-delay: 0.6s; }
+.star:nth-child(5) { animation-delay: 0.8s; }
+
 .testimonial-content {
   position: relative;
   z-index: 2;
@@ -1487,6 +1903,23 @@ onUnmounted(() => {
   object-fit: cover;
 }
 
+.verified-badge {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 20px;
+  height: 20px;
+  background: #43cea2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  border: 2px solid white;
+}
+
 .author-info {
   flex: 1;
 }
@@ -1501,6 +1934,12 @@ onUnmounted(() => {
 .author-role {
   font-size: 14px;
   color: #666;
+  margin-bottom: 2px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: #999;
 }
 
 .card-gradient {
@@ -1516,6 +1955,85 @@ onUnmounted(() => {
 
 .testimonial-card:hover .card-gradient {
   opacity: 1;
+}
+
+/* FAQ区域 */
+.faq-section {
+  padding: 120px 0;
+  background: white;
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(67, 206, 162, 0.1);
+  border-radius: 15px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.faq-item:hover {
+  border-color: rgba(67, 206, 162, 0.3);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.faq-question {
+  padding: 25px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover .faq-question {
+  color: #43cea2;
+}
+
+.faq-icon {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #43cea2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #43cea2;
+  transition: all 0.3s ease;
+}
+
+.faq-icon.active {
+  transform: rotate(45deg);
+  background: #43cea2;
+  color: white;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(67, 206, 162, 0.02);
+}
+
+.faq-answer.open {
+  max-height: 200px;
+}
+
+.faq-answer p {
+  padding: 0 30px 25px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
 }
 
 /* 行动召唤区域 */
@@ -1849,6 +2367,54 @@ onUnmounted(() => {
   100% {
     opacity: 0;
     transform: translateY(-40px) scale(0);
+  }
+}
+
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes progress-shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+@keyframes brain-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
   }
 }
 

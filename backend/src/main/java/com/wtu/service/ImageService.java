@@ -1,10 +1,7 @@
 package com.wtu.service;
 
 
-import com.wtu.DTO.ImageFusionDTO;
-import com.wtu.DTO.ImageToImageDTO;
-import com.wtu.DTO.SketchToImageDTO;
-import com.wtu.DTO.TextToImageDTO;
+import com.wtu.DTO.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
 
@@ -64,5 +61,12 @@ public interface ImageService {
      */
     List<String> getAllImageUrls(Long userId);
 
-
+    /**
+     * 豆包模型风格转换功能
+     *
+     * @param request 请求参数
+     * @param userId  用户id
+     * @return 图像URL列表
+     */
+    String styleConversion(StyleConversionDTO request, Long userId) throws Exception;
 }

@@ -1,8 +1,5 @@
 package com.wtu.controller;
-import com.wtu.DTO.ImageFusionDTO;
-import com.wtu.DTO.ImageToImageDTO;
-import com.wtu.DTO.SketchToImageDTO;
-import com.wtu.DTO.TextToImageDTO;
+import com.wtu.DTO.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.result.Result;
@@ -46,7 +43,6 @@ public class ImageController {
         // 调用用户服务的textToImage方法生成图像
         List<String> ids = imageService.textToImage(request, userId);
         List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
-        log.info("URLS: {}", urls);
         return Result.success(urls);
     }
 
@@ -56,21 +52,15 @@ public class ImageController {
                                              HttpServletRequest httpServletRequest) {
         try {
             Long userId = UserContext.getCurrentUserId(httpServletRequest);
-            log.info("当前用户 ID: {}", userId);
-            log.info("开始处理以图生图请求: {}", request);
             // 调用用户服务的imageToImage方法生成图像
             List<String> ids = imageService.imageToImage(request, userId);
-            log.info("ids:{}",ids);
             List<String> urls = ids.
                     stream().
                     map(imageStorageService::getImageUrl).
                     collect(Collectors.toList());
 
-            log.info("URLS: {}", urls);
-
             return Result.success(urls);
         } catch (Exception e) {
-            log.error("以图生图失败", e);
             // 错误信息处理保持不变
             String errorMessage = e.getMessage();
             if (errorMessage != null && errorMessage.contains("520")) {
@@ -78,6 +68,15 @@ public class ImageController {
             }
             return Result.error("以图生图失败: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/doubao/styleConversion")
+    public Result<String> styleConversion(@RequestBody StyleConversionDTO request,
+                                             HttpServletRequest httpServletRequest) throws Exception {
+
+        //service层处理id与URL转换，Controller层直接返回即可.
+        return Result.success(imageService.styleConversion(request,
+                UserContext.getCurrentUserId(httpServletRequest)));
     }
 
     @PostMapping("/image-fusion")
@@ -122,9 +121,6 @@ public class ImageController {
     @PostMapping("/upload")
     @Operation(description = "文件上传")
     public Result<String> upload(MultipartFile file) {
-        log.info("文件上传开始: 文件名={}, 大小={}bytes",
-                file.getOriginalFilename(), file.getSize());
-
         try {
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null) {
@@ -135,17 +131,13 @@ public class ImageController {
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             // 构建新的文件名称
             String objectName = UUID.randomUUID() + extension;
-            log.info("生成的对象名称: {}", objectName);
 
             String filePath = aliOssUtil.upload(file.getBytes(), objectName);
-            log.info("上传成功，返回的文件路径: {}", filePath);
 
             return Result.success(filePath);
         } catch (IOException e) {
-            log.error("文件上传失败, 错误: {}", e.getMessage(), e);
             return Result.error("文件读取失败: " + e.getMessage());
         } catch (Exception e) {
-            log.error("文件上传过程发生未知错误", e);
             return Result.error("上传过程发生错误: " + e.getMessage());
         }
     }

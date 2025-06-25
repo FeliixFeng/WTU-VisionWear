@@ -11,10 +11,9 @@ import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
 import com.volcengine.service.visual.IVisualService;
-import com.wtu.DTO.ImageFusionDTO;
-import com.wtu.DTO.ImageToImageDTO;
-import com.wtu.DTO.SketchToImageDTO;
-import com.wtu.DTO.TextToImageDTO;
+import com.volcengine.service.visual.model.request.ImageStyleConversionRequest;
+import com.volcengine.service.visual.model.response.ImageStyleConversionResponse;
+import com.wtu.DTO.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.entity.Image;
@@ -59,7 +58,6 @@ public class ImageServiceImpl implements ImageService {
         if (request.getPrompt().length() < 10) {
             req.put("use_pre_llm", true);
         }
-        log.info("req:{}", req.toString());
         //发送请求，得到response
         Object response = visualService.cvProcess(req);
         //从response中拿出base64编码
@@ -305,6 +303,21 @@ public class ImageServiceImpl implements ImageService {
 
         log.info("获取到用户 {} 的图像URL: {} 个", userId, imageUrls.size());
         return imageUrls;
+    }
+
+    @Override
+    public String styleConversion(StyleConversionDTO request, Long userId) throws Exception {
+        IVisualService visualService = ModelUtils.createVisualService("cn-north-1");
+        ImageStyleConversionRequest requestJson = new ImageStyleConversionRequest();
+        requestJson.setImageBase64(request.getImageBase64());
+        requestJson.setType(request.getType());
+        //调用请求，拿取base64编码
+        ImageStyleConversionResponse response = visualService.imageStyleConversion(requestJson);
+        String image = response.getData().getImage();
+        //存入数据库中，拿到Imageid
+        String id = imageStorageService.saveBase64Image(image, userId);
+        //通过imageId拿取url并返回
+        return imageStorageService.getImageUrl(id);
     }
 
 }

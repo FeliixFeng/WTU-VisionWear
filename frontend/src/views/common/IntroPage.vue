@@ -1,26 +1,58 @@
 <template>
   <div class="intro-page">
+    <!-- 装饰性背景元素 -->
+    <div class="bg-decorations">
+      <div class="decoration-circle decoration-1"></div>
+      <div class="decoration-circle decoration-2"></div>
+      <div class="decoration-circle decoration-3"></div>
+      <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+      </div>
+    </div>
+
     <!-- 导航栏 -->
-    <div class="nav-container">
+    <div class="nav-container" :class="{ 'nav-scrolled': isScrolled }">
       <div class="container">
         <el-row class="nav-row" justify="space-between" align="middle">
           <el-col :span="8">
             <div class="logo">
-              <span class="logo-text">VisionWear</span>
-              <span class="logo-tagline">AI时尚先锋</span>
+              <div class="logo-icon">
+                <div class="logo-sparkle">✨</div>
+              </div>
+              <div class="logo-content">
+                <span class="logo-text">VisionWear</span>
+                <span class="logo-tagline">AI时尚先锋</span>
+              </div>
             </div>
           </el-col>
           <el-col :span="16">
             <div class="nav-menu">
               <el-menu mode="horizontal" :ellipsis="false" class="menu-items">
-                <el-menu-item index="1">功能</el-menu-item>
-                <el-menu-item index="2">价格</el-menu-item>
-                <el-menu-item index="3">关于我们</el-menu-item>
-                <el-menu-item index="4">联系我们</el-menu-item>
+                <el-menu-item index="1">
+                  <span class="menu-text">功能</span>
+                  <div class="menu-underline"></div>
+                </el-menu-item>
+                <el-menu-item index="2">
+                  <span class="menu-text">价格</span>
+                  <div class="menu-underline"></div>
+                </el-menu-item>
+                <el-menu-item index="3">
+                  <span class="menu-text">关于我们</span>
+                  <div class="menu-underline"></div>
+                </el-menu-item>
+                <el-menu-item index="4">
+                  <span class="menu-text">联系我们</span>
+                  <div class="menu-underline"></div>
+                </el-menu-item>
               </el-menu>
               <div class="nav-buttons">
-                <el-button @click="showLoginDialog" type="text">登录</el-button>
-                <el-button @click="showRegisterDialog" type="primary" round>免费注册</el-button>
+                <el-button @click="showLoginDialog" type="text" class="login-btn">登录</el-button>
+                <el-button @click="showRegisterDialog" type="primary" class="register-btn">
+                  <span>免费注册</span>
+                  <div class="btn-glow"></div>
+                </el-button>
               </div>
             </div>
           </el-col>
@@ -30,33 +62,72 @@
 
     <!-- 英雄区域 -->
     <div class="hero-section">
-      <div class="animated-bg"></div>
+      <div class="hero-bg-animation"></div>
+      <div class="hero-particles"></div>
       <div class="container">
-        <el-row :gutter="40">
+        <el-row :gutter="100">
           <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <div class="hero-content">
-              <div class="badge">时尚科技</div>
-              <h1 class="hero-title">AI定义时尚，创意塑造风格</h1>
-              <p class="hero-description">VisionWear将前沿AI技术与时尚设计完美融合，为您打造个性化穿搭方案与独特风格体验。</p>
+            <div class="hero-content" ref="heroContent">
+              <div class="badge-container">
+                <div class="badge">
+                  <span class="badge-icon">🚀</span>
+                  <span>时尚科技</span>
+                  <div class="badge-shimmer"></div>
+                </div>
+              </div>
+              <h1 class="hero-title">
+                <span class="title-line">AI定义时尚</span>
+                <span class="title-line">创意塑造风格</span>
+                <div class="title-cursor"></div>
+              </h1>
+              <p class="hero-description">
+                VisionWear将前沿AI技术与时尚设计完美融合，为您打造个性化穿搭方案与独特风格体验。
+              </p>
               <div class="hero-features">
-                <div class="feature-item"><i class="el-icon-brush"></i> 智能设计方案</div>
-                <div class="feature-item"><i class="el-icon-refresh"></i> 个性化穿搭</div>
-                <div class="feature-item"><i class="el-icon-chat-line-round"></i> 时尚顾问</div>
+                <div class="feature-item">
+                  <div class="feature-icon">🎨</div>
+                  <span>智能设计方案</span>
+                  <div class="feature-ripple"></div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔄</div>
+                  <span>个性化穿搭</span>
+                  <div class="feature-ripple"></div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">💬</div>
+                  <span>时尚顾问</span>
+                  <div class="feature-ripple"></div>
+                </div>
               </div>
               <div class="hero-buttons">
-                <el-button type="primary" size="large" round @click="showRegisterDialog">立即体验</el-button>
-                <el-button type="info" size="large" round plain>探索功能</el-button>
+                <el-button type="primary" size="large" @click="showRegisterDialog" class="cta-primary">
+                  <span>立即体验</span>
+                  <div class="btn-particles"></div>
+                </el-button>
+                <el-button type="info" size="large" plain class="cta-secondary">
+                  <span>探索功能</span>
+                  <div class="btn-border-animation"></div>
+                </el-button>
               </div>
             </div>
           </el-col>
           <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-            <div class="hero-image">
-              <div class="image-decoration"></div>
-              <el-carousel :interval="4000" arrow="always" height="500px" class="hero-carousel">
-                <el-carousel-item v-for="(item, index) in carouselImages" :key="index">
-                  <img :src="item.src" :alt="item.alt" class="hero-carousel-image" />
-                </el-carousel-item>
-              </el-carousel>
+            <div class="hero-image" ref="heroImage">
+              <div class="image-frame">
+                <div class="frame-decoration"></div>
+                <el-carousel :interval="4000" arrow="hover" height="500px" class="hero-carousel">
+                  <el-carousel-item v-for="(item, index) in carouselImages" :key="index">
+                    <div class="carousel-item-container">
+                      <img :src="item.src" :alt="item.alt" class="hero-carousel-image" />
+                      <div class="carousel-overlay">
+                        <h3 class="carousel-title">{{ item.title }}</h3>
+                        <p class="carousel-description">{{ item.description }}</p>
+                      </div>
+                    </div>
+                  </el-carousel-item>
+                </el-carousel>
+              </div>
             </div>
           </el-col>
         </el-row>
@@ -64,42 +135,56 @@
     </div>
 
     <!-- 特点展示区域 -->
-    <div class="features-section">
+    <div class="features-section" ref="featuresSection">
       <div class="container">
-        <h2 class="section-title">时尚科技的完美融合</h2>
-        <p class="section-subtitle">重新定义您的穿衣体验</p>
-        
+        <div class="section-header">
+          <h2 class="section-title">时尚科技的完美融合</h2>
+          <p class="section-subtitle">重新定义您的穿衣体验</p>
+          <div class="title-decoration"></div>
+        </div>
+
         <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">👔</div>
-            <h3>个性化风格定制</h3>
-            <p>基于您的喜好、体型与场合需求，智能推荐最适合您的穿搭方案</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">🎨</div>
-            <h3>色彩搭配顾问</h3>
-            <p>专业的色彩分析系统，让您的穿搭更加和谐、突显个人气质</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">💫</div>
-            <h3>趋势预测分析</h3>
-            <p>实时捕捉全球时尚动向，让您走在潮流前沿，展现前卫品味</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">📱</div>
-            <h3>虚拟换装体验</h3>
-            <p>通过AR技术在线尝试不同搭配，轻松找到最适合的衣着风格</p>
+          <div class="feature-card" v-for="(feature, index) in features" :key="index">
+            <div class="card-glow"></div>
+            <div class="feature-icon-container">
+              <div class="feature-icon">{{ feature.icon }}</div>
+              <div class="icon-ring"></div>
+            </div>
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-description">{{ feature.description }}</p>
+            <div class="card-shine"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 简单内容区域 -->
+    <!-- 数据展示区域 -->
+    <div class="stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card" v-for="(stat, index) in stats" :key="index">
+            <div class="stat-icon">{{ stat.icon }}</div>
+            <div class="stat-number" :data-target="stat.number">{{ animatedStats[index] }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+            <div class="stat-progress">
+              <div class="progress-bar" :style="{ width: stat.progress + '%' }"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 内容区域样式 -->
     <div class="content-section">
       <div class="container">
         <div class="content-wrapper">
           <div class="content-image">
-            <img src="https://img.freepik.com/free-photo/high-fashion-look-glamour-portrait-beautiful-sexy-stylish-caucasian-young-woman-model_158538-1400.jpg" alt="智能时尚" />
+            <div class="image-container">
+              <img src="https://img.freepik.com/free-photo/high-fashion-look-glamour-portrait-beautiful-sexy-stylish-caucasian-young-woman-model_158538-1400.jpg" alt="智能时尚" />
+              <div class="image-overlay">
+                <div class="overlay-text">智能时尚</div>
+              </div>
+            </div>
           </div>
           <div class="content-text">
             <h2 class="section-title">智能时尚的新时代</h2>
@@ -107,18 +192,18 @@
               VisionWear 利用最先进的人工智能技术，结合对时尚潮流的深入理解，为每位用户提供量身定制的时尚体验。
               无论您是追求个性风格还是希望跟上最新潮流，我们的平台都能满足您的需求。
             </p>
-            <div class="stats-row">
-              <div class="stat-item">
-                <div class="stat-number">5000+</div>
-                <div class="stat-label">用户选择</div>
+            <div class="features-list">
+              <div class="feature-point">
+                <div class="point-icon">✓</div>
+                <span>AI驱动的个性化推荐</span>
               </div>
-              <div class="stat-item">
-                <div class="stat-number">98%</div>
-                <div class="stat-label">满意度</div>
+              <div class="feature-point">
+                <div class="point-icon">✓</div>
+                <span>实时时尚趋势分析</span>
               </div>
-              <div class="stat-item">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">客户支持</div>
+              <div class="feature-point">
+                <div class="point-icon">✓</div>
+                <span>虚拟试衣体验</span>
               </div>
             </div>
           </div>
@@ -129,20 +214,29 @@
     <!-- 用户评价区域 -->
     <div class="testimonial-section">
       <div class="container">
-        <h2 class="section-title">用户评价</h2>
-        <p class="section-subtitle">听听用户们怎么说</p>
-        
-        <el-carousel :interval="4000" type="card" height="300px">
+        <div class="section-header">
+          <h2 class="section-title">用户评价</h2>
+          <p class="section-subtitle">听听用户们怎么说</p>
+          <div class="title-decoration"></div>
+        </div>
+
+        <el-carousel :interval="4000" type="card" height="350px" class="testimonial-carousel">
           <el-carousel-item v-for="(item, index) in testimonials" :key="index">
             <div class="testimonial-card">
-              <div class="testimonial-avatar">
-                <img :src="item.avatar" :alt="item.name" />
-              </div>
+              <div class="testimonial-quote">"</div>
               <div class="testimonial-content">
                 <p class="testimonial-text">{{ item.text }}</p>
-                <p class="testimonial-author">{{ item.name }}</p>
-                <p class="testimonial-role">{{ item.role }}</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">
+                    <img :src="item.avatar" :alt="item.name" />
+                  </div>
+                  <div class="author-info">
+                    <p class="author-name">{{ item.name }}</p>
+                    <p class="author-role">{{ item.role }}</p>
+                  </div>
+                </div>
               </div>
+              <div class="card-gradient"></div>
             </div>
           </el-carousel-item>
         </el-carousel>
@@ -151,11 +245,16 @@
 
     <!-- 行动召唤区域 -->
     <div class="cta-section">
+      <div class="cta-bg-animation"></div>
       <div class="container">
         <div class="cta-card">
+          <div class="cta-icon">🚀</div>
           <h2 class="cta-title">准备好开始您的时尚旅程了吗？</h2>
           <p class="cta-description">立即注册，体验AI驱动的智能时尚生活方式</p>
-          <el-button type="primary" size="large" round @click="showRegisterDialog">免费开始</el-button>
+          <el-button type="primary" size="large" @click="showRegisterDialog" class="cta-button">
+            <span>免费开始</span>
+            <div class="btn-sparkle"></div>
+          </el-button>
         </div>
       </div>
     </div>
@@ -163,7 +262,13 @@
     <!-- 简化的页脚 -->
     <div class="footer">
       <div class="container">
-        <p>&copy; {{ new Date().getFullYear() }} VisionWear. 保留所有权利。</p>
+        <div class="footer-content">
+          <div class="footer-logo">
+            <span class="logo-text">VisionWear</span>
+            <span class="logo-tagline">AI时尚先锋</span>
+          </div>
+          <p class="footer-text">&copy; {{ new Date().getFullYear() }} VisionWear. 保留所有权利。</p>
+        </div>
       </div>
     </div>
 
@@ -176,7 +281,6 @@
         :close-on-click-modal="false"
         custom-class="auth-dialog"
     >
-      <!-- 引入您现有的登录页面组件 -->
       <LoginPage
           v-if="loginDialogVisible"
           :is-dialog="true"
@@ -194,7 +298,6 @@
         :close-on-click-modal="false"
         custom-class="auth-dialog"
     >
-      <!-- 引入您现有的注册页面组件 -->
       <RegisterPage
           v-if="registerDialogVisible"
           :is-dialog="true"
@@ -211,7 +314,6 @@
         :close-on-click-modal="false"
         custom-class="auth-dialog"
     >
-      <!-- 引入忘记密码页面组件 -->
       <ForgotPasswordPage
           v-if="forgotPasswordDialogVisible"
           :is-dialog="true"
@@ -222,7 +324,7 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, onMounted, onUnmounted} from 'vue'
 // 导入您修改后的登录和注册页面组件
 import LoginPage from '../auth/LoginPage.vue'
 import RegisterPage from '../auth/RegisterPage.vue'
@@ -232,6 +334,12 @@ import ForgotPasswordPage from "../auth/ForgotPasswordPage.vue";
 const loginDialogVisible = ref(false)
 const registerDialogVisible = ref(false)
 const forgotPasswordDialogVisible = ref(false)
+
+// 滚动状态
+const isScrolled = ref(false)
+
+// 动画数据
+const animatedStats = ref([0, 0, 0])
 
 // 轮播图数据
 const carouselImages = ref([
@@ -267,19 +375,50 @@ const carouselImages = ref([
   }
 ])
 
+// 特性数据
+const features = ref([
+  {
+    icon: '👔',
+    title: '个性化风格定制',
+    description: '基于您的喜好、体型与场合需求，智能推荐最适合您的穿搭方案'
+  },
+  {
+    icon: '🎨',
+    title: '色彩搭配顾问',
+    description: '专业的色彩分析系统，让您的穿搭更加和谐、突显个人气质'
+  },
+  {
+    icon: '💫',
+    title: '趋势预测分析',
+    description: '实时捕捉全球时尚动向，让您走在潮流前沿，展现前卫品味'
+  },
+  {
+    icon: '📱',
+    title: '虚拟换装体验',
+    description: '通过AR技术在线尝试不同搭配，轻松找到最适合的衣着风格'
+  }
+])
+
+// 统计数据
+const stats = ref([
+  { icon: '👥', number: 5000, label: '用户选择', progress: 85 },
+  { icon: '⭐', number: 98, label: '满意度', progress: 98 },
+  { icon: '🕒', number: 24, label: '小时客户支持', progress: 100 }
+])
+
 // 用户评价数据
 const testimonials = ref([
   {
     name: '张小姐',
     role: '时尚博主',
     avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    text: 'DeepWear彻底改变了我的穿衣方式！AI推荐的搭配总是令人惊艳，省去了我大量选择服装的时间。'
+    text: 'VisionWear彻底改变了我的穿衣方式！AI推荐的搭配总是令人惊艳，省去了我大量选择服装的时间。'
   },
   {
     name: '李先生',
     role: '企业经理',
     avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-    text: '作为一个对时尚了解不多的人，DeepWear为我提供了专业级别的穿搭建议，让我在各种场合都能得体亮相。'
+    text: '作为一个对时尚了解不多的人，VisionWear为我提供了专业级别的穿搭建议，让我在各种场合都能得体亮相。'
   },
   {
     name: '王女士',
@@ -288,6 +427,28 @@ const testimonials = ref([
     text: '平台的AI算法非常智能，能够精准捕捉最新的时尚趋势，作为设计师的我都从中获得了很多灵感！'
   }
 ])
+
+// 滚动事件处理
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 50
+}
+
+// 数字动画
+const animateNumbers = () => {
+  stats.value.forEach((stat, index) => {
+    let current = 0
+    const target = stat.number
+    const increment = target / 100
+    const timer = setInterval(() => {
+      current += increment
+      if (current >= target) {
+        current = target
+        clearInterval(timer)
+      }
+      animatedStats.value[index] = Math.floor(current)
+    }, 20)
+  })
+}
 
 // 显示登录弹窗
 const showLoginDialog = () => {
@@ -316,68 +477,209 @@ const switchToRegister = () => {
   loginDialogVisible.value = false
   forgotPasswordDialogVisible.value = false
 }
+
 // 显示忘记密码弹窗
 const switchToForgotPassword = () => {
   forgotPasswordDialogVisible.value = true
   loginDialogVisible.value = false
   registerDialogVisible.value = false
 }
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+  setTimeout(animateNumbers, 1000)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
 
 <style scoped>
 /* 全局样式 */
+* {
+  box-sizing: border-box;
+}
+
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+/* 背景装饰元素 */
+.bg-decorations {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(67, 206, 162, 0.1), rgba(24, 90, 157, 0.1));
+  animation: float 20s infinite ease-in-out;
+}
+
+.decoration-1 {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  right: -150px;
+  animation-delay: 0s;
+}
+
+.decoration-2 {
+  width: 200px;
+  height: 200px;
+  top: 60%;
+  left: -100px;
+  animation-delay: 5s;
+}
+
+.decoration-3 {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  right: 10%;
+  animation-delay: 10s;
+}
+
+.floating-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.shape {
+  position: absolute;
+  opacity: 0.1;
+  animation: drift 15s infinite linear;
+}
+
+.shape-1 {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 35px solid #43cea2;
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 30px;
+  height: 30px;
+  background: #185a9d;
+  top: 70%;
+  right: 30%;
+  animation-delay: 7s;
+}
+
+.shape-3 {
+  width: 25px;
+  height: 25px;
+  background: #43cea2;
+  border-radius: 50%;
+  top: 40%;
+  left: 80%;
+  animation-delay: 14s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes drift {
+  0% { transform: translateX(-100px) rotate(0deg); }
+  100% { transform: translateX(calc(100vw + 100px)) rotate(360deg); }
 }
 
 /* 导航栏样式 */
 .nav-container {
   height: 80px;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.nav-container:hover {
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+.nav-container.nav-scrolled {
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  height: 70px;
 }
 
 .nav-row {
-  height: 80px;
+  height: 100%;
 }
 
 .logo {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-icon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shine 3s infinite;
+}
+
+.logo-sparkle {
+  font-size: 20px;
+  animation: sparkle 2s infinite;
+}
+
+.logo-content {
+  display: flex;
   flex-direction: column;
-  align-items: flex-start;
 }
 
 .logo-text {
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 24px;
+  font-weight: 800;
   background: linear-gradient(135deg, #43cea2, #185a9d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: transform 0.3s ease;
-}
-
-.logo-text:hover {
-  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
 .logo-tagline {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
+  font-weight: 500;
   margin-top: -2px;
 }
 
@@ -385,6 +687,7 @@ const switchToForgotPassword = () => {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 30px;
 }
 
 .menu-items {
@@ -394,318 +697,666 @@ const switchToForgotPassword = () => {
 
 .menu-items :deep(.el-menu-item) {
   font-size: 15px;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  padding: 0 20px;
+  border-bottom: none !important;
 }
 
-.menu-items :deep(.el-menu-item:hover) {
-  color: #43cea2;
+.menu-text {
+  position: relative;
+  z-index: 2;
+}
+
+.menu-underline {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.menu-items :deep(.el-menu-item:hover) .menu-underline {
+  width: 100%;
 }
 
 .nav-buttons {
-  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.nav-buttons .el-button--primary {
-  background: linear-gradient(135deg, #43cea2, #185a9d);
-  border: none;
+.login-btn {
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
-.nav-buttons .el-button--primary:hover {
+.login-btn:hover {
+  color: #43cea2;
+  transform: translateY(-1px);
+}
+
+.register-btn {
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border: none;
+  border-radius: 25px;
+  padding: 10px 25px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.register-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(67, 206, 162, 0.4);
+  box-shadow: 0 8px 25px rgba(67, 206, 162, 0.4);
+}
+
+.btn-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.register-btn:hover .btn-glow {
+  opacity: 1;
+  animation: glow-pulse 1.5s infinite;
 }
 
 /* 英雄区域样式 */
 .hero-section {
-  padding: 180px 0 120px;
-  background: linear-gradient(135deg, rgba(67, 206, 162, 0.1), rgba(24, 90, 157, 0.1));
+  min-height: 100vh;
+  padding: 120px 0 80px;
+  background: linear-gradient(135deg, rgba(67, 206, 162, 0.05), rgba(24, 90, 157, 0.05));
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
-.animated-bg {
+.hero-bg-animation {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 10% 20%, rgba(67, 206, 162, 0.05) 0%, rgba(24, 90, 157, 0.05) 90%);
-  opacity: 0.8;
-  animation: pulse 15s infinite alternate;
+  background:
+      radial-gradient(circle at 20% 80%, rgba(67, 206, 162, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(24, 90, 157, 0.1) 0%, transparent 50%);
+  animation: bg-float 20s infinite ease-in-out;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
+.hero-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image:
+      radial-gradient(2px 2px at 20px 30px, rgba(67, 206, 162, 0.3), transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(24, 90, 157, 0.3), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(67, 206, 162, 0.4), transparent);
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  animation: particle-float 15s infinite linear;
 }
 
 .hero-content {
-  padding-right: 40px;
-  animation: fadeInUp 1s ease;
+  animation: slide-in-left 1s ease-out;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.badge-container {
+  margin-bottom: 25px;
 }
 
 .badge {
-  display: inline-block;
-  padding: 6px 15px;
-  background: linear-gradient(135deg, rgba(67, 206, 162, 0.2), rgba(24, 90, 157, 0.2));
-  color: #185a9d;
-  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(67, 206, 162, 0.2);
+  border-radius: 50px;
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 15px;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #185a9d;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.badge-icon {
+  animation: bounce 2s infinite;
+}
+
+.badge-shimmer {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 3s infinite;
 }
 
 .hero-title {
-  font-size: 42px;
-  font-weight: 800;
-  color: #333;
-  margin-bottom: 25px;
-  line-height: 1.2;
-  white-space: nowrap;
+  font-size: 52px;
+  font-weight: 900;
+  margin-bottom: 30px;
+  line-height: 1.1;
+  position: relative;
+}
+
+.title-line {
+  display: block;
   background: linear-gradient(135deg, #43cea2, #185a9d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: title-glow 3s ease-in-out infinite alternate;
+}
+
+.title-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 50px;
+  background: #43cea2;
+  margin-left: 5px;
+  animation: blink 1s infinite;
 }
 
 .hero-description {
   font-size: 18px;
   color: #555;
-  margin-bottom: 25px;
-  line-height: 1.8;
+  margin-bottom: 35px;
+  line-height: 1.7;
+  opacity: 0;
+  animation: fade-in 1s ease-out 0.5s forwards;
 }
 
 .hero-features {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fade-in 1s ease-out 0.7s forwards;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 15px;
-  background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 30px;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 50px;
   font-size: 14px;
+  font-weight: 500;
   color: #333;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .feature-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  background-color: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.feature-icon {
+  font-size: 16px;
+  animation: icon-spin 3s infinite ease-in-out;
+}
+
+.feature-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(67, 206, 162, 0.3) 0%, transparent 70%);
+  transition: all 0.6s ease;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.feature-item:hover .feature-ripple {
+  width: 200px;
+  height: 200px;
 }
 
 .hero-buttons {
   display: flex;
-  gap: 15px;
+  gap: 20px;
+  opacity: 0;
+  animation: fade-in 1s ease-out 0.9s forwards;
 }
 
-.hero-buttons .el-button--primary {
+.cta-primary {
   background: linear-gradient(135deg, #43cea2, #185a9d);
   border: none;
-  box-shadow: 0 5px 15px rgba(67, 206, 162, 0.3);
-  transition: all 0.3s ease;
-  padding: 12px 30px;
-}
-
-.hero-buttons .el-button--primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(67, 206, 162, 0.4);
-}
-
-.hero-image {
+  border-radius: 50px;
+  padding: 15px 35px;
+  font-size: 16px;
+  font-weight: 600;
   position: relative;
-  animation: fadeInRight 1s ease;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(67, 206, 162, 0.3);
 }
 
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.cta-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(67, 206, 162, 0.4);
 }
 
-.image-decoration {
+.cta-secondary {
+  border: 2px solid #43cea2;
+  border-radius: 50px;
+  padding: 13px 35px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #43cea2;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.cta-secondary:hover {
+  background: #43cea2;
+  color: white;
+  transform: translateY(-3px);
+}
+
+.btn-border-animation {
   position: absolute;
-  top: -30px;
-  right: -30px;
-  width: 200px;
-  height: 200px;
-  background: linear-gradient(135deg, #43cea2, #185a9d);
-  border-radius: 50%;
-  opacity: 0.1;
-  z-index: -1;
-}
-
-.hero-image img {
+  top: 0;
+  left: -100%;
   width: 100%;
-  max-width: 500px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(67, 206, 162, 0.2), transparent);
   transition: all 0.5s ease;
-  object-fit: cover;
-  height: 600px;
 }
 
-.hero-image img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+.cta-secondary:hover .btn-border-animation {
+  left: 100%;
 }
 
-.hero-carousel {
-  width: 100%;
-  max-width: 500px;
+.btn-particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.cta-primary:hover .btn-particles {
+  animation: particle-burst 0.6s ease-out;
+}
+
+/* 英雄图片样式 */
+.hero-image {
+  animation: slide-in-right 1s ease-out;
+  padding-left: 30px;
+}
+
+.image-frame {
+  position: relative;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.frame-decoration {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+}
+
+.frame-decoration::before {
+  content: '✨';
+  animation: sparkle 2s infinite;
+}
+
+.hero-carousel {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.carousel-item-container {
+  position: relative;
+  height: 100%;
 }
 
 .hero-carousel-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
 }
 
-.hero-carousel :deep(.el-carousel__arrow) {
-  background-color: rgba(67, 206, 162, 0.8);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.carousel-item-container:hover .hero-carousel-image {
+  transform: scale(1.05);
 }
 
-.hero-carousel :deep(.el-carousel__arrow:hover) {
-  background-color: rgba(67, 206, 162, 1);
+.carousel-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: white;
+  padding: 30px;
+  transform: translateY(100%);
+  transition: all 0.3s ease;
 }
 
-.hero-carousel :deep(.el-carousel__indicators) {
-  bottom: 15px;
+.carousel-item-container:hover .carousel-overlay {
+  transform: translateY(0);
 }
 
-.hero-carousel :deep(.el-carousel__button) {
-  background-color: rgba(67, 206, 162, 0.8);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+.carousel-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
-/* 特点展示区域 */
+.carousel-description {
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+/* 特性展示区域 */
 .features-section {
-  padding: 100px 0;
-  background-color: white;
+  padding: 120px 0;
+  background: white;
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 80px;
+  position: relative;
 }
 
 .section-title {
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 15px;
-  text-align: center;
-  color: #333;
+  font-size: 42px;
+  font-weight: 800;
+  margin-bottom: 20px;
   background: linear-gradient(135deg, #43cea2, #185a9d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  position: relative;
 }
 
 .section-subtitle {
   font-size: 18px;
   color: #666;
-  margin-bottom: 50px;
-  text-align: center;
+  margin-bottom: 30px;
+}
+
+.title-decoration {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  margin: 0 auto;
+  border-radius: 2px;
+  position: relative;
+}
+
+.title-decoration::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -10px;
+  right: -10px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 4px;
+  opacity: 0.3;
+  animation: pulse-glow 2s infinite;
 }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
 }
 
 .feature-card {
   background: white;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  border-radius: 20px;
+  padding: 40px 30px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(67, 206, 162, 0.1);
+  cursor: pointer;
 }
 
 .feature-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  border-bottom: 3px solid #43cea2;
+  transform: translateY(-15px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  border-color: rgba(67, 206, 162, 0.3);
+}
+
+.card-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(67, 206, 162, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.feature-card:hover .card-glow {
+  opacity: 1;
+}
+
+.feature-icon-container {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 25px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .feature-icon {
-  font-size: 40px;
-  margin-bottom: 20px;
+  font-size: 35px;
+  z-index: 2;
+  position: relative;
 }
 
-.feature-card h3 {
+.icon-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(67, 206, 162, 0.2);
+  border-radius: 50%;
+  transition: all 0.4s ease;
+}
+
+.feature-card:hover .icon-ring {
+  border-color: #43cea2;
+  transform: scale(1.2);
+  animation: ring-pulse 1.5s infinite;
+}
+
+.feature-title {
   font-size: 20px;
+  font-weight: 600;
   margin-bottom: 15px;
   color: #333;
 }
 
-.feature-card p {
+.feature-description {
   color: #666;
   line-height: 1.6;
+  font-size: 15px;
 }
 
-/* 内容区域样式 */
-.content-section {
-  padding: 100px 0;
+.card-shine {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: all 0.6s ease;
+}
+
+.feature-card:hover .card-shine {
+  opacity: 1;
+  animation: shine-sweep 1s ease-out;
+}
+
+/* 统计数据区域 */
+.stats-section {
+  padding: 80px 0;
   background: linear-gradient(135deg, rgba(67, 206, 162, 0.05), rgba(24, 90, 157, 0.05));
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  font-size: 40px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.stat-number {
+  font-size: 48px;
+  font-weight: 800;
+  color: #43cea2;
+  margin-bottom: 10px;
+  font-family: 'Monaco', monospace;
+}
+
+.stat-label {
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.stat-progress {
+  width: 100%;
+  height: 4px;
+  background: rgba(67, 206, 162, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 2px;
+  transition: width 2s ease;
+  animation: progress-glow 3s infinite;
+}
+
+/* 内容区域 */
+.content-section {
+  padding: 120px 0;
+  background: white;
 }
 
 .content-wrapper {
   display: flex;
   align-items: center;
-  gap: 50px;
+  gap: 80px;
 }
 
 .content-image {
   flex: 1;
 }
 
-.content-image img {
-  width: 100%;
+.image-container {
+  position: relative;
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  transition: all 0.5s ease;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-.content-image img:hover {
-  transform: scale(1.03);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+.image-container img {
+  width: 100%;
+  transition: transform 0.5s ease;
+}
+
+.image-container:hover img {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 15px 25px;
+  border-radius: 10px;
+  color: #333;
+  font-weight: 600;
+  transform: translateY(100%);
+  transition: all 0.3s ease;
+}
+
+.image-container:hover .image-overlay {
+  transform: translateY(0);
 }
 
 .content-text {
@@ -714,152 +1365,318 @@ const switchToForgotPassword = () => {
 
 .content-text .section-title {
   text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 36px;
 }
 
 .section-description {
   font-size: 16px;
   color: #555;
   line-height: 1.8;
-  margin-bottom: 30px;
+  margin-bottom: 35px;
 }
 
-.stats-row {
+.features-list {
   display: flex;
-  justify-content: space-between;
-  margin-top: 40px;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.stat-item {
-  text-align: center;
+.feature-point {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 16px;
+  color: #333;
 }
 
-.stat-number {
-  font-size: 36px;
-  font-weight: 700;
-  color: #43cea2;
-  margin-bottom: 5px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #666;
+.point-icon {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  flex-shrink: 0;
 }
 
 /* 用户评价区域 */
 .testimonial-section {
-  padding: 100px 0;
-  background-color: white;
+  padding: 120px 0;
+  background: linear-gradient(135deg, rgba(67, 206, 162, 0.03), rgba(24, 90, 157, 0.03));
+}
+
+.testimonial-carousel {
+  margin-top: 60px;
 }
 
 .testimonial-card {
   background: white;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  border-radius: 20px;
+  padding: 40px;
   height: 100%;
-}
-
-.testimonial-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  position: relative;
   overflow: hidden;
-  margin-bottom: 20px;
-  border: 3px solid #43cea2;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.testimonial-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.testimonial-quote {
+  font-size: 60px;
+  color: #43cea2;
+  opacity: 0.3;
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-family: serif;
 }
 
 .testimonial-content {
-  text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .testimonial-text {
   font-size: 16px;
   color: #555;
-  line-height: 1.6;
-  margin-bottom: 20px;
+  line-height: 1.7;
+  margin-bottom: 30px;
   font-style: italic;
 }
 
 .testimonial-author {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.testimonial-role {
+.author-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #43cea2;
+  position: relative;
+}
+
+.author-avatar::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  border-radius: 50%;
+  z-index: -1;
+  animation: avatar-glow 3s infinite;
+}
+
+.author-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.author-info {
+  flex: 1;
+}
+
+.author-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+.author-role {
   font-size: 14px;
   color: #666;
 }
 
+.card-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(transparent, rgba(67, 206, 162, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.testimonial-card:hover .card-gradient {
+  opacity: 1;
+}
+
 /* 行动召唤区域 */
 .cta-section {
-  padding: 80px 0;
-  background: linear-gradient(135deg, rgba(67, 206, 162, 0.1), rgba(24, 90, 157, 0.1));
+  padding: 100px 0;
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-bg-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+      radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  animation: bg-float 15s infinite ease-in-out;
 }
 
 .cta-card {
-  background: white;
-  border-radius: 20px;
-  padding: 60px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  padding: 80px 60px;
   text-align: center;
+  position: relative;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.cta-icon {
+  font-size: 60px;
+  margin-bottom: 30px;
+  animation: float-icon 3s infinite ease-in-out;
 }
 
 .cta-title {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   color: #333;
-  margin-bottom: 15px;
-  background: linear-gradient(135deg, #43cea2, #185a9d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin-bottom: 20px;
+  line-height: 1.2;
 }
 
 .cta-description {
   font-size: 18px;
   color: #666;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  line-height: 1.6;
 }
 
-.cta-card .el-button {
+.cta-button {
   background: linear-gradient(135deg, #43cea2, #185a9d);
   border: none;
-  box-shadow: 0 10px 20px rgba(67, 206, 162, 0.3);
-  padding: 12px 40px;
+  border-radius: 50px;
+  padding: 18px 45px;
   font-size: 18px;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(67, 206, 162, 0.4);
 }
 
-.cta-card .el-button:hover {
+.cta-button:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(67, 206, 162, 0.4);
+  box-shadow: 0 15px 40px rgba(67, 206, 162, 0.5);
+}
+
+.btn-sparkle {
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: sparkle-drift 2s infinite;
+}
+
+.btn-sparkle::before,
+.btn-sparkle::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+}
+
+.btn-sparkle::before {
+  top: -10px;
+  left: 15px;
+  animation: sparkle-drift 2s infinite 0.5s;
+}
+
+.btn-sparkle::after {
+  top: 10px;
+  left: -10px;
+  animation: sparkle-drift 2s infinite 1s;
 }
 
 /* 页脚样式 */
 .footer {
-  padding: 40px 0;
-  background-color: #2c3e50;
-  background-image: linear-gradient(135deg, #2c3e50, #1a252f);
-  color: #fff;
-  text-align: center;
+  padding: 60px 0;
+  background: linear-gradient(135deg, #2c3e50, #1a252f);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(67, 206, 162, 0.5), transparent);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-logo {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo .logo-text {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #43cea2, #8dd6bd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer-logo .logo-tagline {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: -2px;
+}
+
+.footer-text {
+  color: #bbb;
+  font-size: 14px;
 }
 
 /* 认证弹窗样式 */
 .auth-dialog {
-  border-radius: 15px;
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
 }
 
 .auth-dialog :deep(.el-dialog__header) {
@@ -871,34 +1688,211 @@ const switchToForgotPassword = () => {
 }
 
 .auth-dialog :deep(.el-dialog__headerbtn) {
-  top: 15px;
-  right: 15px;
+  top: 20px;
+  right: 20px;
   z-index: 10;
+  width: 35px;
+  height: 35px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.auth-dialog :deep(.el-dialog__headerbtn:hover) {
+  background: white;
+  transform: scale(1.1);
 }
 
 .auth-dialog :deep(.el-dialog__close) {
   color: #333;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* 动画定义 */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bg-float {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(10deg); }
+}
+
+@keyframes particle-float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-5px); }
+  60% { transform: translateY(-3px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes title-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+}
+
+@keyframes icon-spin {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3);
+  }
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(180deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes ring-pulse {
+  0% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes shine-sweep {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+@keyframes progress-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(67, 206, 162, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(67, 206, 162, 0.8); }
+}
+
+@keyframes avatar-glow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes sparkle-drift {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0);
+  }
 }
 
 /* 响应式样式 */
+@media (max-width: 1200px) {
+  .hero-title {
+    font-size: 46px;
+  }
+
+  .section-title {
+    font-size: 36px;
+  }
+
+  .cta-title {
+    font-size: 30px;
+  }
+}
+
 @media (max-width: 991px) {
   .hero-section {
     padding: 140px 0 80px;
   }
 
   .hero-content {
-    padding-right: 0;
     margin-bottom: 50px;
   }
 
   .hero-title {
-    font-size: 32px;
-    white-space: nowrap;
+    font-size: 38px;
   }
 
   .hero-description {
     font-size: 16px;
+  }
+
+  .content-wrapper {
+    flex-direction: column;
+    gap: 50px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
   }
 }
 
@@ -908,8 +1902,49 @@ const switchToForgotPassword = () => {
   }
 
   .hero-title {
-    font-size: 26px;
-    white-space: nowrap;
+    font-size: 32px;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .cta-title {
+    font-size: 24px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .cta-card {
+    padding: 50px 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 15px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-features {
+    flex-direction: column;
+  }
+
+  .feature-item {
+    justify-content: center;
   }
 }
 </style>

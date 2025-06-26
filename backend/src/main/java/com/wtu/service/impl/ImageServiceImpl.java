@@ -13,11 +13,12 @@ import com.tencentcloudapi.common.profile.HttpProfile;
 import com.volcengine.service.visual.IVisualService;
 import com.volcengine.service.visual.model.request.ImageStyleConversionRequest;
 import com.volcengine.service.visual.model.response.ImageStyleConversionResponse;
-import com.wtu.DTO.*;
+import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.entity.Image;
-import com.wtu.exception.ServiceException;
+import com.wtu.exception.BusinessException;
+import com.wtu.exception.ExceptionUtils;
 import com.wtu.mapper.ImageMapper;
 import com.wtu.service.ImageService;
 import com.wtu.service.ImageStorageService;
@@ -50,6 +51,10 @@ public class ImageServiceImpl implements ImageService {
     // 文本生成图像
     @Override
     public List<String> textToImage(TextToImageDTO request, Long userId) throws Exception {
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         List<String> ids = new ArrayList<>();
         //用工具类快速构造VisualService
         IVisualService visualService = ModelUtils.createVisualService("cn-north-1");
@@ -73,6 +78,9 @@ public class ImageServiceImpl implements ImageService {
     // 图像生成图像
     @Override
     public List<String> imageToImage(ImageToImageDTO request, Long userId) throws Exception {
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(request.getReqKey(), "请求Key不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
 
         List<String> ids = new ArrayList<>();
         JSONObject jsonRequest = ModelUtils.toJsonObject(request);
@@ -83,6 +91,10 @@ public class ImageServiceImpl implements ImageService {
 
         //这个方法，需要传的是一整个未被剪切的JsonObject，方法会自动帮我们剪切出data，然后从data中拿取我们想要的数据。
         String taskId=ModelUtils.getFromJsonData(response, "task_id", String.class);
+        if (taskId == null || taskId.isEmpty()) {
+            throw new BusinessException("获取任务ID失败");
+        }
+        
         //用taskID去申请另一个接口，得到图片
         JSONObject taskRequest = new JSONObject();
         taskRequest.put("req_key", request.getReqKey());
@@ -95,6 +107,10 @@ public class ImageServiceImpl implements ImageService {
             if ("done".equals(status)) {
                 //先确保taskResponse有数据
                 List<String> base64 = ModelUtils.getBase64(taskResponse);
+                if (base64 == null || base64.isEmpty()) {
+                    throw new BusinessException("获取图像结果失败");
+                }
+                
                 for (String s : base64) {
                     //对base64进行解码并上传,得到ImageID,存入ids中
                     ids.add(imageStorageService.saveBase64Image(s, userId));
@@ -117,6 +133,10 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public SketchToImageVO sketchToImage(SketchToImageDTO request, Long userId) throws Exception {
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(request.getSketchImageId(), "线稿图ID不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
 
@@ -137,6 +157,10 @@ public class ImageServiceImpl implements ImageService {
 
             // 3. 解析响应并保存图片
             String resultImageUrl = response.getResultImage();
+            if (resultImageUrl == null || resultImageUrl.isEmpty()) {
+                throw new BusinessException("获取结果图像URL失败");
+            }
+            
             String imageId = imageStorageService.saveImageFromUrl(resultImageUrl, userId);
 
             return SketchToImageVO.builder()
@@ -153,10 +177,12 @@ public class ImageServiceImpl implements ImageService {
 
         } catch (TencentCloudSDKException e) {
             log.error("腾讯云API调用失败: {}", e.getMessage());
-            throw new Exception("线稿生图服务暂不可用: " + e.getMessage());
+            throw new BusinessException("线稿生图服务暂不可用: " + e.getMessage());
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
             log.error("线稿生图失败", e);
-            throw new Exception("线稿生图失败: " + e.getMessage());
+            throw new BusinessException("线稿生图失败: " + e.getMessage());
         }
     }
 
@@ -165,6 +191,11 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public ImageFusionVO imageFusion(ImageFusionDTO request, Long userId) {
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(request.getImageUrlList(), "图片URL列表不能为空");
+        ExceptionUtils.requireTrue(!request.getImageUrlList().isEmpty(), "图片URL列表不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
         log.info("开始图片融合请求: {}, 图片url: {}", requestId, request.getImageUrlList());
@@ -195,10 +226,14 @@ public class ImageServiceImpl implements ImageService {
 
         JsonNode responseJson = responseEntity.getBody();
         if (responseJson == null || !"SUCCESS".equals(responseJson.path("status").asText())) {
-            throw new RuntimeException("图片融合失败: " + (responseJson != null ? responseJson.path("message").asText() : "无响应"));
+            throw new BusinessException("图片融合失败: " + (responseJson != null ? responseJson.path("message").asText() : "无响应"));
         }
 
         String jobId = responseJson.path("data").path("jobId").asText();
+        if (jobId == null || jobId.isEmpty()) {
+            throw new BusinessException("获取任务ID失败");
+        }
+        
         log.info("图片融合任务提交成功，jobId={}", jobId);
 
         // 4. 只返回jobId，前端或调用方后续用jobId查询结果
@@ -212,6 +247,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public ImageFusionVO queryImageByJobId(String jobId, Long userId) {
+        ExceptionUtils.requireNonEmpty(jobId, "任务ID不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         String apiKey = ttApiKey;
         String fetchUrl = "https://api.ttapi.io/midjourney/v1/fetch";
         log.info("查询图片融合结果，jobId: {}, userId: {}", jobId, userId);
@@ -229,19 +267,19 @@ public class ImageServiceImpl implements ImageService {
         JsonNode responseJson = response.getBody();
 
         if (responseJson == null) {
-            throw new RuntimeException("无响应");
+            throw new BusinessException("无响应");
         }
 
         String status = responseJson.path("status").asText();
         if (!"SUCCESS".equals(status)) {
             String msg = responseJson.path("message").asText();
-            throw new RuntimeException("查询失败: " + msg);
+            throw new BusinessException("查询失败: " + msg);
         }
 
         JsonNode dataNode = responseJson.path("data");
         String cdnImage = dataNode.path("cdnImage").asText(null);
         if (cdnImage == null || cdnImage.isEmpty()) {
-            throw new RuntimeException("未获取到图片地址");
+            throw new BusinessException("未获取到图片地址");
         }
 
         // 假设 data 是你解析出来的 Data 对象
@@ -267,6 +305,8 @@ public class ImageServiceImpl implements ImageService {
             String prompt,
             String rspImgType
     ) throws TencentCloudSDKException {
+        ExceptionUtils.requireNonEmpty(sketchUrl, "线稿图URL不能为空");
+        
         // 配置认证信息
         Credential cred = new Credential(tencentSecretId, tencentSecretKey);
 
@@ -291,6 +331,8 @@ public class ImageServiceImpl implements ImageService {
     // 获取用户所有图像URL
     @Override
     public List<String> getAllImageUrls(Long userId) {
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         LambdaQueryWrapper<Image> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Image::getUserId, userId)
                 .eq(Image::getStatus, 0)
@@ -307,9 +349,11 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String styleConversion(StyleConversionDTO request, Long userId) throws Exception {
-
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         if(request.getImageBase64().isBlank()){
-            throw new ServiceException("图片编码不能为空");
+            throw new BusinessException("图片编码不能为空");
         }
 
         IVisualService visualService = ModelUtils.createVisualService("cn-north-1");
@@ -319,6 +363,10 @@ public class ImageServiceImpl implements ImageService {
         //调用请求，拿取base64编码
         ImageStyleConversionResponse response = visualService.imageStyleConversion(requestJson);
         String image = response.getData().getImage();
+        if (image == null || image.isEmpty()) {
+            throw new BusinessException("获取转换后图片失败");
+        }
+        
         //存入数据库中，拿到Imageid
         String id = imageStorageService.saveBase64Image(image, userId);
         //通过imageId拿取url并返回

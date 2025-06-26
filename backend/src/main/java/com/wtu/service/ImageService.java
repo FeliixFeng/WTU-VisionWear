@@ -1,7 +1,7 @@
 package com.wtu.service;
 
 
-import com.wtu.DTO.*;
+import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
 

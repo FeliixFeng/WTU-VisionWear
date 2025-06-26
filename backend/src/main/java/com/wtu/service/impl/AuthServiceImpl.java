@@ -2,11 +2,12 @@ package com.wtu.service.impl;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.wtu.DTO.LoginDTO;
-import com.wtu.DTO.RegisterDTO;
+import com.wtu.DTO.user.LoginDTO;
+import com.wtu.DTO.user.RegisterDTO;
 import com.wtu.VO.LoginVO;
 import com.wtu.entity.User;
-import com.wtu.exception.ServiceException;
+import com.wtu.exception.AuthException;
+import com.wtu.exception.ExceptionUtils;
 import com.wtu.mapper.UserMapper;
 import com.wtu.properties.JwtProperties;
 import com.wtu.service.AuthService;
@@ -65,12 +66,12 @@ public class AuthServiceImpl implements AuthService {
         // 2. 判空 + 加密后密码比对
         String password = DigestUtil.md5Hex(dto.getPassword());
         if (user == null || !user.getPassWord().equals(password)) {
-            throw new ServiceException("用户名或密码错误!");
+            throw new AuthException("用户名或密码错误!");
         }
 
         // 3. 判断状态
         if (user.getStatus() != 0) {
-            throw new ServiceException("账号状态异常，请联系管理员！");
+            throw new AuthException("账号状态异常，请联系管理员！");
         }
 
         // 4. 更新最后登录时间

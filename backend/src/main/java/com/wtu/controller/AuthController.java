@@ -1,12 +1,13 @@
 package com.wtu.controller;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.alibaba.fastjson.JSON;
-import com.wtu.DTO.LoginDTO;
-import com.wtu.DTO.RegisterDTO;
-import com.wtu.DTO.WxSignatureDTO;
+import com.wtu.DTO.user.LoginDTO;
+import com.wtu.DTO.user.RegisterDTO;
+import com.wtu.DTO.user.WxSignatureDTO;
 import com.wtu.VO.LoginVO;
 import com.wtu.entity.WeChatUser;
-import com.wtu.exception.ServiceException;
+import com.wtu.exception.AuthException;
+import com.wtu.exception.ExceptionUtils;
 import com.wtu.result.Result;
 import com.wtu.service.AuthService;
 import com.wtu.utils.WeChatUtil;
@@ -76,7 +77,7 @@ public class AuthController {
             return wxSignatureDTO.getEchostr();
         }else{
             log.info("signature:{}",wxSignatureDTO.getSignature());
-            throw new ServiceException("微信登录校验失败！");
+            throw new AuthException("微信登录校验失败！");
         }
 
     }

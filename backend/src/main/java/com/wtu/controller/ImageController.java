@@ -1,7 +1,9 @@
 package com.wtu.controller;
-import com.wtu.DTO.*;
+import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
+import com.wtu.exception.BusinessException;
+import com.wtu.exception.ExceptionUtils;
 import com.wtu.result.Result;
 import com.wtu.service.ImageService;
 import com.wtu.service.ImageStorageService;
@@ -37,13 +39,18 @@ public class ImageController {
     @PostMapping("/doubao/text-to-image")
     @Operation(summary = "文生图功能")
     public Result<List<String>> textToImage(@RequestBody @Valid TextToImageDTO request,
-                                            HttpServletRequest httpServletRequest) throws Exception {
-        //从token 获取当前用户ID
-        Long userId = UserContext.getCurrentUserId(httpServletRequest);
-        // 调用用户服务的textToImage方法生成图像
-        List<String> ids = imageService.textToImage(request, userId);
-        List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
-        return Result.success(urls);
+                                            HttpServletRequest httpServletRequest) {
+        try {
+            //从token 获取当前用户ID
+            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            // 调用用户服务的textToImage方法生成图像
+            List<String> ids = imageService.textToImage(request, userId);
+            List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
+            return Result.success(urls);
+        } catch (Exception e) {
+            log.error("文生图失败", e);
+            throw new BusinessException("文生图失败: " + e.getMessage());
+        }
     }
 
     @PostMapping("/doubao/image-to-image")
@@ -61,23 +68,28 @@ public class ImageController {
 
             return Result.success(urls);
         } catch (Exception e) {
+            log.error("图生图失败", e);
             // 错误信息处理保持不变
             String errorMessage = e.getMessage();
             if (errorMessage != null && errorMessage.contains("520")) {
-                return Result.error("调用Stable Diffusion API时发生服务器错误(520)，请检查API配置和请求参数");
+                throw new BusinessException("调用Stable Diffusion API时发生服务器错误(520)，请检查API配置和请求参数");
             }
-            return Result.error("以图生图失败: " + e.getMessage());
+            throw new BusinessException("以图生图失败: " + e.getMessage());
         }
     }
 
     @PostMapping("/doubao/styleConversion")
     @Operation(summary = "图片风格转换功能")
     public Result<String> styleConversion(@RequestBody StyleConversionDTO request,
-                                             HttpServletRequest httpServletRequest) throws Exception {
-
-        //service层处理id与URL转换，Controller层直接返回即可.
-        return Result.success(imageService.styleConversion(request,
-                UserContext.getCurrentUserId(httpServletRequest)));
+                                             HttpServletRequest httpServletRequest) {
+        try {
+            //service层处理id与URL转换，Controller层直接返回即可.
+            return Result.success(imageService.styleConversion(request,
+                    UserContext.getCurrentUserId(httpServletRequest)));
+        } catch (Exception e) {
+            log.error("图片风格转换失败", e);
+            throw new BusinessException("图片风格转换失败: " + e.getMessage());
+        }
     }
 
     @PostMapping("/image-fusion")
@@ -90,16 +102,21 @@ public class ImageController {
             return Result.success(response);
         } catch (Exception e) {
             log.error("图片融合失败", e);
-            return Result.error("图片融合失败: " + e.getMessage());
+            throw new BusinessException("图片融合失败: " + e.getMessage());
         }
     }
 
     @GetMapping("/image-fusion/result")
     @Operation(summary = "获取图片融合结果")
-    public Result<ImageFusionVO> getFusionResult(@RequestParam String jobId, HttpServletRequest httpServletRequest) throws Exception {
-        Long userId = UserContext.getCurrentUserId(httpServletRequest);
-        ImageFusionVO response = imageService.queryImageByJobId(jobId, userId);
-        return Result.success(response);
+    public Result<ImageFusionVO> getFusionResult(@RequestParam String jobId, HttpServletRequest httpServletRequest) {
+        try {
+            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            ImageFusionVO response = imageService.queryImageByJobId(jobId, userId);
+            return Result.success(response);
+        } catch (Exception e) {
+            log.error("获取融合结果失败", e);
+            throw new BusinessException("获取融合结果失败: " + e.getMessage());
+        }
     }
 
 
@@ -115,7 +132,8 @@ public class ImageController {
                     .collect(Collectors.toList());
             return Result.success(ids);
         } catch (Exception e) {
-            return Result.error("线稿生图失败: " + e.getMessage());
+            log.error("线稿生图失败", e);
+            throw new BusinessException("线稿生图失败: " + e.getMessage());
         }
     }
 
@@ -126,7 +144,7 @@ public class ImageController {
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null) {
                 log.error("文件名为空");
-                return Result.error("文件名为空");
+                throw new BusinessException("文件名为空");
             }
 
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
@@ -137,9 +155,11 @@ public class ImageController {
 
             return Result.success(filePath);
         } catch (IOException e) {
-            return Result.error("文件读取失败: " + e.getMessage());
+            log.error("文件读取失败", e);
+            throw new BusinessException("文件读取失败: " + e.getMessage());
         } catch (Exception e) {
-            return Result.error("上传过程发生错误: " + e.getMessage());
+            log.error("上传过程发生错误", e);
+            throw new BusinessException("上传过程发生错误: " + e.getMessage());
         }
     }
 

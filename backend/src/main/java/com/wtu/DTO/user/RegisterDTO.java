@@ -1,4 +1,4 @@
-package com.wtu.DTO;
+package com.wtu.DTO.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

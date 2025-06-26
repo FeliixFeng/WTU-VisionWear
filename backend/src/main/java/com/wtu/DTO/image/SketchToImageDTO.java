@@ -1,4 +1,4 @@
-package com.wtu.DTO;
+package com.wtu.DTO.image;
 
 import lombok.*;
 

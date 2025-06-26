@@ -1,11 +1,14 @@
 package com.wtu.service.impl;
 
 import com.wtu.entity.Image;
+import com.wtu.exception.BusinessException;
+import com.wtu.exception.ExceptionUtils;
 import com.wtu.mapper.ImageMapper;
 import com.wtu.service.ImageStorageService;
 import com.wtu.utils.AliOssUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.net.URL;
 
@@ -25,6 +28,9 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
     @Override
     public String saveBase64Image(String base64Image, Long userId) {
+        ExceptionUtils.requireNonEmpty(base64Image, "图像数据不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         try {
             String imageId = UUID.randomUUID().toString();
             String objectName = imageId + ".png";
@@ -46,14 +52,20 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             log.info("图片保存成功: imageId={}, userId={}", imageId, userId);
             return imageId;
 
+        } catch (IllegalArgumentException e) {
+            log.error("Base64解码失败: {}", e.getMessage());
+            throw new BusinessException("图像格式不正确，无法解码");
         } catch (Exception e) {
             log.error("保存图像到OSS失败", e);
-            throw new RuntimeException("保存图像到OSS失败", e);
+            throw new BusinessException("保存图像失败: " + e.getMessage());
         }
     }
 
     @Override
     public String saveImageFromUrl(String imageUrl, Long userId) {
+        ExceptionUtils.requireNonEmpty(imageUrl, "图像URL不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
         try {
             String imageId = UUID.randomUUID().toString();
             String objectName = imageId + ".png";
@@ -77,18 +89,22 @@ public class ImageStorageServiceImpl implements ImageStorageService {
                     .build();
             imageMapper.insert(image);
 
-            log.info("URL图片保存成功: imageId={}, userId={}, originalUrl={}", imageId, userId, imageUrl);
+            log.info("URL图片保存成功: imageId={}, userId={}", imageId, userId);
             return imageId;
         } catch (IOException e) {
             log.error("从URL获取图片失败: {}", imageUrl, e);
-            throw new RuntimeException("从URL获取图片失败", e);
+            throw new BusinessException("无法从URL获取图片: " + e.getMessage());
         } catch (Exception e) {
             log.error("保存URL图片到OSS失败", e);
-            throw new RuntimeException("保存URL图片到OSS失败", e);
+            throw new BusinessException("保存图片失败: " + e.getMessage());
         }
     }
+    
     @Override
+    @Cacheable(value = "imageUrls", key = "#imageId", unless = "#result == null")
     public String getImageUrl(String imageId) {
+        ExceptionUtils.requireNonEmpty(imageId, "图像ID不能为空");
+        
         // 直接构建并返回URL
         String objectName = imageId + ".png";
         return aliOssUtil.getAccessUrl(objectName);

@@ -38,7 +38,6 @@ public class UserController {
         // 获取用户生成的所有图片URL
         List<String> imageUrls = imageService.getAllImageUrls(userId);
 
-        log.info("获取用户生成的所有图片URL: {}", imageUrls);
 
         return Result.success(imageUrls);
     }

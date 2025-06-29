@@ -62,13 +62,10 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
             userMapper.insert(user);
-            log.info("用户注册成功: {}", dto.getUsername());
             return "注册成功";
         } catch (AuthException e) {
-            log.warn("用户注册失败: {}, 原因: {}", dto.getUsername(), e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("用户注册异常", e);
             throw new BusinessException("注册失败: " + e.getMessage());
         }
     }
@@ -114,13 +111,10 @@ public class AuthServiceImpl implements AuthService {
                     .token(token)
                     .build();
 
-            log.info("用户登录成功: {}", dto.getUsername());
             return loginVO;
         } catch (AuthException e) {
-            log.warn("用户登录失败: {}, 原因: {}", dto.getUsername(), e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("用户登录异常", e);
             throw new BusinessException("登录失败: " + e.getMessage());
         }
     }

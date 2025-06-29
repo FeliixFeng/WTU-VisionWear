@@ -82,7 +82,6 @@ public class ImageServiceImpl implements ImageService {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("文本生成图像失败", e);
             throw new BusinessException("文本生成图像失败: " + e.getMessage());
         }
     }
@@ -152,7 +151,6 @@ public class ImageServiceImpl implements ImageService {
             Thread.currentThread().interrupt();
             throw new BusinessException("图像生成被中断");
         } catch (Exception e) {
-            log.error("图像生成图像失败", e);
             throw new BusinessException("图像生成失败: " + e.getMessage());
         }
     }
@@ -182,7 +180,6 @@ public class ImageServiceImpl implements ImageService {
             if (!sketchUrl.startsWith("http")) {
                 sketchUrl = imageStorageService.getImageUrl(sketchUrl);
             }
-            log.info("线稿图URL: {}", sketchUrl);
 
             // 2. 使用腾讯云SDK调用API
             SketchToImageResponse response = callTencentSketchToImage(
@@ -212,12 +209,10 @@ public class ImageServiceImpl implements ImageService {
                     .build();
 
         } catch (TencentCloudSDKException e) {
-            log.error("腾讯云API调用失败: {}", e.getMessage());
             throw new BusinessException("线稿生图服务暂不可用: " + e.getMessage());
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("线稿生图失败", e);
             throw new BusinessException("线稿生图失败: " + e.getMessage());
         }
     }
@@ -236,7 +231,6 @@ public class ImageServiceImpl implements ImageService {
         String requestId = UUID.randomUUID().toString();
         
         try {
-            log.info("开始图片融合请求: {}", requestId);
             
             // 1. 图片URL转Base64
             List<String> base64Images = request.getImageUrlList().stream()
@@ -271,8 +265,7 @@ public class ImageServiceImpl implements ImageService {
             if (jobId == null || jobId.isEmpty()) {
                 throw new BusinessException("获取任务ID失败");
             }
-            
-            log.info("图片融合任务提交成功，jobId={}", jobId);
+
 
             // 4. 只返回jobId，前端或调用方后续用jobId查询结果
             return ImageFusionVO.builder()
@@ -283,7 +276,6 @@ public class ImageServiceImpl implements ImageService {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("图片融合失败", e);
             throw new BusinessException("图片融合失败: " + e.getMessage());
         }
     }
@@ -294,8 +286,6 @@ public class ImageServiceImpl implements ImageService {
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
         
         try {
-            log.info("查询图片融合结果，jobId: {}, userId: {}", jobId, userId);
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("TT-API-KEY", ttApiKey);
@@ -344,7 +334,6 @@ public class ImageServiceImpl implements ImageService {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("查询图片融合结果失败", e);
             throw new BusinessException("查询图片融合结果失败: " + e.getMessage());
         }
     }
@@ -392,10 +381,8 @@ public class ImageServiceImpl implements ImageService {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
-            log.info("获取到用户 {} 的图像URL: {} 个", userId, imageUrls.size());
             return imageUrls;
         } catch (Exception e) {
-            log.error("获取用户图像URL失败", e);
             throw new BusinessException("获取用户图像列表失败: " + e.getMessage());
         }
     }
@@ -425,7 +412,6 @@ public class ImageServiceImpl implements ImageService {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("图片风格转换失败", e);
             throw new BusinessException("图片风格转换失败: " + e.getMessage());
         }
     }

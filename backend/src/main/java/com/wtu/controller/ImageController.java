@@ -48,7 +48,6 @@ public class ImageController {
             List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
             return Result.success(urls);
         } catch (Exception e) {
-            log.error("文生图失败", e);
             throw new BusinessException("文生图失败: " + e.getMessage());
         }
     }
@@ -68,7 +67,6 @@ public class ImageController {
 
             return Result.success(urls);
         } catch (Exception e) {
-            log.error("图生图失败", e);
             // 错误信息处理保持不变
             String errorMessage = e.getMessage();
             if (errorMessage != null && errorMessage.contains("520")) {
@@ -87,7 +85,6 @@ public class ImageController {
             return Result.success(imageService.styleConversion(request,
                     UserContext.getCurrentUserId(httpServletRequest)));
         } catch (Exception e) {
-            log.error("图片风格转换失败", e);
             throw new BusinessException("图片风格转换失败: " + e.getMessage());
         }
     }
@@ -101,7 +98,6 @@ public class ImageController {
 
             return Result.success(response);
         } catch (Exception e) {
-            log.error("图片融合失败", e);
             throw new BusinessException("图片融合失败: " + e.getMessage());
         }
     }
@@ -114,7 +110,6 @@ public class ImageController {
             ImageFusionVO response = imageService.queryImageByJobId(jobId, userId);
             return Result.success(response);
         } catch (Exception e) {
-            log.error("获取融合结果失败", e);
             throw new BusinessException("获取融合结果失败: " + e.getMessage());
         }
     }
@@ -130,9 +125,14 @@ public class ImageController {
             List<String> ids = response.getImages().stream()
                     .map(SketchToImageVO.GeneratedImage::getImageId)
                     .collect(Collectors.toList());
-            return Result.success(ids);
+
+            List<String> urls = ids.
+                    stream().
+                    map(imageStorageService::getImageUrl).
+                    collect(Collectors.toList());
+
+            return Result.success(urls);
         } catch (Exception e) {
-            log.error("线稿生图失败", e);
             throw new BusinessException("线稿生图失败: " + e.getMessage());
         }
     }
@@ -143,7 +143,6 @@ public class ImageController {
         try {
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null) {
-                log.error("文件名为空");
                 throw new BusinessException("文件名为空");
             }
 
@@ -155,10 +154,8 @@ public class ImageController {
 
             return Result.success(filePath);
         } catch (IOException e) {
-            log.error("文件读取失败", e);
             throw new BusinessException("文件读取失败: " + e.getMessage());
         } catch (Exception e) {
-            log.error("上传过程发生错误", e);
             throw new BusinessException("上传过程发生错误: " + e.getMessage());
         }
     }

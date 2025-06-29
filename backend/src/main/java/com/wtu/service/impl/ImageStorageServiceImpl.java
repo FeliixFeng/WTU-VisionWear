@@ -49,14 +49,11 @@ public class ImageStorageServiceImpl implements ImageStorageService {
                     .build();
             imageMapper.insert(image);
 
-            log.info("图片保存成功: imageId={}, userId={}", imageId, userId);
             return imageId;
 
         } catch (IllegalArgumentException e) {
-            log.error("Base64解码失败: {}", e.getMessage());
             throw new BusinessException("图像格式不正确，无法解码");
         } catch (Exception e) {
-            log.error("保存图像到OSS失败", e);
             throw new BusinessException("保存图像失败: " + e.getMessage());
         }
     }
@@ -89,13 +86,10 @@ public class ImageStorageServiceImpl implements ImageStorageService {
                     .build();
             imageMapper.insert(image);
 
-            log.info("URL图片保存成功: imageId={}, userId={}", imageId, userId);
             return imageId;
         } catch (IOException e) {
-            log.error("从URL获取图片失败: {}", imageUrl, e);
             throw new BusinessException("无法从URL获取图片: " + e.getMessage());
         } catch (Exception e) {
-            log.error("保存URL图片到OSS失败", e);
             throw new BusinessException("保存图片失败: " + e.getMessage());
         }
     }
@@ -104,7 +98,9 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     @Cacheable(value = "imageUrls", key = "#imageId", unless = "#result == null")
     public String getImageUrl(String imageId) {
         ExceptionUtils.requireNonEmpty(imageId, "图像ID不能为空");
-        
+        if(imageId.endsWith(".png")){
+            return  aliOssUtil.getAccessUrl(imageId);
+        }
         // 直接构建并返回URL
         String objectName = imageId + ".png";
         return aliOssUtil.getAccessUrl(objectName);

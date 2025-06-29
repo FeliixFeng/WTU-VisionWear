@@ -7,7 +7,6 @@ import com.wtu.DTO.user.WxSignatureDTO;
 import com.wtu.VO.LoginVO;
 import com.wtu.entity.WeChatUser;
 import com.wtu.exception.AuthException;
-import com.wtu.exception.ExceptionUtils;
 import com.wtu.result.Result;
 import com.wtu.service.AuthService;
 import com.wtu.utils.WeChatUtil;

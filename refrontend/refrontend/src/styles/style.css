@@ -1,0 +1,23 @@
+html {
+  margin: 0;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+/* 设置全局盒子自动内减 */
+* {
+  box-sizing: border-box;
+}
+/* 清除ul标签的默认样式 */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* 清除a标签的默认样式  */
+a {
+  text-decoration: none;
+  color: inherit;
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+	<!-- 背景渐变 - 更深的背景色以增强对比度 -->
+	<defs>
+		<linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#4F46E5" />
+			<stop offset="100%" stop-color="#4338CA" />
+		</linearGradient>
+		<linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#F9FAFB" />
+			<stop offset="100%" stop-color="#F3F4F6" />
+		</linearGradient>
+	</defs>
+
+	<!-- 外层圆形 -->
+	<circle cx="100" cy="100" r="90" fill="url(#bgGradient)" />
+
+	<!-- 主体图形元素 - 非圆形内部 -->
+	<g>
+		<!-- 中心六边形 - 代表AI核心 -->
+		<path d="M100 50 L140 75 L140 125 L100 150 L60 125 L60 75 Z" fill="#818CF8" stroke="#C7D2FE" stroke-width="2.5" />
+
+		<!-- 内部菱形 - 增加层次感 -->
+		<path d="M100 70 L125 100 L100 130 L75 100 Z" fill="#C7D2FE" stroke="#E0E7FF" stroke-width="2" />
+
+		<!-- 中心方块 - 代表设计界面 -->
+		<rect x="85" y="85" width="30" height="30" rx="3" fill="url(#accentGradient)" stroke="#4F46E5" stroke-width="1.5" />
+
+		<!-- 装饰性角落元素 - 增加棱角感 -->
+		<path d="M60 75 L40 65 L50 55 L70 65 Z" fill="#C7D2FE" />
+		<path d="M140 75 L160 65 L150 55 L130 65 Z" fill="#C7D2FE" />
+		<path d="M60 125 L40 135 L50 145 L70 135 Z" fill="#C7D2FE" />
+		<path d="M140 125 L160 135 L150 145 L130 135 Z" fill="#C7D2FE" />
+	</g>
+</svg>

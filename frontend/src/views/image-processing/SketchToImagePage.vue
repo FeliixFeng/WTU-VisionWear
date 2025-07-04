@@ -1,35 +1,36 @@
 <template>
   <div class="sketch-to-image-container">
-    <el-alert
-      title="功能开发中"
-      type="warning"
-      description="该功能正在开发中，暂不可用"
-      :closable="false"
-      show-icon
-    />
-    
+    <el-alert title="功能开发中" type="warning" description="该功能正在开发中，暂不可用" :closable="false" show-icon />
+
     <h2>线稿成图</h2>
     <div class="content">
       <p class="description">上传线稿，AI将为您生成完整的彩色图像</p>
-      
+
       <div class="sketch-to-image-workspace">
         <div class="upload-section">
-          <h4>上传线稿</h4>
-          <div class="upload-area">
-            <el-upload
-              action="#"
-              class="sketch-uploader"
-              :auto-upload="false"
-              drag>
-              <el-icon class="el-icon--upload"><Upload /></el-icon>
-              <div class="el-upload__text">拖拽线稿到此处或 <em>点击上传</em></div>
-              <template #tip>
-                <div class="el-upload__tip">支持JPG、PNG格式，建议使用清晰的线稿</div>
-              </template>
-            </el-upload>
-          </div>
+          <a-tabs default-active-key="2">
+            <a-tab-pane key="1" title="上传线稿">
+              <!-- <h4>上传线稿</h4> -->
+              <div class="upload-area">
+                <el-upload action="#" class="sketch-uploader" :auto-upload="false" drag>
+                  <el-icon class="el-icon--upload">
+                    <Upload />
+                  </el-icon>
+                  <div class="el-upload__text">拖拽线稿到此处或 <em>点击上传</em></div>
+                  <template #tip>
+                    <div class="el-upload__tip">支持JPG、PNG格式，建议使用清晰的线稿</div>
+                  </template>
+                </el-upload>
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="2" title="画板">
+              <div class="drawing-area">
+                <rawingCanvas></rawingCanvas>
+              </div>
+            </a-tab-pane>
+          </a-tabs>
         </div>
-        
+
         <div class="options-section">
           <h4>生成选项</h4>
           <div class="option-form">
@@ -41,11 +42,12 @@
                   <el-option label="水彩风格" value="watercolor"></el-option>
                 </el-select>
               </el-form-item>
-              
+
               <el-form-item label="提示词">
-                <el-input v-model="options.prompt" type="textarea" rows="3" placeholder="描述您希望生成的内容，如：'蓝色背景，女性角色'"></el-input>
+                <el-input v-model="options.prompt" type="textarea" rows="3"
+                  placeholder="描述您希望生成的内容，如：'蓝色背景，女性角色'"></el-input>
               </el-form-item>
-              
+
               <el-form-item label="生成数量">
                 <el-radio-group v-model="options.count">
                   <el-radio :label="1">1张</el-radio>
@@ -54,7 +56,7 @@
                 </el-radio-group>
               </el-form-item>
             </el-form>
-            
+
             <div class="generate-button">
               <el-button type="primary" :disabled="true">开始生成</el-button>
             </div>
@@ -68,6 +70,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Upload } from '@element-plus/icons-vue'
+import rawingCanvas from '../../components/rawingCanvas.vue'
 
 const options = ref({
   style: 'realistic',
@@ -99,7 +102,8 @@ const options = ref({
   gap: 30px;
 }
 
-.upload-section, .options-section {
+.upload-section,
+.options-section {
   flex: 1;
   background-color: white;
   border-radius: 8px;
@@ -116,6 +120,10 @@ h4 {
 
 .upload-area {
   padding: 10px 0;
+}
+
+.drawing-area {
+  height: 500px;
 }
 
 .sketch-uploader {

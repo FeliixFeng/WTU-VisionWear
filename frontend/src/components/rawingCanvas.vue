@@ -141,7 +141,9 @@ canvas {
 }
 
 button {
-  padding: 5px 10px;
+  padding: 8px 16px;
+  min-width: 100px;
+  font-size: 14px;
   background-color: #007bff;
   color: white;
   border: none;

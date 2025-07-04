@@ -40,7 +40,7 @@ const constantRouters = [
 	},
 	{
 		path: "/login",
-		component: () => import("@/views/login/index.vue"),
+		component: () => import("@/views/login/introPage.vue"),
 		name: "login",
 	},
 ]

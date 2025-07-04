@@ -3,6 +3,7 @@ import { useRouter } from "vue-router"
 import dbUtils from "utils/util.strotage.js"
 import { getMyImages } from "@/apis/modules/getMyImages"
 import { defineStore } from "pinia"
+import { register } from "@/apis/modules/weChat"
 import { ref } from "vue"
 
 export const useAuthStore = defineStore("users", () => {
@@ -28,11 +29,21 @@ export const useAuthStore = defineStore("users", () => {
 			console.log(err)
 		}
 	}
+	async function DoRegister(userData) {
+		return register(userData).then((res) => {
+			if (!res.status) {
+				MyMessage.error(res.origin.msg)
+			} else {
+				MyMessage.success(res.origin.msg)
+			}
+		})
+	}
 	async function updateMyImages() {
 		const response = await getMyImages()
 		userImages.value = response.data
 	}
 	return {
+		DoRegister,
 		userImages,
 		logout,
 		login,

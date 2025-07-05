@@ -1,6 +1,7 @@
 package com.wtu.controller;
 import com.wtu.DTO.user.ChangeInfoDTO;
 import com.wtu.DTO.user.ChangePasswordDTO;
+import com.wtu.entity.User;
 import com.wtu.result.Result;
 import com.wtu.service.ImageService;
 import com.wtu.service.MaterialService;
@@ -62,5 +63,12 @@ public class UserController {
         Long userId = UserContext.getCurrentUserId(request);
         userService.changeUserInfo(changeInfoDTO, userId);
         return Result.success("用户信息修改成功!");
+    }
+    
+    @GetMapping("/{userId}")
+    @Operation(summary = "根据ID获取用户所有信息")
+    public Result<User> getUserById(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        return Result.success(user);
     }
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,6 +25,15 @@ public class User implements Serializable {
 
     @Schema(description = "用户账户名")
     private String userName;
+
+    @Schema(description = "用户昵称")
+    private String nickName;
+
+    @Schema(description = "生日日期")
+    private LocalDate birthday;
+
+    @Schema(description = "头像URL")
+    private String avatar;
 
     @Schema(description = "用户加密后密码")
     private String passWord;

@@ -22,7 +22,8 @@ public class ChangeInfoDTO {
     @Schema(description = "用户手机号码")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号码格式不正确")
     private String phone;
-    
-    @Schema(description = "用户midjourney密钥")
-    private String apiKey;
+
+    @Schema(description = "用户昵称")
+    private String nickName;
+
 } 

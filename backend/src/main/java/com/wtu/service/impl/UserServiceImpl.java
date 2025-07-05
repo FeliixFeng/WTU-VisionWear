@@ -85,6 +85,14 @@ public class UserServiceImpl implements UserService {
             
             user.setUserName(changeInfoDTO.getUserName());
         }
+
+        //处理昵称
+        if(StringUtils.hasText(changeInfoDTO.getNickName())){
+            if(changeInfoDTO.getNickName().length()>20){
+                throw new BusinessException("昵称长度不能超过20个字符");
+            }
+            user.setNickName(changeInfoDTO.getNickName());
+        }
         
         // 处理邮箱
         if (StringUtils.hasText(changeInfoDTO.getEmail())) {
@@ -95,15 +103,7 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.hasText(changeInfoDTO.getPhone())) {
             user.setPhone(changeInfoDTO.getPhone());
         }
-        
-        // 处理API密钥
-        if (StringUtils.hasText(changeInfoDTO.getApiKey())) {
-            if (changeInfoDTO.getApiKey().length() > 100) {
-                throw new BusinessException("API密钥长度不能超过100个字符");
-            }
-            user.setApiKey(changeInfoDTO.getApiKey());
-        }
-        
+
         // 更新用户信息
         int result = userMapper.updateById(user);
         if (result <= 0) {
@@ -111,5 +111,20 @@ public class UserServiceImpl implements UserService {
         }
         
         log.info("用户{}信息修改成功", userId);
+    }
+    
+    /**
+     * 根据用户ID获取用户所有信息
+     * @param userId 用户ID
+     * @return 用户实体对象
+     */
+    @Override
+    public User getUserById(Long userId) {
+        // 查询用户是否存在
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            throw new BusinessException("用户不存在！");
+        }
+        return user;
     }
 }

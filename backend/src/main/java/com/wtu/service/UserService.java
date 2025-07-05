@@ -1,6 +1,7 @@
 package com.wtu.service;
 import com.wtu.DTO.user.ChangeInfoDTO;
 import com.wtu.DTO.user.ChangePasswordDTO;
+import com.wtu.entity.User;
 
 public interface UserService {
     /**
@@ -14,4 +15,11 @@ public interface UserService {
      * @param userId 用户ID
      */
     void changeUserInfo(ChangeInfoDTO changeInfoDTO, Long userId);
+    
+    /**
+     * 根据用户ID获取用户所有信息
+     * @param userId 用户ID
+     * @return 用户实体对象
+     */
+    User getUserById(Long userId);
 }

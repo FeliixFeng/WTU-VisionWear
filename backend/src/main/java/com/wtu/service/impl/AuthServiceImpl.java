@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +53,17 @@ public class AuthServiceImpl implements AuthService {
             if (userMapper.selectOne(emailWrapper) != null) {
                 throw new AuthException("邮箱已注册");
             }
+            //设置默认的昵称
+            String prefix="DeepVision@";
+            StringBuilder stringBuilder=new StringBuilder();
+            int remainLength=20-prefix.length();
+            String baseChar="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            for (int i = 0;i<remainLength;i++){
+                Random random=new Random();
+                int randomInt = random.nextInt(baseChar.length());
+                stringBuilder.append(baseChar.charAt(randomInt));
+            }
+            String nickName=prefix + stringBuilder;
 
             // 保存用户
             User user = User.builder()
@@ -59,6 +72,7 @@ public class AuthServiceImpl implements AuthService {
                     .status(0)
                     .passWord(DigestUtil.md5Hex(dto.getPassword())) // 加密密码
                     .createTime(LocalDateTime.now())
+                    .nickName(nickName)
                     .build();
 
             userMapper.insert(user);

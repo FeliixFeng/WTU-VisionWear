@@ -43,6 +43,11 @@ const constantRouters = [
 		component: () => import("@/views/login/introPage.vue"),
 		name: "login",
 	},
+	{
+		path: "/personalCenter",
+		component: () => import("@/views/personalCenter/index.vue"),
+		name: "personalCenter",
+	},
 ]
 
 export default [...constantRouters]

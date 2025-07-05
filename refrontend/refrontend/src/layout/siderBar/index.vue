@@ -32,6 +32,11 @@ const iconList = [
 		icon: "icon-ronghebiao",
 		url: "/imageFusion",
 	},
+	{
+		name: "个人中心",
+		icon: "icon-gerenzhongxin",
+		url: "/personalCenter",
+	},
 ]
 const showName = (e) => {
 	const element = e.target

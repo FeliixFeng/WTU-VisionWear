@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router"
-import { onBeforeMount, ref } from "vue"
+import { onBeforeMount, ref, computed } from "vue"
 import { useUesrInformationStore } from "@/store/userInformationStore.js"
 import dbUtils from "utils/util.strotage"
 
@@ -8,8 +8,11 @@ const userData = dbUtils.get("userData")
 const router = useRouter()
 const userInformation = ref()
 const userImages = ref([])
+const showPasswordForm = ref(false)
 const createTime = ref("") //注册日期
 const uesrInformationStore = useUesrInformationStore()
+const formRef = ref()
+const PasswordRef = ref()
 const formData = ref({
 	avatar: "", //头像url
 	nickName: "", //昵称
@@ -17,7 +20,12 @@ const formData = ref({
 	email: "", //email
 	phone: "", //phone
 })
-
+//根据接口定义修改密码的相关信息
+const PasswordInformation = ref({
+	username: "",
+	oldPassword: "",
+	newPassword: "",
+})
 const rules = ref({
 	nickName: [
 		{ required: true, message: "请输入昵称", trigger: "blur" },
@@ -73,7 +81,45 @@ const rules = ref({
 		},
 	],
 })
+const passwordRules = computed(() => {
+	if (!showPasswordForm.value) {
+		return {} // 不显示表单时，不做任何校验
+	}
+	return {
+		oldPassword: [
+			{ required: true, message: "请输入旧密码", trigger: "blur" },
+			{
+				validator: (rule, value, callback) => {
+					if (/\s/.test(value)) {
+						callback(new Error("旧密码不能包含空格或回车"))
+					} else if (value.length < 5 || value.length > 20) {
+						callback(new Error("旧密码长度需为 5-20 个字符"))
+					} else {
+						callback()
+					}
+				},
+				trigger: "blur",
+			},
+		],
+		newPassword: [
+			{ required: true, message: "请输入新密码", trigger: "blur" },
+			{
+				validator: (rule, value, callback) => {
+					if (/\s/.test(value)) {
+						callback(new Error("新密码不能包含空格或回车"))
+					} else if (value.length < 5 || value.length > 20) {
+						callback(new Error("新密码长度需为 5-20 个字符"))
+					} else {
+						callback()
+					}
+				},
+				trigger: "blur",
+			},
+		],
+	}
+})
 
+// 返回上一个路由
 const ret = () => {
 	router.back()
 }
@@ -85,10 +131,33 @@ const initializeForm = () => {
 	formData.value.email = userInformation.value.email
 	formData.value.phone = userInformation.value.phone
 	createTime.value = userInformation.value.createTime
+	PasswordInformation.value.username = userData.userName
+}
+
+const changPswd = (pswdData) => {
+	if (!PasswordRef.value) return
+	PasswordRef.value.validate(async (valid) => {
+		// 确保信息填写正确才发送请求
+		if (valid) {
+			uesrInformationStore.doChangePassword(pswdData)
+		}
+	})
 }
 
 const save = () => {
-	console.log("修改后的数据：", formData.value)
+	if (!formRef.value) return
+	formRef.value.validate(async (valid) => {
+		// 确保信息填写正确才发送请求
+		if (valid) {
+			//修改信息
+			console.log("修改后的数据：", formData.value)
+			// 修改密码
+			if (showPasswordForm) {
+				changPswd(PasswordInformation.value)
+				showPasswordForm.value = false
+			}
+		}
+	})
 }
 
 onBeforeMount(async () => {
@@ -97,8 +166,6 @@ onBeforeMount(async () => {
 	const res2 = await uesrInformationStore.doGetUserImages()
 	userImages.value = res2.data
 	initializeForm()
-	console.log(formData.value)
-	console.log(res.data)
 })
 </script>
 <template>
@@ -113,6 +180,7 @@ onBeforeMount(async () => {
 			</div>
 			<div class="data">
 				<el-form
+					ref="formRef"
 					:model="formData"
 					:rules="rules"
 					label-width="200px"
@@ -157,13 +225,66 @@ onBeforeMount(async () => {
 							disabled
 						/>
 					</el-form-item>
-					<el-button
-						style="float: right; width: 100px"
-						type="success"
-						@click="save"
-						>保存</el-button
-					>
 				</el-form>
+				<el-form
+					:validate-on-rule-change="false"
+					v-show="showPasswordForm"
+					ref="PasswordRef"
+					:model="PasswordInformation"
+					:rules="passwordRules"
+					label-width="200px"
+					style="width: 750px; margin-top: 40px"
+				>
+					<el-form-item
+						label="旧密码"
+						prop="oldPassword"
+					>
+						<el-input
+							v-model="PasswordInformation.oldPassword"
+							type="password"
+							show-password
+						/>
+					</el-form-item>
+					<el-form-item
+						label="新密码"
+						prop="newPassword"
+					>
+						<el-input
+							v-model="PasswordInformation.newPassword"
+							type="password"
+							show-password
+						/> </el-form-item
+				></el-form>
+				<el-button
+					style="float: right; width: 100px; margin-right: 130px"
+					type="success"
+					@click="save"
+					>保存</el-button
+				>
+				<el-button
+					style="float: right; width: 100px; margin-right: 20px"
+					type="success"
+					native-type="button"
+					@click="showPasswordForm = true"
+					>修改密码</el-button
+				>
+			</div>
+
+			<div class="showMyImage">
+				<p>我的照片</p>
+				<div class="images">
+					<el-image
+						v-for="(item, index) in userImages"
+						class="picture"
+						style="width: 20%; height: 200px"
+						:src="item"
+						:preview-src-list="userImages"
+						:initial-index="index"
+						lazy
+						preview-teleported
+						fit="cover"
+					></el-image>
+				</div>
 			</div>
 		</main>
 	</div>
@@ -175,10 +296,11 @@ onBeforeMount(async () => {
 }
 .center {
 	width: 880px;
-	height: 820px;
-	margin: 0 auto;
+	/* height: 1800px; */
+	margin: 1px auto;
 	background-color: white;
 	border-radius: 1%;
+	padding-bottom: 150px;
 }
 .return {
 	position: absolute;
@@ -209,5 +331,34 @@ onBeforeMount(async () => {
 }
 .el-form-item {
 	margin-bottom: 40px;
+}
+.showMyImage {
+	width: 800px;
+	height: 850px;
+	margin: 20px auto;
+}
+p {
+	margin-top: 120px;
+	font-size: 20px;
+	border-top: 1px dashed green;
+	padding: 20px 0 5px 0;
+}
+.images {
+	width: 800px;
+	height: 900px;
+	/* border: 1px dashed aqua; */
+	overflow-y: auto;
+}
+.picture {
+	float: left;
+	padding: 5px;
+	border: 3px solid transparent; /* 初始边框透明，防止布局跳动 */
+	transition: all 0.3s ease;
+}
+
+.picture:hover {
+	transform: scale(1.1); /* 放大一点点 */
+	border: 2px solid #49ec98; /* 出现边框 */
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* 加点阴影更立体 */
 }
 </style>

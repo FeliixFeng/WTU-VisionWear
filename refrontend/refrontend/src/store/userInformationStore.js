@@ -1,5 +1,4 @@
 import { useRouter } from "vue-router"
-import dbUtils from "utils/util.strotage.js"
 import { MyMessage } from "@/utils/util.toast.js"
 import { defineStore } from "pinia"
 import {
@@ -31,9 +30,21 @@ export const useUesrInformationStore = defineStore(
 				return res
 			})
 		}
+		async function doChangePassword(data) {
+			return changePassword(data).then((res) => {
+				// 检查响应状态并显示相应的消息
+				if (!res.status) {
+					MyMessage.error(res.origin.msg)
+				} else {
+					MyMessage.success(res.origin.msg)
+				}
+				return res
+			})
+		}
 		return {
 			doGetUserInformation,
 			doGetUserImages,
+			doChangePassword,
 		}
 	}
 )

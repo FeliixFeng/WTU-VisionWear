@@ -3,6 +3,7 @@ package com.wtu.service;
 
 import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
+import com.wtu.VO.SketchToImageByTYVO;
 import com.wtu.VO.SketchToImageVO;
 
 import java.util.List;
@@ -21,6 +22,16 @@ public interface ImageService {
     List<String> textToImage(TextToImageDTO request, Long userId) throws Exception;
 
     /**
+     * 通义万象文生图功能（SDK异步）
+     *
+     * @param request 文生图请求
+     * @param userId  用户ID
+     * @return
+     */
+    List<String> textToImageByTongyi(TextToImageByTYDTO request, Long userId) throws Exception;
+
+
+    /**
      * 图像生成图像 (Image-to-Image)
      *
      * @param request 以图生图请求
@@ -37,6 +48,16 @@ public interface ImageService {
      * @return 图像生成响应
      */
     SketchToImageVO sketchToImage(SketchToImageDTO request, Long userId) throws Exception;
+
+    /**
+     * 通义万象涂鸦生图功能（SDK异步）
+     *
+     * @param request 涂鸦生图请求
+     * @param userId  用户ID
+     * @return
+     */
+    SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId) throws Exception;
+
 
     /**
      * 图像融合

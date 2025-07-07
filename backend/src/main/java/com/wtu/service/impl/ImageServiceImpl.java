@@ -1,5 +1,10 @@
 package com.wtu.service.impl;
 
+import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
+import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesisParam;
+import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesisResult;
+import com.alibaba.dashscope.exception.ApiException;
+import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,6 +20,7 @@ import com.volcengine.service.visual.model.request.ImageStyleConversionRequest;
 import com.volcengine.service.visual.model.response.ImageStyleConversionResponse;
 import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
+import com.wtu.VO.SketchToImageByTYVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.entity.Image;
 import com.wtu.exception.BusinessException;
@@ -85,6 +91,136 @@ public class ImageServiceImpl implements ImageService {
             throw new BusinessException("文本生成图像失败: " + e.getMessage());
         }
     }
+
+    // 通义-文生图功能
+    @Value("${vision.aliyun.api-key}")
+    private String aliyunApiKey;
+
+    @Override
+    public List<String> textToImageByTongyi(TextToImageByTYDTO request, Long userId) throws Exception {
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+
+        try {
+            ImageSynthesisParam.ImageSynthesisParamBuilder builder = ImageSynthesisParam.builder()
+                    .apiKey(aliyunApiKey)
+                    .model(request.getModel())
+                    .prompt(request.getPrompt())
+                    .n(request.getN())
+                    .size(request.getSize());
+
+            if (request.getNegative_prompt() != null && !request.getNegative_prompt().isEmpty()) {
+                builder.negativePrompt(request.getNegative_prompt());
+            }
+            if (request.getSeed() != null && request.getSeed() > 0) {
+                builder.seed(request.getSeed());
+            }
+            ImageSynthesisParam param = builder.build();
+
+            ImageSynthesis imageSynthesis = new ImageSynthesis();
+            ImageSynthesisResult result = imageSynthesis.call(param); // 同步调用
+
+            if (result == null || result.getOutput() == null || result.getOutput().getResults() == null) {
+                throw new BusinessException("未能获取到图像生成结果");
+            }
+
+            List<String> ids = new ArrayList<>();
+            for (var img : result.getOutput().getResults()) {
+                String imageUrl = img.get("url");
+                if (imageUrl == null || imageUrl.isEmpty()) continue;
+                String imageId = imageStorageService.saveImageFromUrl(imageUrl, userId);
+                ids.add(imageId);
+            }
+
+            if (ids.isEmpty()) {
+                throw new BusinessException("未能生成有效的图像");
+            }
+            return ids;
+
+        } catch (ApiException | NoApiKeyException e) {
+            log.error("通义万象SDK调用失败", e);
+            throw new BusinessException("通义万象SDK调用失败: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("文本生成图像失败", e);
+            throw new BusinessException("文本生成图像失败: " + e.getMessage());
+        }
+    }
+
+
+    // 通义-涂鸦生图功能
+    @Override
+    public SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId) throws Exception {
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+
+        long startTime = System.currentTimeMillis();
+        String requestId = UUID.randomUUID().toString();
+
+        String sketchImageUrl = request.getSketchImageUrl();
+
+        if (sketchImageUrl == null || sketchImageUrl.isEmpty()) {
+            throw new BusinessException("涂鸦图像不能为空");
+        }
+
+        try {
+            // 构建参数，完全对齐官方SDK
+            ImageSynthesisParam param = ImageSynthesisParam.builder()
+                    .apiKey(aliyunApiKey)
+                    .model(request.getModel())
+                    .prompt(request.getPrompt())
+                    .n(request.getN())
+                    .size(request.getSize())
+                    .sketchImageUrl(sketchImageUrl)
+                    .style(request.getStyle())
+                    .seed(request.getSeed())
+                    .build();
+
+            // 调用SDK
+            ImageSynthesis imageSynthesis = new ImageSynthesis("image2image");
+            ImageSynthesisResult result = imageSynthesis.call(param);
+
+            if (result == null || result.getOutput() == null || result.getOutput().getResults() == null) {
+                throw new BusinessException("未能获取到图像生成结果");
+            }
+
+            List<SketchToImageByTYVO.GeneratedImage> imageList = new ArrayList<>();
+            for (var img : result.getOutput().getResults()) {
+                String imageUrl = img.get("url");
+                int width = img.containsKey("width") ? Integer.parseInt(img.get("width")) : 0;
+                int height = img.containsKey("height") ? Integer.parseInt(img.get("height")) : 0;
+                long seed = img.containsKey("seed") ? Long.parseLong(img.get("seed")) : 0L;
+                String style = img.get("style");
+                String imageId = imageStorageService.saveImageFromUrl(imageUrl, userId);
+
+                imageList.add(SketchToImageByTYVO.GeneratedImage.builder()
+                        .imageId(imageId)
+                        .imageUrl(imageUrl)
+                        .width(width)
+                        .height(height)
+                        .seed(seed)
+                        .style(style)
+                        .build());
+            }
+
+            return SketchToImageByTYVO.builder()
+                    .requestId(requestId)
+                    .images(imageList)
+                    .prompt(request.getPrompt())
+                    .sketchImageUrl(sketchImageUrl)
+                    .generationTimeMs(System.currentTimeMillis() - startTime)
+                    .build();
+
+        } catch (ApiException | NoApiKeyException e) {
+            log.error("通义万象SDK调用失败", e);
+            throw new BusinessException("通义万象SDK调用失败: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("涂鸦作图失败", e);
+            throw new BusinessException("涂鸦作图失败: " + e.getMessage());
+        }
+    }
+
 
     // 图像生成图像
     @Override
@@ -168,15 +304,15 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public SketchToImageVO sketchToImage(SketchToImageDTO request, Long userId) throws Exception {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
-        ExceptionUtils.requireNonNull(request.getSketchImageId(), "线稿图ID不能为空");
+        ExceptionUtils.requireNonNull(request.getSketchImageURL(), "线稿图URL不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
-        
+
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
 
         try {
             // 1. 获取线稿图URL
-            String sketchUrl = request.getSketchImageId();
+            String sketchUrl = request.getSketchImageURL();
             if (!sketchUrl.startsWith("http")) {
                 sketchUrl = imageStorageService.getImageUrl(sketchUrl);
             }
@@ -193,12 +329,11 @@ public class ImageServiceImpl implements ImageService {
             if (resultImageUrl == null || resultImageUrl.isEmpty()) {
                 throw new BusinessException("获取结果图像URL失败");
             }
-            
+
             String imageId = imageStorageService.saveImageFromUrl(resultImageUrl, userId);
 
             return SketchToImageVO.builder()
                     .requestId(requestId)
-                    .sketchImageId(request.getSketchImageId())
                     .images(List.of(
                             SketchToImageVO.GeneratedImage.builder()
                                     .imageId(imageId)

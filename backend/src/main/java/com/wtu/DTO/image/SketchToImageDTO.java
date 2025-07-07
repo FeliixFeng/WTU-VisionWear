@@ -8,9 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 public class SketchToImageDTO {
     /**
-     * 线稿图片ID
+     * 线稿图片URL
      */
-    private String sketchImageId;
+    private String sketchImageURL;
 
     /**
      * 生成提示词

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SketchToImageByTYDTO {
+public class DoodleToImageByTYDTO {
 
     @Schema(description = "模型名称，固定为wanx-sketch-to-image-lite",defaultValue = "wanx-sketch-to-image-lite")
     @NotBlank(message = "model为必填项")

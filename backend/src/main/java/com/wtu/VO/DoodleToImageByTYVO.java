@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Data
 @Builder
-public class SketchToImageByTYVO {
+public class DoodleToImageByTYVO {
     private String requestId;
     private List<GeneratedImage> images;
     private String prompt;

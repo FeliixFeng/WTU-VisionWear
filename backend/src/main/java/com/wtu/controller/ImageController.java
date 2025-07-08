@@ -1,10 +1,9 @@
 package com.wtu.controller;
 import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
-import com.wtu.VO.SketchToImageByTYVO;
+import com.wtu.VO.DoodleToImageByTYVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.exception.BusinessException;
-import com.wtu.exception.ExceptionUtils;
 import com.wtu.result.Result;
 import com.wtu.service.ImageService;
 import com.wtu.service.ImageStorageService;
@@ -133,12 +132,12 @@ public class ImageController {
 
     @PostMapping
     @Operation(summary = "通义万象涂鸦作图功能")
-    public Result<SketchToImageByTYVO> sketchToImageByTongyi(
-            @RequestBody @Valid SketchToImageByTYDTO request,
+    public Result<DoodleToImageByTYVO> DoodleToImageByTongyi(
+            @RequestBody @Valid DoodleToImageByTYDTO request,
             HttpServletRequest httpServletRequest) {
         try {
             Long userId = UserContext.getCurrentUserId(httpServletRequest);
-            SketchToImageByTYVO vo = imageService.sketchToImageByTongyi(request, userId);
+            DoodleToImageByTYVO vo = imageService.DoodleToImageByTongyi(request, userId);
             return Result.success(vo);
         } catch (Exception e) {
             throw new BusinessException("通义万象涂鸦作图失败: " + e.getMessage());

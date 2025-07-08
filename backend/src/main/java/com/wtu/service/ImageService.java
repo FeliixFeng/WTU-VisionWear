@@ -3,7 +3,7 @@ package com.wtu.service;
 
 import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
-import com.wtu.VO.SketchToImageByTYVO;
+import com.wtu.VO.DoodleToImageByTYVO;
 import com.wtu.VO.SketchToImageVO;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public interface ImageService {
      * @param userId  用户ID
      * @return
      */
-    SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId) throws Exception;
+    DoodleToImageByTYVO DoodleToImageByTongyi(DoodleToImageByTYDTO request, Long userId) throws Exception;
 
 
     /**

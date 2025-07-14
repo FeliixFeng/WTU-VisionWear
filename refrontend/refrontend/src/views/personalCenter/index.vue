@@ -3,6 +3,7 @@ import { useRouter } from "vue-router"
 import { onBeforeMount, ref, computed } from "vue"
 import { useUesrInformationStore } from "@/store/userInformationStore.js"
 import dbUtils from "utils/util.strotage"
+import avatarUpload from "./component/avatarUpload.vue"
 
 const userData = dbUtils.get("userData")
 const router = useRouter()
@@ -175,9 +176,7 @@ onBeforeMount(async () => {
 				class="iconfont icon-fanhui return"
 				@click="ret"
 			></i>
-			<div class="headPortrait">
-				<div class="showAvatar"></div>
-			</div>
+			<avatarUpload></avatarUpload>
 			<div class="data">
 				<el-form
 					ref="formRef"
@@ -296,7 +295,6 @@ onBeforeMount(async () => {
 }
 .center {
 	width: 880px;
-	/* height: 1800px; */
 	margin: 1px auto;
 	background-color: white;
 	border-radius: 1%;
@@ -322,12 +320,6 @@ onBeforeMount(async () => {
 	justify-content: center;
 	align-items: center;
 	border-bottom: 1px dashed rgb(54, 171, 157);
-}
-.showAvatar {
-	width: 150px;
-	height: 150px;
-	background-color: green;
-	margin: auto;
 }
 .el-form-item {
 	margin-bottom: 40px;

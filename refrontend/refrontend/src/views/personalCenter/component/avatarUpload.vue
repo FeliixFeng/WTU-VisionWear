@@ -7,6 +7,17 @@ const file = ref()
 const inputUrl = ref("")
 const resultUrl = ref("")
 const imgCvs = ref()
+const preCvs = ref()
+let dragging = false
+const coord = {
+	x: 0,
+	y: 0,
+}
+// 拖拽偏移量
+const offset = {
+	x: 0,
+	y: 0,
+}
 let picture = null
 
 class Picture {
@@ -25,6 +36,7 @@ class Picture {
 			}
 		})
 	}
+	// 初始化数据
 	initialize() {
 		if (this.width > this.height) {
 			if (this.width > 350) {
@@ -41,6 +53,7 @@ class Picture {
 		}
 		this.updataCoord()
 	}
+	// 更新顶点坐标
 	updataCoord() {
 		this.x = (350 - this.width) / 2
 		this.y = (350 - this.height) / 2
@@ -50,18 +63,40 @@ class Picture {
 		// 画图前需要清空画布
 		ctx.clearRect(0, 0, 350, 350)
 		ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
+		//蒙层（裁剪区域）
+		ctx.strokeStyle = "rgba(255,255,255,0.6)"
+		ctx.strokeRect(100, 100, 150, 150)
+		//预览图绘制
+		this.extractImg()
 	}
+	// 图片放大
 	magnify() {
 		this.width = (this.n + 1) * this.width
 		this.height = (this.n + 1) * this.height
 		this.updataCoord()
 		this.draw()
 	}
+	// 图片缩小
 	shrink() {
 		this.width = (1 - this.n) * this.width
 		this.height = (1 - this.n) * this.height
 		this.updataCoord()
 		this.draw()
+	}
+	// 图片拖拽
+	dragPicture() {
+		if (Math.abs(offset.x) <= 3 && Math.abs(offset.y) <= 3) return //防抖：忽略微小移动
+		this.x += offset.x
+		this.y += offset.y
+		this.draw()
+	}
+	//提取蒙层里的图片并预览
+	extractImg() {
+		const ctx = imgCvs.value.getContext("2d")
+		const preCtx = preCvs.value.getContext("2d")
+		const imageData = ctx.getImageData(100, 100, 150, 150)
+		preCtx.putImageData(imageData, 0, 0)
+		resultUrl.value = preCvs.value.toDataURL("image/png")
 	}
 }
 
@@ -73,6 +108,29 @@ const magnify = () => {
 const shrink = () => {
 	if (!inputUrl.value || !picture) return
 	picture.shrink()
+}
+
+const startDraPic = (e) => {
+	coord.x = e.offsetX
+	coord.y = e.offsetY
+	dragging = true
+}
+
+const onDragPic = (e) => {
+	if (!inputUrl.value || !picture || !dragging) return
+	const newX = e.offsetX
+	const newY = e.offsetY
+	offset.x = newX - coord.x
+	offset.y = newY - coord.y
+	coord.x = newX
+	coord.y = newY
+	picture.dragPicture()
+}
+
+const stopDraPic = () => {
+	dragging = false
+	offset.x = 0
+	offset.y = 0
 }
 
 const inputImg = () => {
@@ -87,9 +145,20 @@ const fileChange = async (e) => {
 		picture = new Picture()
 		await picture.ready
 		picture.draw()
+		imgCvs.value.style.cursor = "grab"
 	}
 }
-
+const close = () => {
+	showInputImg.value = false
+	URL.revokeObjectURL(inputUrl.value)
+	inputUrl.value = null
+	imgCvs.value.style.cursor = "auto"
+	const ctx = imgCvs.value.getContext("2d")
+	const preCtx = preCvs.value.getContext("2d")
+	ctx.clearRect(0, 0, 350, 350)
+	preCtx.clearRect(0, 0, 150, 150)
+	inputRef.value.value = null
+}
 const save = () => {}
 </script>
 <template>
@@ -107,6 +176,10 @@ const save = () => {}
 			<div class="inputBox">
 				<div class="tailor">
 					<canvas
+						@mousedown="startDraPic"
+						@mousemove="onDragPic"
+						@mouseup="stopDraPic"
+						@mouseleave="stopDraPic"
 						ref="imgCvs"
 						class="myImg"
 						width="350"
@@ -134,6 +207,7 @@ const save = () => {}
 				</div>
 				<div class="preview">
 					<canvas
+						ref="preCvs"
 						class="previewImg"
 						width="150"
 						height="150"
@@ -141,7 +215,7 @@ const save = () => {}
 				</div>
 				<el-button
 					type="success"
-					@click="showInputImg = false"
+					@click="close"
 					style="margin: 10px 10px 0 620px; width: 100px"
 				>
 					取消
@@ -163,7 +237,7 @@ const save = () => {}
 	position: relative;
 	width: 150px;
 	height: 150px;
-	background-color: green;
+	/* background-color: green; */
 	margin: auto;
 	border-radius: 50%;
 	box-shadow: 0 0 10px 5px rgba(1, 1, 1, 0.15);
@@ -200,14 +274,12 @@ i.icon-shangchuan:hover {
 	display: inline-block;
 	width: 440px;
 	height: 440px;
-	/* border: 1px green dashed; */
 	vertical-align: top;
 }
 .preview {
 	display: inline-block;
 	width: 440px;
 	height: 440px;
-	/* border: 1px green dashed; */
 	vertical-align: top;
 }
 .myImg {

@@ -9,6 +9,7 @@ const resultUrl = ref("")
 const imgCvs = ref()
 const preCvs = ref()
 let dragging = false
+let rafId = null
 const coord = {
 	x: 0,
 	y: 0,
@@ -85,7 +86,6 @@ class Picture {
 	}
 	// 图片拖拽
 	dragPicture() {
-		if (Math.abs(offset.x) <= 3 && Math.abs(offset.y) <= 3) return //防抖：忽略微小移动
 		this.x += offset.x
 		this.y += offset.y
 		this.draw()
@@ -118,13 +118,19 @@ const startDraPic = (e) => {
 
 const onDragPic = (e) => {
 	if (!inputUrl.value || !picture || !dragging) return
-	const newX = e.offsetX
-	const newY = e.offsetY
-	offset.x = newX - coord.x
-	offset.y = newY - coord.y
-	coord.x = newX
-	coord.y = newY
-	picture.dragPicture()
+	// 限制为60祯，避免每次移动都重绘图片导致过于卡顿
+	if (!rafId) {
+		rafId = requestAnimationFrame(() => {
+			const newX = e.offsetX
+			const newY = e.offsetY
+			offset.x = newX - coord.x
+			offset.y = newY - coord.y
+			coord.x = newX
+			coord.y = newY
+			picture.dragPicture()
+			rafId = null // 清除标记，准备下一次
+		})
+	}
 }
 
 const stopDraPic = () => {

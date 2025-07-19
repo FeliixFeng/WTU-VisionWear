@@ -1,6 +1,7 @@
 package com.wtu.controller;
 import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
+import com.wtu.VO.SketchToImageByTYVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.exception.BusinessException;
 import com.wtu.exception.ExceptionUtils;
@@ -49,6 +50,22 @@ public class ImageController {
             return Result.success(urls);
         } catch (Exception e) {
             throw new BusinessException("文生图失败: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/tongyi/text-to-image")
+    @Operation(summary = "通义万象文生图功能")
+    public Result<List<String>> textToImageByTongyi(@RequestBody @Valid TextToImageByTYDTO request,
+                                                    HttpServletRequest httpServletRequest) {
+        try {
+            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            List<String> ids = imageService.textToImageByTongyi(request, userId);
+            List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
+            return Result.success(urls);
+        } catch (Exception e) {
+            log.error("通义万象文生图失败", e);
+            throw new BusinessException("通义万象文生图失败: " + e.getMessage());
         }
     }
 
@@ -114,6 +131,19 @@ public class ImageController {
         }
     }
 
+    @PostMapping
+    @Operation(summary = "通义万象涂鸦作图功能")
+    public Result<SketchToImageByTYVO> sketchToImageByTongyi(
+            @RequestBody @Valid SketchToImageByTYDTO request,
+            HttpServletRequest httpServletRequest) {
+        try {
+            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            SketchToImageByTYVO vo = imageService.sketchToImageByTongyi(request, userId);
+            return Result.success(vo);
+        } catch (Exception e) {
+            throw new BusinessException("通义万象涂鸦作图失败: " + e.getMessage());
+        }
+    }
 
     @PostMapping("/sketch-to-image")
     @Operation(summary = "线稿生图功能")
@@ -130,7 +160,6 @@ public class ImageController {
                     stream().
                     map(imageStorageService::getImageUrl).
                     collect(Collectors.toList());
-
             return Result.success(urls);
         } catch (Exception e) {
             throw new BusinessException("线稿生图失败: " + e.getMessage());

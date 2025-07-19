@@ -54,9 +54,19 @@ const closeName = (e) => {
 </script>
 <template>
 	<div class="sider">
-		<ul class="menu" @mouseover="showName" @mouseleave="closeName">
-			<li v-for="(item, index) in iconList" :key="index">
-				<router-link :to="item.url" class="link">
+		<ul
+			class="menu"
+			@mouseover="showName"
+			@mouseleave="closeName"
+		>
+			<li
+				v-for="(item, index) in iconList"
+				:key="index"
+			>
+				<router-link
+					:to="item.url"
+					class="link"
+				>
 					<i :class="['iconfont', item.icon]"></i>
 					<span class="name">{{ item.name }}</span>
 				</router-link>
@@ -70,7 +80,8 @@ const closeName = (e) => {
 	float: left;
 	position: absolute;
 	top: 60px;
-	left: 20px;
+	left: 10px;
+	z-index: 100;
 }
 
 .menu {

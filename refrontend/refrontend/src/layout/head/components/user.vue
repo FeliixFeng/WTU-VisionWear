@@ -1,37 +1,20 @@
 <template>
 	<div>
 		<slot></slot>
-		<div
-			class="user-icon-area"
-			@click="toggleUserPanel"
-			ref="iconArea"
-		>
-			<span
-				class="iconfont icon-dengluzhanghaodenglu user-icon"
-				aria-label="用户菜单"
-			></span>
+		<div class="user-icon-area" @click="toggleUserPanel" ref="iconArea">
+			<span class="iconfont icon-dengluzhanghaodenglu user-icon" aria-label="用户菜单"></span>
 
 			<transition name="fade">
-				<div
-					class="user-panel-float"
-					v-show="showUserPanel"
-					@click.stop
-				>
+				<div class="user-panel-float" v-show="showUserPanel" @click.stop>
 					<div class="user-info">
 						<div class="avatar">
-							<img
-								src="https://img.icons8.com/ios-filled/50/user.png"
-								alt="用户头像"
-							/>
+							<img src="https://img.icons8.com/ios-filled/50/user.png" alt="用户头像" />
 						</div>
 						<div class="user-text">
-							<div class="phone">151****9603</div>
-							<div class="user-id">用户9603</div>
+							<div class="phone">191****0289</div>
+							<div class="user-id">用户9604</div>
 						</div>
-						<div
-							class="switch"
-							@click="switchTeam"
-						>
+						<div class="switch" @click="switchTeam">
 							⟳ 切换团队
 						</div>
 					</div>
@@ -44,73 +27,43 @@
 
 						<div class="bar-label">算力（每月更新）<span>0/50</span></div>
 						<div class="bar-bg">
-							<div
-								class="bar-fill"
-								style="width: 0%"
-							></div>
+							<div class="bar-fill" style="width: 0%"></div>
 						</div>
 
 						<div class="bar-label">
 							作图体验点（每月更新）<span>0/200</span>
 						</div>
 						<div class="bar-bg">
-							<div
-								class="bar-fill"
-								style="width: 0%"
-							></div>
+							<div class="bar-fill" style="width: 0%"></div>
 						</div>
 
 						<div class="package-tip">购买套餐获得更多算力，解锁更多权益</div>
-						<button
-							class="buy-btn"
-							@click="buyPackage"
-						>
+						<button class="buy-btn" @click="buyPackage">
 							立即购买套餐 ⚡
 						</button>
 					</div>
 
 					<div class="user-actions">
-						<div
-							class="action-item"
-							@click="createTeam"
-						>
+						<div class="action-item" @click="createTeam">
 							<i class="action-icon">🎨</i> 创建团队
 						</div>
-						<div
-							class="action-item"
-							@click="goToWebsite"
-						>
+						<div class="action-item" @click="goToWebsite">
 							<i class="action-icon">🏠</i> 前往官网
 						</div>
-						<div
-							class="action-item"
-							@click="buyPackage"
-						>
+						<div class="action-item" @click="buyPackage">
 							<i class="action-icon">🛒</i> 购买套餐
 						</div>
-						<div
-							class="action-item"
-							@click="goToSettings"
-						>
+						<div class="action-item" @click="goToSettings">
 							<i class="action-icon">⚙️</i> 个人设置
 							<span class="blue">绑定微信快速登录</span>
 						</div>
-						<div
-							class="action-item"
-							@click="goToOrders"
-						>
+						<div class="action-item" @click="goToOrders">
 							<i class="action-icon">📦</i> 订单中心
 						</div>
-						<div
-							class="action-item"
-							@click="resetPassword"
-						>
+						<div class="action-item" @click="resetPassword">
 							<i class="action-icon">🔑</i> 重置密码
 						</div>
-						<div
-							class="action-item logout"
-							@click="logout"
-						>
+						<div class="action-item logout" @click="logout">
 							<i class="action-icon">🚪</i> 退出登录
 						</div>
 					</div>
@@ -238,6 +191,7 @@ export default {
 .fade-leave-active {
 	transition: opacity 0.3s, transform 0.3s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
 	opacity: 0;

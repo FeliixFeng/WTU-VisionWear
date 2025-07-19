@@ -12,11 +12,11 @@ const iconList = [
 		icon: "icon-icon_xiangaoshengtu2",
 		url: "/lineToImage",
 	},
-	{
-		name: "局部重绘",
-		icon: "icon-jubuzhonghui",
-		url: "/partialRedrawing",
-	},
+	// {
+	// 	name: "局部重绘",
+	// 	icon: "icon-jubuzhonghui",
+	// 	url: "/partialRedrawing",
+	// },
 	{
 		name: "风格迁移",
 		icon: "icon-fenggeqianyi1",
@@ -49,19 +49,9 @@ const closeName = (e) => {
 </script>
 <template>
 	<div class="sider">
-		<ul
-			class="menu"
-			@mouseover="showName"
-			@mouseleave="closeName"
-		>
-			<li
-				v-for="(item, index) in iconList"
-				:key="index"
-			>
-				<router-link
-					:to="item.url"
-					class="link"
-				>
+		<ul class="menu" @mouseover="showName" @mouseleave="closeName">
+			<li v-for="(item, index) in iconList" :key="index">
+				<router-link :to="item.url" class="link">
 					<i :class="['iconfont', item.icon]"></i>
 					<span class="name">{{ item.name }}</span>
 				</router-link>
@@ -77,6 +67,7 @@ const closeName = (e) => {
 	top: 60px;
 	left: 20px;
 }
+
 .menu {
 	width: 50px;
 	margin: 0 auto;
@@ -86,6 +77,7 @@ const closeName = (e) => {
 	/* 加阴阴 */
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 }
+
 .menu li {
 	width: 30px;
 	height: 40px;
@@ -95,36 +87,44 @@ const closeName = (e) => {
 	border-radius: 5px;
 	background-color: white;
 }
+
 .menu li i {
 	font-size: 20px;
 	margin-left: 3px;
 }
+
 .menu li:hover {
 	background-color: #f2f2f2;
 }
+
 .name {
 	display: none;
 }
+
 .activeShow {
 	width: 120px;
 	transition: width 0.5s ease;
 }
+
 .activeShow li {
 	width: 100px;
 	transition: width 0.5s ease;
 	/* 隐藏超出盒子的元素 */
 	overflow: hidden;
 }
+
 .activeShow .name {
 	display: inline-block;
 	margin-left: 5px;
 }
+
 .link {
 	display: inline-block;
 	width: 100%;
 	height: 100%;
 	border-radius: 5px;
 }
+
 .router-link-active {
 	background-color: #a6f774;
 }

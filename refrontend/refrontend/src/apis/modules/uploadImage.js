@@ -12,7 +12,7 @@ export function uploadImage(formData) {
 		if (!res.status) {
 			MyMessage.error(res.origin.msg)
 		} else {
-			MyMessage.success(res.origin.msg)
+			MyMessage.success("图片上传成功")
 		}
 		return res
 	})

@@ -3,6 +3,7 @@ import showResultPicture from "@/components/showResultPicture.vue"
 import { ref, reactive, onMounted, computed } from "vue"
 import { useLineToImageStore } from "@/store/lineToImageStore.js"
 import { useAuthStore } from "@/store/users"
+import rawingCanvas from "@/components/rawingCanvas.vue"
 defineOptions({
 	name: "lineToImage",
 })
@@ -16,7 +17,7 @@ const resultImage = ref("")
 const requestBody = reactive({
 	sketchImageURL: "",
 	prompt: "",
-	rspImgType: "",
+	rspImgType: "base64",
 	config: "",
 })
 const canGenerate = computed(() => {
@@ -31,7 +32,8 @@ const changeSourceImage = (url) => {
 const generatePicture = async () => {
 	loadingImages.value = true
 	const res = await lineToImageStore.doLineToImage(requestBody)
-	console.log("res:", res.data)
+	console.log("res:", res)
+	resultImage.value = res.data[0]
 	authStore.updateMyImages()
 	loadingImages.value = false
 }
@@ -48,7 +50,9 @@ const generatePicture = async () => {
 					<drag @updateUml="changeSourceImage" />
 				</div>
 			</el-tab-pane>
-			<el-tab-pane label="画板">Config</el-tab-pane>
+			<el-tab-pane label="画板">
+				<rawingCanvas></rawingCanvas>
+			</el-tab-pane>
 		</el-tabs>
 
 		<el-input
@@ -59,12 +63,28 @@ const generatePicture = async () => {
 			type="textarea"
 			placeholder="描述您想要的图像风格和内容（必填项,至少三个字）"
 		/>
+		<p>文件类型</p>
+		<el-radio-group
+			v-model="requestBody.rspImgType"
+			style="margin: 0 0 20px 25px"
+		>
+			<el-radio
+				value="base64"
+				size="large"
+				>base64</el-radio
+			>
+			<el-radio
+				value="url"
+				size="large"
+				>url</el-radio
+			>
+		</el-radio-group>
 		<el-button
 			class="button"
 			:disabled="!canGenerate"
 			:loading="loadingImages"
 			type="success"
-			style="width: 500px; margin: 100px 0 0 25px"
+			style="width: 500px; margin: 50px 0 0 25px"
 			@click="generatePicture"
 			>一键生成</el-button
 		>
@@ -106,5 +126,10 @@ h1.lineToImageTitle {
 .fileInput {
 	width: 100%;
 	height: 230px;
+}
+p {
+	padding-left: 25px;
+	margin: 0;
+	margin-top: 10px;
 }
 </style>

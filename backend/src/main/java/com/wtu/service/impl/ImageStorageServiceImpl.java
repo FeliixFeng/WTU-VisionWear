@@ -69,6 +69,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
             // 1. 从URL下载图片数据
             byte[] imageBytes;
+
             try (InputStream in = new URL(imageUrl).openStream()) {
                 imageBytes = in.readAllBytes();
             }

@@ -1,12 +1,76 @@
 <script setup>
 import showResultPicture from "@/components/showResultPicture.vue"
+import { ref, reactive, onMounted, computed } from "vue"
+import { useLineToImageStore } from "@/store/lineToImageStore.js"
+import { useAuthStore } from "@/store/users"
+defineOptions({
+	name: "lineToImage",
+})
+
+const authStore = useAuthStore()
+const lineToImageStore = useLineToImageStore()
+const loadingImages = ref(false)
+const sourceImageUrl = ref("")
+const resultImage = ref("")
+
+const requestBody = reactive({
+	sketchImageURL: "",
+	prompt: "",
+	rspImgType: "",
+	config: "",
+})
+const canGenerate = computed(() => {
+	return (
+		requestBody.prompt.trim().length >= 3 && sourceImageUrl.value.trim() !== ""
+	)
+})
+const changeSourceImage = (url) => {
+	sourceImageUrl.value = url
+	requestBody.sketchImageURL = url
+}
+const generatePicture = async () => {
+	loadingImages.value = true
+	const res = await lineToImageStore.doLineToImage(requestBody)
+	console.log("res:", res.data)
+	authStore.updateMyImages()
+	loadingImages.value = false
+}
 </script>
 <template>
 	<div class="lineToImageFunction">
 		<h1 class="lineToImageTitle">线稿成图</h1>
+		<el-tabs
+			type="border-card"
+			style="width: 500px; height: 300px; margin: 10px auto"
+		>
+			<el-tab-pane label="上传线稿">
+				<div class="fileInput">
+					<drag @updateUml="changeSourceImage" />
+				</div>
+			</el-tab-pane>
+			<el-tab-pane label="画板">Config</el-tab-pane>
+		</el-tabs>
+
+		<el-input
+			v-model="requestBody.prompt"
+			style="width: 500px; margin: 15px 25px"
+			:rows="3"
+			resize="none"
+			type="textarea"
+			placeholder="描述您想要的图像风格和内容（必填项,至少三个字）"
+		/>
+		<el-button
+			class="button"
+			:disabled="!canGenerate"
+			:loading="loadingImages"
+			type="success"
+			style="width: 500px; margin: 100px 0 0 25px"
+			@click="generatePicture"
+			>一键生成</el-button
+		>
 	</div>
 	<div class="lineToImageRes">
-		<showResultPicture />
+		<showResultPicture :resultUrl="resultImage" />
 	</div>
 </template>
 <style scoped>
@@ -38,5 +102,9 @@ h1.lineToImageTitle {
 	margin: 0 20px;
 	padding: 15px 0;
 	border-bottom: #0cadda 1px dashed;
+}
+.fileInput {
+	width: 100%;
+	height: 230px;
 }
 </style>

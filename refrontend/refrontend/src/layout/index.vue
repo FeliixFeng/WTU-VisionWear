@@ -19,7 +19,6 @@ import MyPicture from "./MyPicture/index.vue"
 	height: 820px;
 	margin: 0 auto;
 	background-color: #f2f2f2;
-	/* background-color: red; */
 	border-radius: 15px;
 }
 </style>

@@ -326,6 +326,7 @@ public class ImageServiceImpl implements ImageService {
 
             // 3. 解析响应并保存图片
             String resultImageUrl = response.getResultImage();
+            log.info("---------resultImageUrl:{}---------",resultImageUrl);
             if (resultImageUrl == null || resultImageUrl.isEmpty()) {
                 throw new BusinessException("获取结果图像URL失败");
             }

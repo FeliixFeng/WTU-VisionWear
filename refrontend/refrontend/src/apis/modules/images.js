@@ -20,3 +20,7 @@ export const getFusionResult = (jobId) => {
 export const styleExtend = (data) => {
 	return service.post("/image/doubao/image-to-image", data)
 }
+// 线稿成图接口
+export const lineToImage = (data) => {
+	return service.post("/image/sketch-to-image", data)
+}

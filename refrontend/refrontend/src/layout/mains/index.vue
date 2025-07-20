@@ -16,8 +16,6 @@ import { RouterView } from "vue-router"
 	width: 1400px;
 	height: 760px;
 	margin: 5px auto;
-	/* background-color: white; */
-	/* background-color: red; */
 	border-radius: 15px;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 	/* 隐藏超出的部分 */

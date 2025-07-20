@@ -3,6 +3,11 @@
 // 菜单的每个选项的name最好在四个字以里，若需要更多字需要调整整个菜单宽度
 const iconList = [
 	{
+		name: "首页",
+		icon: "icon-zhuye",
+		url: "/home",
+	},
+	{
 		name: "文生图",
 		icon: "icon-wenshengtu",
 		url: "/textToImage",
@@ -142,6 +147,7 @@ const closeName = (e) => {
 }
 
 .router-link-active {
-	background-color: #a6f774;
+	/* background-color: #a6f774; */
+	background-color: #77cbf3;
 }
 </style>

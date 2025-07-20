@@ -1,10 +1,12 @@
-const constantRouters = [{
+const constantRouters = [
+	{
 		path: "/",
 		component: () => import("@/layout/index.vue"),
 		// 重回定向到/textToImage
 		redirect: "/textToImage",
 		name: "Layout",
-		children: [{
+		children: [
+			{
 				path: "/textToImage",
 				component: () => import("@/views/textToImage/index.vue"),
 				name: "textToImage",
@@ -33,6 +35,11 @@ const constantRouters = [{
 				path: "/styleExtend",
 				component: () => import("@/views/styleExtend/index.vue"),
 				name: "styleExtend",
+			},
+			{
+				path: "/home",
+				component: () => import("@/views/home/index.vue"),
+				name: "home",
 			},
 		],
 	},

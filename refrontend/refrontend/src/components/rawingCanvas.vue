@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, defineEmits, watch } from 'vue';
 
 const isDrawing = ref(false);
 const lastX = ref(0);
@@ -29,6 +29,15 @@ const brushSize = ref(5);
 const brushColor = ref('#000000');
 const canvas = ref(null);
 const ctx = ref(null);
+const emit = defineEmits(['draw']);
+
+const emitState = () => {
+  emit('draw', {
+    canvasUrl: canvas.value.toDataURL('image/png'),
+  });
+};
+
+watch([brushSize, brushColor], emitState);
 
 const resizeCanvas = () => {
   canvas.value.width = canvas.value.offsetWidth;
@@ -64,6 +73,7 @@ const draw = (e) => {
   ctx.value.stroke();
 
   [lastX.value, lastY.value] = [x, y];
+  emitState();
 };
 
 const stopDrawing = () => {
@@ -73,6 +83,7 @@ const stopDrawing = () => {
 const clearCanvas = () => {
   ctx.value.fillStyle = '#ffffff';
   ctx.value.fillRect(0, 0, canvas.value.width, canvas.value.height);
+  emitState();
 };
 
 const saveAsImage = () => {

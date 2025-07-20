@@ -14,6 +14,11 @@ const loadingImages = ref(false)
 const sourceImageUrl = ref("")
 const resultImage = ref("")
 
+const drawCanvas = (data) => {
+	//console.log(data.canvasUrl);
+	sourceImageUrl.value = data.canvasUrl;
+}
+
 const requestBody = reactive({
 	sketchImageURL: "",
 	prompt: "",
@@ -49,7 +54,7 @@ const generatePicture = async () => {
 			</el-tab-pane>
 			<el-tab-pane label="画板">
 				<div class="canvas-container">
-					<rawingCanvas></rawingCanvas>
+					<rawingCanvas @draw="drawCanvas"></rawingCanvas>
 				</div>
 			</el-tab-pane>
 		</el-tabs>

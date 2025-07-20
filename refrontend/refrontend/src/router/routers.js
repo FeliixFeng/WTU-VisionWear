@@ -2,8 +2,8 @@ const constantRouters = [
 	{
 		path: "/",
 		component: () => import("@/layout/index.vue"),
-		// 重回定向到/textToImage
-		redirect: "/textToImage",
+		// 重回定向到/home
+		redirect: "/home",
 		name: "Layout",
 		children: [
 			{

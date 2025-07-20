@@ -56,7 +56,7 @@ public class ImageServiceImpl implements ImageService {
 
     // 文本生成图像
     @Override
-    public List<String> textToImage(TextToImageDTO request, Long userId) throws Exception {
+    public List<String> textToImage(TextToImageDTO request, Long userId){
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -76,7 +76,7 @@ public class ImageServiceImpl implements ImageService {
             //从response中拿出base64编码
             List<String> base64Array = ModelUtils.getBase64(response);
             
-            if (base64Array == null || base64Array.isEmpty()) {
+            if (base64Array.isEmpty()) {
                 throw new BusinessException("未能生成有效的图像");
             }
             
@@ -97,7 +97,7 @@ public class ImageServiceImpl implements ImageService {
     private String aliyunApiKey;
 
     @Override
-    public List<String> textToImageByTongyi(TextToImageByTYDTO request, Long userId) throws Exception {
+    public List<String> textToImageByTongyi(TextToImageByTYDTO request, Long userId) {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -150,7 +150,7 @@ public class ImageServiceImpl implements ImageService {
 
     // 通义-涂鸦生图功能
     @Override
-    public SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId) throws Exception {
+    public SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId){
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -224,7 +224,7 @@ public class ImageServiceImpl implements ImageService {
 
     // 图像生成图像
     @Override
-    public List<String> imageToImage(ImageToImageDTO request, Long userId) throws Exception {
+    public List<String> imageToImage(ImageToImageDTO request, Long userId){
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getReqKey(), "请求Key不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -260,7 +260,7 @@ public class ImageServiceImpl implements ImageService {
                 if ("done".equals(status)) {
                     //先确保taskResponse有数据
                     List<String> base64 = ModelUtils.getBase64(taskResponse);
-                    if (base64 == null || base64.isEmpty()) {
+                    if (base64.isEmpty()) {
                         throw new BusinessException("获取图像结果失败");
                     }
                     
@@ -302,7 +302,7 @@ public class ImageServiceImpl implements ImageService {
     private String tencentSecretKey;
 
     @Override
-    public SketchToImageVO sketchToImage(SketchToImageDTO request, Long userId) throws Exception {
+    public SketchToImageVO sketchToImage(SketchToImageDTO request, Long userId) {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getSketchImageURL(), "线稿图URL不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -511,19 +511,17 @@ public class ImageServiceImpl implements ImageService {
                     .eq(Image::getStatus, 0)
                     .orderByDesc(Image::getCreateTime);
 
-            List<String> imageUrls = imageMapper.selectList(wrapper).stream()
+            return imageMapper.selectList(wrapper).stream()
                     .map(Image::getImageUrl)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
-
-            return imageUrls;
         } catch (Exception e) {
             throw new BusinessException("获取用户图像列表失败: " + e.getMessage());
         }
     }
 
     @Override
-    public String styleConversion(StyleConversionDTO request, Long userId) throws Exception {
+    public String styleConversion(StyleConversionDTO request, Long userId){
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
         ExceptionUtils.requireNonEmpty(request.getImageBase64(), "图片编码不能为空");

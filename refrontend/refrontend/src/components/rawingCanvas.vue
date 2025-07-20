@@ -13,7 +13,7 @@
 
       <div class="action-buttons">
         <button @click="clearCanvas">清空画布</button>
-        <button @click="saveAsImage">保存为图片</button>
+        <!-- <button @click="saveAsImage">保存为图片</button> -->
       </div>
     </div>
   </div>
@@ -86,13 +86,11 @@ onMounted(() => {
   ctx.value = canvas.value.getContext('2d');
   resizeCanvas();
 
-  // Use ResizeObserver for better resizing
   const resizeObserver = new ResizeObserver(() => {
     resizeCanvas();
   });
   resizeObserver.observe(canvas.value);
 
-  // Cleanup observer on unmount
   onBeforeUnmount(() => {
     resizeObserver.disconnect();
   });
@@ -108,9 +106,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: 80vh;
-  max-width: 100vw;
-  height: 500px;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -119,13 +115,15 @@ canvas {
   border: 1px solid #ccc;
   background-color: white;
   cursor: crosshair;
-  min-height: 300px;
   max-width: 100%;
+  min-height: 0;
 }
 
 .controls {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 10px;
   margin-top: 10px;
 }
 
@@ -133,17 +131,23 @@ canvas {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.brush-controls label {
+  font-size: 12px;
 }
 
 .action-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 button {
-  padding: 8px 16px;
-  min-width: 100px;
-  font-size: 14px;
+  padding: 5px 10px;
+  min-width: 80px;
+  font-size: 12px;
   background-color: #007bff;
   color: white;
   border: none;
@@ -153,5 +157,16 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+@media (max-width: 500px) {
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .brush-controls {
+    justify-content: center;
+  }
 }
 </style>

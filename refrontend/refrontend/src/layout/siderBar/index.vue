@@ -85,7 +85,7 @@ const closeName = (e) => {
 	float: left;
 	position: absolute;
 	top: 60px;
-	left: 10px;
+	left: 5px;
 	z-index: 100;
 }
 

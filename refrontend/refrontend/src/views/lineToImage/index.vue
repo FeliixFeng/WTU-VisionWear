@@ -16,7 +16,8 @@ const resultImage = ref("")
 
 const drawCanvas = (data) => {
 	//console.log(data.canvasUrl);
-	sourceImageUrl.value = data.canvasUrl;
+	sourceImageUrl.value = data.canvasUrl
+	requestBody.sketchImageURL = data.canvasUrl
 }
 
 const requestBody = reactive({
@@ -46,7 +47,10 @@ const generatePicture = async () => {
 <template>
 	<div class="lineToImageFunction">
 		<h1 class="lineToImageTitle">线稿成图</h1>
-		<el-tabs type="border-card" style="width: 500px;  margin: 10px auto">
+		<el-tabs
+			type="border-card"
+			style="width: 500px; margin: 10px auto"
+		>
 			<el-tab-pane label="上传线稿">
 				<div class="fileInput">
 					<drag @updateUml="changeSourceImage" />
@@ -59,15 +63,39 @@ const generatePicture = async () => {
 			</el-tab-pane>
 		</el-tabs>
 
-		<el-input v-model="requestBody.prompt" style="width: 500px; margin: 15px 25px" :rows="3" resize="none"
-			type="textarea" placeholder="描述您想要的图像风格和内容（必填项,至少三个字）" />
+		<el-input
+			v-model="requestBody.prompt"
+			style="width: 500px; margin: 15px 25px"
+			:rows="3"
+			resize="none"
+			type="textarea"
+			placeholder="描述您想要的图像风格和内容（必填项,至少三个字）"
+		/>
 		<p>文件类型</p>
-		<el-radio-group v-model="requestBody.rspImgType" style="margin: 0 0 20px 25px">
-			<el-radio value="base64" size="large">base64</el-radio>
-			<el-radio value="url" size="large">url</el-radio>
+		<el-radio-group
+			v-model="requestBody.rspImgType"
+			style="margin: 0 0 20px 25px"
+		>
+			<el-radio
+				value="base64"
+				size="large"
+				>base64</el-radio
+			>
+			<el-radio
+				value="url"
+				size="large"
+				>url</el-radio
+			>
 		</el-radio-group>
-		<el-button class="button" :disabled="!canGenerate" :loading="loadingImages" type="success"
-			style="width: 500px; margin: 50px 0 0 25px" @click="generatePicture">一键生成</el-button>
+		<el-button
+			class="button"
+			:disabled="!canGenerate"
+			:loading="loadingImages"
+			type="success"
+			style="width: 500px; margin: 50px 0 0 25px"
+			@click="generatePicture"
+			>一键生成</el-button
+		>
 	</div>
 	<div class="lineToImageRes">
 		<showResultPicture :resultUrl="resultImage" />

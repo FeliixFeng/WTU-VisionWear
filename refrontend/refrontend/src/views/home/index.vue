@@ -52,7 +52,8 @@ const list = [
 </template>
 <style scoped>
 .homeContainer {
-	width: 1100px;
+	margin-top: 5px;
+	width: 75vw;
 	height: 740px;
 	padding: 30px;
 	background-color: white;

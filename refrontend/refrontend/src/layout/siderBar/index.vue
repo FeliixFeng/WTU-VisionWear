@@ -58,33 +58,41 @@ const closeName = (e) => {
 }
 </script>
 <template>
-	<div class="sider">
-		<ul
-			class="menu"
-			@mouseover="showName"
-			@mouseleave="closeName"
-		>
-			<li
-				v-for="(item, index) in iconList"
-				:key="index"
+	<div class="nav">
+		<div class="sider">
+			<ul
+				class="menu"
+				@mouseover="showName"
+				@mouseleave="closeName"
 			>
-				<router-link
-					:to="item.url"
-					class="link"
+				<li
+					v-for="(item, index) in iconList"
+					:key="index"
 				>
-					<i :class="['iconfont', item.icon]"></i>
-					<span class="name">{{ item.name }}</span>
-				</router-link>
-			</li>
-		</ul>
+					<router-link
+						:to="item.url"
+						class="link"
+					>
+						<i :class="['iconfont', item.icon]"></i>
+						<span class="name">{{ item.name }}</span>
+					</router-link>
+				</li>
+			</ul>
+		</div>
 	</div>
 </template>
 <style scoped>
+.nav {
+	display: inline-block;
+	position: relative;
+	width: 8vw;
+	height: 92vh;
+}
 .sider {
-	margin: 5px;
-	float: left;
+	/* margin: 5px; */
+	/* float: left; */
 	position: absolute;
-	top: 60px;
+	top: 10px;
 	left: 5px;
 	z-index: 100;
 }

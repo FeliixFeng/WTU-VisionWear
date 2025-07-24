@@ -49,7 +49,7 @@ const generatePicture = async () => {
 		<h1 class="lineToImageTitle">线稿成图</h1>
 		<el-tabs
 			type="border-card"
-			style="width: 500px; margin: 10px auto"
+			style="width: 450px; margin: 10px auto"
 		>
 			<el-tab-pane label="上传线稿">
 				<div class="fileInput">
@@ -62,10 +62,10 @@ const generatePicture = async () => {
 				</div>
 			</el-tab-pane>
 		</el-tabs>
-
+		<p>样式描述</p>
 		<el-input
 			v-model="requestBody.prompt"
-			style="width: 500px; margin: 15px 25px"
+			style="width: 450px; margin: 10px 20px"
 			:rows="3"
 			resize="none"
 			type="textarea"
@@ -92,7 +92,7 @@ const generatePicture = async () => {
 			:disabled="!canGenerate"
 			:loading="loadingImages"
 			type="success"
-			style="width: 500px; margin: 50px 0 0 25px"
+			style="width: 400px"
 			@click="generatePicture"
 			>一键生成</el-button
 		>
@@ -103,9 +103,10 @@ const generatePicture = async () => {
 </template>
 <style scoped>
 .lineToImageFunction {
+	position: relative;
 	float: left;
-	width: 550px;
-	height: 750px;
+	width: 36vw;
+	height: 91vh;
 	border-radius: 15px;
 	border: 2px solid #c9e1fa;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
@@ -115,8 +116,8 @@ const generatePicture = async () => {
 
 .lineToImageRes {
 	float: left;
-	width: 550px;
-	height: 750px;
+	width: 36vw;
+	height: 91vh;
 	border-radius: 15px;
 	border: 1px solid #cbcccb;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
@@ -148,5 +149,11 @@ p {
 	padding-left: 25px;
 	margin: 0;
 	margin-top: 10px;
+}
+.button {
+	position: absolute;
+	bottom: 50px;
+	left: 50%;
+	transform: translate(-50%);
 }
 </style>

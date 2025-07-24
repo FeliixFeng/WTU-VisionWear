@@ -79,7 +79,7 @@ const generatePicture = async function () {
 				>
 					<el-input
 						v-model="formData.prompt"
-						style="width: 500px"
+						style="width: 450px"
 						:rows="5"
 						resize="none"
 						type="textarea"
@@ -92,7 +92,7 @@ const generatePicture = async function () {
 			<el-select
 				v-model="formData.style"
 				placeholder="请选择风格"
-				style="width: 500px; margin-left: 20px"
+				style="width: 450px; margin-left: 20px"
 			>
 				<el-option
 					v-for="(option, index) in styleOptions"
@@ -104,7 +104,7 @@ const generatePicture = async function () {
 			<p>宽度</p>
 			<el-select
 				v-model="formData.width"
-				style="width: 500px; margin-left: 20px"
+				style="width: 450px; margin-left: 20px"
 			>
 				<el-option
 					v-for="(option, index) in size"
@@ -115,7 +115,7 @@ const generatePicture = async function () {
 			<p>高度</p>
 			<el-select
 				v-model="formData.width"
-				style="width: 500px; margin-left: 20px"
+				style="width: 450px; margin-left: 20px"
 			>
 				<el-option
 					v-for="(option, index) in size"
@@ -125,7 +125,7 @@ const generatePicture = async function () {
 
 			<p>提示词相关性</p>
 			<el-slider
-				style="width: 500px; margin-left: 20px"
+				style="width: 450px; margin-left: 20px"
 				v-model="formData.cfgScale"
 				:min="1"
 				:max="30"
@@ -134,10 +134,11 @@ const generatePicture = async function () {
 			></el-slider>
 
 			<el-button
+				class="buto"
 				:disabled="!canGenerate"
 				:loading="loadingImages"
 				type="success"
-				style="width: 500px; margin: 100px 0 0 20px"
+				style="width: 400px"
 				@click="generatePicture"
 				>一键生成</el-button
 			>
@@ -149,9 +150,10 @@ const generatePicture = async function () {
 </template>
 <style scoped>
 .textToImageFunction {
+	position: relative;
 	float: left;
-	width: 550px;
-	height: 750px;
+	width: 36vw;
+	height: 91vh;
 	border-radius: 15px;
 	border: 2px solid #c9e1fa;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
@@ -160,8 +162,8 @@ const generatePicture = async function () {
 }
 .textToImageRes {
 	float: left;
-	width: 550px;
-	height: 750px;
+	width: 36vw;
+	height: 91vh;
 	border-radius: 15px;
 	border: 1px solid #cbcccb;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
@@ -179,5 +181,12 @@ h1.textToImageTitle {
 }
 p {
 	margin: 20px 20px 5px 20px;
+}
+
+.buto {
+	position: absolute;
+	bottom: 50px;
+	left: 50%;
+	transform: translate(-55%);
 }
 </style>

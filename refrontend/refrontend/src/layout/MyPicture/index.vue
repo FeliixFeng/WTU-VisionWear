@@ -64,11 +64,16 @@ const handleDragStart = (event, imageUrl) => {
 </template>
 <style scoped>
 .MyPicture {
-	position: absolute;
+	display: inline-block;
+	float: right;
+	margin-top: 5px;
+	/* position: absolute; */
 	bottom: 10px;
 	right: 0;
-	width: 15%;
-	height: 750px;
+	/* width: 15%; */
+	width: 15vw;
+	/* height: 750px; */
+	height: 91vh;
 	background-color: white;
 	border-radius: 15px;
 	border: 1px solid #cbcccb;

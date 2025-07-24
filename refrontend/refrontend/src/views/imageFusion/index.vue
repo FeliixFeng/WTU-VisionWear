@@ -77,8 +77,8 @@ const fusion = async () => {
 <style scoped>
 .imageFusionFunction {
 	float: left;
-	width: 550px;
-	height: 750px;
+	width: 36vw;
+	height: 91vh;
 	border-radius: 15px;
 	border: 2px solid #c9e1fa;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
@@ -87,8 +87,8 @@ const fusion = async () => {
 }
 .imageFusionRes {
 	float: left;
-	width: 550px;
-	height: 750px;
+	width: 36vw;
+	height: 91vh;
 	border-radius: 15px;
 	border: 1px solid #cbcccb;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);

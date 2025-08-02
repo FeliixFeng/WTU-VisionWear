@@ -19,8 +19,9 @@ import com.volcengine.service.visual.IVisualService;
 import com.volcengine.service.visual.model.request.ImageStyleConversionRequest;
 import com.volcengine.service.visual.model.response.ImageStyleConversionResponse;
 import com.wtu.DTO.image.*;
+import com.wtu.DTO.image.DoodleToImageByTYDTO;
+import com.wtu.VO.DoodleToImageByTYVO;
 import com.wtu.VO.ImageFusionVO;
-import com.wtu.VO.SketchToImageByTYVO;
 import com.wtu.VO.SketchToImageVO;
 import com.wtu.entity.Image;
 import com.wtu.exception.BusinessException;
@@ -60,7 +61,7 @@ public class ImageServiceImpl implements ImageService {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
-        
+
         try {
             List<String> ids = new ArrayList<>();
             //用工具类快速构造VisualService
@@ -75,11 +76,11 @@ public class ImageServiceImpl implements ImageService {
             Object response = visualService.cvProcess(req);
             //从response中拿出base64编码
             List<String> base64Array = ModelUtils.getBase64(response);
-            
+
             if (base64Array.isEmpty()) {
                 throw new BusinessException("未能生成有效的图像");
             }
-            
+
             for (String s : base64Array) {
                 ids.add(imageStorageService.saveBase64Image(s, userId));
             }
@@ -150,7 +151,7 @@ public class ImageServiceImpl implements ImageService {
 
     // 通义-涂鸦生图功能
     @Override
-    public SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId){
+    public DoodleToImageByTYVO DoodleToImageByTongyi(DoodleToImageByTYDTO request, Long userId){
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -185,7 +186,7 @@ public class ImageServiceImpl implements ImageService {
                 throw new BusinessException("未能获取到图像生成结果");
             }
 
-            List<SketchToImageByTYVO.GeneratedImage> imageList = new ArrayList<>();
+            List<DoodleToImageByTYVO.GeneratedImage> imageList = new ArrayList<>();
             for (var img : result.getOutput().getResults()) {
                 String imageUrl = img.get("url");
                 int width = img.containsKey("width") ? Integer.parseInt(img.get("width")) : 0;
@@ -194,7 +195,7 @@ public class ImageServiceImpl implements ImageService {
                 String style = img.get("style");
                 String imageId = imageStorageService.saveImageFromUrl(imageUrl, userId);
 
-                imageList.add(SketchToImageByTYVO.GeneratedImage.builder()
+                imageList.add(DoodleToImageByTYVO.GeneratedImage.builder()
                         .imageId(imageId)
                         .imageUrl(imageUrl)
                         .width(width)
@@ -204,7 +205,7 @@ public class ImageServiceImpl implements ImageService {
                         .build());
             }
 
-            return SketchToImageByTYVO.builder()
+            return DoodleToImageByTYVO.builder()
                     .requestId(requestId)
                     .images(imageList)
                     .prompt(request.getPrompt())
@@ -242,7 +243,7 @@ public class ImageServiceImpl implements ImageService {
             if (taskId == null || taskId.isEmpty()) {
                 throw new BusinessException("获取任务ID失败");
             }
-            
+
             //用taskID去申请另一个接口，得到图片
             JSONObject taskRequest = new JSONObject();
             taskRequest.put("req_key", request.getReqKey());
@@ -263,7 +264,7 @@ public class ImageServiceImpl implements ImageService {
                     if (base64.isEmpty()) {
                         throw new BusinessException("获取图像结果失败");
                     }
-                    
+
                     for (String s : base64) {
                         //对base64进行解码并上传,得到ImageID,存入ids中
                         ids.add(imageStorageService.saveBase64Image(s, userId));
@@ -272,14 +273,14 @@ public class ImageServiceImpl implements ImageService {
                 } else if ("failed".equals(status)) {
                     throw new BusinessException("图像生成任务失败");
                 }
-                
+
                 // 等待一段时间后重试
                 Thread.sleep(sleepTime);
                 retryCount++;
                 // 逐步增加等待时间，但最多等待10秒
                 sleepTime = Math.min(sleepTime * 2, 10000);
             }
-            
+
             throw new BusinessException("图像生成超时，请稍后重试");
         } catch (BusinessException e) {
             throw e;
@@ -361,12 +362,12 @@ public class ImageServiceImpl implements ImageService {
         ExceptionUtils.requireNonNull(request.getImageUrlList(), "图片URL列表不能为空");
         ExceptionUtils.requireTrue(!request.getImageUrlList().isEmpty(), "图片URL列表不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
-        
+
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
-        
+
         try {
-            
+
             // 1. 图片URL转Base64
             List<String> base64Images = request.getImageUrlList().stream()
                     .map(imageBase64Util::imageUrlToBase64)
@@ -419,7 +420,7 @@ public class ImageServiceImpl implements ImageService {
     public ImageFusionVO queryImageByJobId(String jobId, Long userId) {
         ExceptionUtils.requireNonEmpty(jobId, "任务ID不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
-        
+
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -431,11 +432,11 @@ public class ImageServiceImpl implements ImageService {
             HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
             ResponseEntity<JsonNode> response = restTemplate.postForEntity(
-                    "https://api.ttapi.io/midjourney/v1/fetch", 
-                    request, 
+                    "https://api.ttapi.io/midjourney/v1/fetch",
+                    request,
                     JsonNode.class
             );
-            
+
             JsonNode responseJson = response.getBody();
             if (responseJson == null) {
                 throw new BusinessException("无响应");
@@ -479,7 +480,7 @@ public class ImageServiceImpl implements ImageService {
             String rspImgType
     ) throws TencentCloudSDKException {
         ExceptionUtils.requireNonEmpty(sketchUrl, "线稿图URL不能为空");
-        
+
         // 配置认证信息
         Credential cred = new Credential(tencentSecretId, tencentSecretKey);
 
@@ -504,7 +505,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public List<String> getAllImageUrls(Long userId) {
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
-        
+
         try {
             LambdaQueryWrapper<Image> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(Image::getUserId, userId)
@@ -525,7 +526,7 @@ public class ImageServiceImpl implements ImageService {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
         ExceptionUtils.requireNonEmpty(request.getImageBase64(), "图片编码不能为空");
-        
+
         try {
             IVisualService visualService = ModelUtils.createVisualService("cn-north-1");
             ImageStyleConversionRequest requestJson = new ImageStyleConversionRequest();
@@ -537,7 +538,7 @@ public class ImageServiceImpl implements ImageService {
             if (image == null || image.isEmpty()) {
                 throw new BusinessException("获取转换后图片失败");
             }
-            
+
             //存入数据库中，拿到Imageid
             String id = imageStorageService.saveBase64Image(image, userId);
             //通过imageId拿取url并返回

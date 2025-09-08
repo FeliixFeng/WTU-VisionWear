@@ -118,6 +118,13 @@ public class ImageController {
         }
     }
 
+    @GetMapping("/image-fusion/progress")
+    @Operation(summary = "获取图片融合进度")
+    public Result<String> getFusionProgress(@RequestParam String jobId, HttpServletRequest httpServletRequest) {
+            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            return Result.success(imageService.getFusionProgress(jobId, userId));
+    }
+
     @GetMapping("/image-fusion/result")
     @Operation(summary = "获取图片融合结果")
     public Result<ImageFusionVO> getFusionResult(@RequestParam String jobId, HttpServletRequest httpServletRequest) {

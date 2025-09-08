@@ -430,7 +430,6 @@ public class ImageServiceImpl implements ImageService {
             body.put("jobId", jobId);
 
             HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-
             ResponseEntity<JsonNode> response = restTemplate.postForEntity(
                     "https://api.ttapi.io/midjourney/v1/fetch",
                     request,
@@ -443,9 +442,31 @@ public class ImageServiceImpl implements ImageService {
             }
 
             String status = responseJson.path("status").asText();
-            if (!"SUCCESS".equals(status)) {
+
+            //只对状态查询一次，后续通过进度判断任务是否完成
+            if ("FAILED".equals(status)) {
                 String msg = responseJson.path("message").asText();
                 throw new BusinessException("查询失败: " + msg);
+            }else{
+                //采用指数退避方式进行异步处理.
+                long baseInterval = 2000; // 初始间隔2秒
+                long maxInterval = 60000; // 最大间隔60秒
+                long currentInterval = baseInterval;
+                int maxAttempts = 30; // 最大轮询次数
+                int attempts = 0;
+
+                while(attempts<maxAttempts){
+                    String progress = getFusionProgress(jobId, userId);
+                    if(Integer.parseInt(progress)<100){
+                        log.info("当前进度为:{}",progress);
+                        Thread.sleep(currentInterval);
+                        currentInterval=Math.min(currentInterval*2,maxInterval);
+                        attempts++;
+                    }else{
+                        break;
+                    }
+
+                }
             }
 
             JsonNode dataNode = responseJson.path("data");
@@ -472,6 +493,34 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             throw new BusinessException("查询图片融合结果失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public String getFusionProgress(String jobId, Long userId) {
+        ExceptionUtils.requireNonEmpty(jobId, "任务ID不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("TT-API-KEY", ttApiKey);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("jobId", jobId);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+            ResponseEntity<JsonNode> response = restTemplate.postForEntity(
+                    "https://api.ttapi.io/midjourney/v1/fetch",
+                    request,
+                    JsonNode.class
+            );
+
+            JsonNode responseJson = response.getBody();
+            if (responseJson == null) {
+                throw new BusinessException("无响应");
+            }
+
+        return responseJson.path("data").get("progress").asText();
     }
 
     private SketchToImageResponse callTencentSketchToImage(
@@ -549,4 +598,6 @@ public class ImageServiceImpl implements ImageService {
             throw new BusinessException("图片风格转换失败: " + e.getMessage());
         }
     }
+
+
 }

@@ -19,7 +19,6 @@ import com.volcengine.service.visual.IVisualService;
 import com.volcengine.service.visual.model.request.ImageStyleConversionRequest;
 import com.volcengine.service.visual.model.response.ImageStyleConversionResponse;
 import com.wtu.DTO.image.*;
-import com.wtu.DTO.image.DoodleToImageByTYDTO;
 import com.wtu.VO.DoodleToImageByTYVO;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.SketchToImageVO;
@@ -49,15 +48,27 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ImageServiceImpl implements ImageService {
 
+    // 线稿生图
+    // 根据需求调整地域
+    private static final String TENCENT_REGION = "ap-shanghai";
     // IOC 注入
     private final RestTemplate restTemplate;
     private final ImageStorageService imageStorageService;
     private final ImageMapper imageMapper;
     private final ImageBase64Util imageBase64Util;
+    // 通义-文生图功能
+    @Value("${vision.aliyun.api-key}")
+    private String aliyunApiKey;
+    @Value("${vision.tencent.secret-id}")
+    private String tencentSecretId;
+    @Value("${vision.tencent.secret-key}")
+    private String tencentSecretKey;
+    @Value("${vision.ttapi.api-key}")
+    private String ttApiKey;
 
     // 文本生成图像
     @Override
-    public List<String> textToImage(TextToImageDTO request, Long userId){
+    public List<String> textToImage(TextToImageDTO request, Long userId) {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -92,10 +103,6 @@ public class ImageServiceImpl implements ImageService {
             throw new BusinessException("文本生成图像失败: " + e.getMessage());
         }
     }
-
-    // 通义-文生图功能
-    @Value("${vision.aliyun.api-key}")
-    private String aliyunApiKey;
 
     @Override
     public List<String> textToImageByTongyi(TextToImageByTYDTO request, Long userId) {
@@ -148,10 +155,9 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
-
     // 通义-涂鸦生图功能
     @Override
-    public DoodleToImageByTYVO DoodleToImageByTongyi(DoodleToImageByTYDTO request, Long userId){
+    public DoodleToImageByTYVO DoodleToImageByTongyi(DoodleToImageByTYDTO request, Long userId) {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -222,10 +228,9 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
-
     // 图像生成图像
     @Override
-    public List<String> imageToImage(ImageToImageDTO request, Long userId){
+    public List<String> imageToImage(ImageToImageDTO request, Long userId) {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(request.getReqKey(), "请求Key不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
@@ -292,16 +297,6 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
-    // 线稿生图
-    // 根据需求调整地域
-    private static final String TENCENT_REGION = "ap-shanghai";
-
-    @Value("${vision.tencent.secret-id}")
-    private String tencentSecretId;
-
-    @Value("${vision.tencent.secret-key}")
-    private String tencentSecretKey;
-
     @Override
     public SketchToImageVO sketchToImage(SketchToImageDTO request, Long userId) {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
@@ -352,9 +347,6 @@ public class ImageServiceImpl implements ImageService {
             throw new BusinessException("线稿生图失败: " + e.getMessage());
         }
     }
-
-    @Value("${vision.ttapi.api-key}")
-    private String ttApiKey;
 
     @Override
     public ImageFusionVO imageFusion(ImageFusionDTO request, Long userId) {
@@ -447,7 +439,7 @@ public class ImageServiceImpl implements ImageService {
             if ("FAILED".equals(status)) {
                 String msg = responseJson.path("message").asText();
                 throw new BusinessException("查询失败: " + msg);
-            }else{
+            } else {
                 //采用指数退避方式进行异步处理.
                 long baseInterval = 2000; // 初始间隔2秒
                 long maxInterval = 60000; // 最大间隔60秒
@@ -455,14 +447,14 @@ public class ImageServiceImpl implements ImageService {
                 int maxAttempts = 30; // 最大轮询次数
                 int attempts = 0;
 
-                while(attempts<maxAttempts){
+                while (attempts < maxAttempts) {
                     String progress = getFusionProgress(jobId, userId);
-                    if(Integer.parseInt(progress)<100){
-                        log.info("当前进度为:{}",progress);
+                    if (Integer.parseInt(progress) < 100) {
+                        log.info("当前进度为:{}", progress);
                         Thread.sleep(currentInterval);
-                        currentInterval=Math.min(currentInterval*2,maxInterval);
+                        currentInterval = Math.min(currentInterval * 2, maxInterval);
                         attempts++;
-                    }else{
+                    } else {
                         break;
                     }
 
@@ -509,16 +501,16 @@ public class ImageServiceImpl implements ImageService {
 
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
-            ResponseEntity<JsonNode> response = restTemplate.postForEntity(
-                    "https://api.ttapi.io/midjourney/v1/fetch",
-                    request,
-                    JsonNode.class
-            );
+        ResponseEntity<JsonNode> response = restTemplate.postForEntity(
+                "https://api.ttapi.io/midjourney/v1/fetch",
+                request,
+                JsonNode.class
+        );
 
-            JsonNode responseJson = response.getBody();
-            if (responseJson == null) {
-                throw new BusinessException("无响应");
-            }
+        JsonNode responseJson = response.getBody();
+        if (responseJson == null) {
+            throw new BusinessException("无响应");
+        }
 
         return responseJson.path("data").get("progress").asText();
     }
@@ -571,7 +563,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public String styleConversion(StyleConversionDTO request, Long userId){
+    public String styleConversion(StyleConversionDTO request, Long userId) {
         ExceptionUtils.requireNonNull(request, "请求参数不能为空");
         ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
         ExceptionUtils.requireNonEmpty(request.getImageBase64(), "图片编码不能为空");

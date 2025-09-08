@@ -1,14 +1,9 @@
 package com.wtu.service;
-
-
 import com.wtu.DTO.image.*;
 import com.wtu.VO.ImageFusionVO;
 import com.wtu.VO.DoodleToImageByTYVO;
 import com.wtu.VO.SketchToImageVO;
-import org.springframework.http.HttpEntity;
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author 高琛

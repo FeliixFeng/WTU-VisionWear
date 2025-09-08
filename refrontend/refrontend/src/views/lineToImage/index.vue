@@ -4,6 +4,20 @@ import { ref, reactive, onMounted, computed } from "vue"
 import { useLineToImageStore } from "@/store/lineToImageStore.js"
 import { useAuthStore } from "@/store/users"
 import rawingCanvas from "@/components/rawingCanvas.vue"
+import { uploadImage } from "@/apis/modules/uploadImage.js";
+
+function dataURLtoFile(dataurl, filename) {
+	let arr = dataurl.split(','),
+		mime = arr[0].match(/:(.*?);/)[1],
+		bstr = atob(arr[1]),
+		n = bstr.length,
+		u8arr = new Uint8Array(n);
+	while (n--) {
+		u8arr[n] = bstr.charCodeAt(n);
+	}
+	return new File([u8arr], filename, { type: mime });
+}
+
 defineOptions({
 	name: "lineToImage",
 })
@@ -35,22 +49,59 @@ const changeSourceImage = (url) => {
 	sourceImageUrl.value = url
 	requestBody.sketchImageURL = url
 }
+// const generatePicture = async () => {
+// 	loadingImages.value = true
+// 	const res = await lineToImageStore.doLineToImage(requestBody)
+// 	console.log("res:", res)
+// 	resultImage.value = res.data[0]
+// 	authStore.updateMyImages()
+// 	loadingImages.value = false
+// }
 const generatePicture = async () => {
-	loadingImages.value = true
-	const res = await lineToImageStore.doLineToImage(requestBody)
-	console.log("res:", res)
-	resultImage.value = res.data[0]
-	authStore.updateMyImages()
-	loadingImages.value = false
-}
+	loadingImages.value = true;
+	try {
+		let finalImageUrl = sourceImageUrl.value;
+
+		if (finalImageUrl.startsWith('data:image')) {
+			const imageFile = dataURLtoFile(finalImageUrl, 'canvas-sketch.png');
+			const formData = new FormData();
+			formData.append("file", imageFile);
+			const res = await uploadImage(formData);
+
+			if (res.status) {
+				finalImageUrl = res.origin.data;
+			} else {
+				console.error("画板图片上传失败:", res);
+				loadingImages.value = false;
+				return;
+			}
+		}
+
+		const finalRequestBody = {
+			...requestBody,
+			sketchImageURL: finalImageUrl,
+		};
+
+		const res = await lineToImageStore.doLineToImage(finalRequestBody);
+
+		if (res && res.status !== false) {
+			resultImage.value = res.data[0];
+			authStore.updateMyImages();
+		} else {
+			console.error("线稿生图失败:", res);
+		}
+
+	} catch (error) {
+		console.error("生成图片过程中发生异常:", error);
+	} finally {
+		loadingImages.value = false;
+	}
+};
 </script>
 <template>
 	<div class="lineToImageFunction">
 		<h1 class="lineToImageTitle">线稿成图</h1>
-		<el-tabs
-			type="border-card"
-			style="width: 450px; margin: 10px auto"
-		>
+		<el-tabs type="border-card" style="width: 450px; margin: 10px auto">
 			<el-tab-pane label="上传线稿">
 				<div class="fileInput">
 					<drag @updateUml="changeSourceImage" />
@@ -63,39 +114,15 @@ const generatePicture = async () => {
 			</el-tab-pane>
 		</el-tabs>
 		<p>样式描述</p>
-		<el-input
-			v-model="requestBody.prompt"
-			style="width: 450px; margin: 10px 20px"
-			:rows="3"
-			resize="none"
-			type="textarea"
-			placeholder="描述您想要的图像风格和内容（必填项,至少三个字）"
-		/>
+		<el-input v-model="requestBody.prompt" style="width: 450px; margin: 10px 20px" :rows="3" resize="none"
+			type="textarea" placeholder="描述您想要的图像风格和内容（必填项,至少三个字）" />
 		<p>文件类型</p>
-		<el-radio-group
-			v-model="requestBody.rspImgType"
-			style="margin: 0 0 20px 25px"
-		>
-			<el-radio
-				value="base64"
-				size="large"
-				>base64</el-radio
-			>
-			<el-radio
-				value="url"
-				size="large"
-				>url</el-radio
-			>
+		<el-radio-group v-model="requestBody.rspImgType" style="margin: 0 0 20px 25px">
+			<el-radio value="base64" size="large">base64</el-radio>
+			<el-radio value="url" size="large">url</el-radio>
 		</el-radio-group>
-		<el-button
-			class="button"
-			:disabled="!canGenerate"
-			:loading="loadingImages"
-			type="success"
-			style="width: 400px"
-			@click="generatePicture"
-			>一键生成</el-button
-		>
+		<el-button class="button" :disabled="!canGenerate" :loading="loadingImages" type="success" style="width: 400px"
+			@click="generatePicture">一键生成</el-button>
 	</div>
 	<div class="lineToImageRes">
 		<showResultPicture :resultUrl="resultImage" />
@@ -150,6 +177,7 @@ p {
 	margin: 0;
 	margin-top: 10px;
 }
+
 .button {
 	position: absolute;
 	bottom: 50px;

@@ -89,11 +89,9 @@ const closeName = (e) => {
 	height: 92vh;
 }
 .sider {
-	/* margin: 5px; */
-	/* float: left; */
 	position: absolute;
 	top: 10px;
-	left: 5px;
+	left: 15px;
 	z-index: 100;
 }
 

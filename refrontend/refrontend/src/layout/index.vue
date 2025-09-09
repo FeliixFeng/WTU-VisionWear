@@ -7,18 +7,24 @@ import MyPicture from "./MyPicture/index.vue"
 <template>
 	<div class="container">
 		<MyHead />
-		<siderBar />
-		<mains />
-		<MyPicture />
+		<div class="myBody">
+			<siderBar />
+			<mains />
+			<MyPicture />
+		</div>
 	</div>
 </template>
 <style scoped>
 .container {
 	position: relative;
 	width: calc(100% - 10px);
-	height: 820px;
+	height: 100vh;
 	margin: 0 auto;
 	background-color: #f2f2f2;
 	border-radius: 15px;
+}
+.myBody {
+	display: flex;
+	justify-content: space-between;
 }
 </style>

@@ -42,7 +42,6 @@ h1.styleTransferTitle {
 	border: 1px solid #cbcccb;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
 	margin: 5px;
-	margin-left: 25px;
 	background-color: white;
 }
 </style>

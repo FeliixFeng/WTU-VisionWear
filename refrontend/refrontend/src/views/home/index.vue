@@ -54,7 +54,7 @@ const list = [
 .homeContainer {
 	margin-top: 5px;
 	width: 75vw;
-	height: 740px;
+	height: 91vh;
 	padding: 30px;
 	background-color: white;
 	border-radius: 15px;

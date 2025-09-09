@@ -11,7 +11,6 @@ import showResultPicture from "@/components/showResultPicture.vue"
 </template>
 <style scoped>
 .partialRedrawingFunction {
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;
@@ -21,7 +20,6 @@ import showResultPicture from "@/components/showResultPicture.vue"
 	background-color: white;
 }
 .partialRedrawingRes {
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;

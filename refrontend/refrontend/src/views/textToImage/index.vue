@@ -74,12 +74,11 @@ const generatePicture = async function () {
 				:rules="rules"
 			>
 				<el-form-item
-					style="margin-left: 20px"
+					class="text"
 					prop="prompt"
 				>
 					<el-input
 						v-model="formData.prompt"
-						style="width: 450px"
 						:rows="5"
 						resize="none"
 						type="textarea"
@@ -90,9 +89,9 @@ const generatePicture = async function () {
 
 			<p>风格</p>
 			<el-select
+				class="select"
 				v-model="formData.style"
 				placeholder="请选择风格"
-				style="width: 450px; margin-left: 20px"
 			>
 				<el-option
 					v-for="(option, index) in styleOptions"
@@ -103,8 +102,8 @@ const generatePicture = async function () {
 
 			<p>宽度</p>
 			<el-select
+				class="select"
 				v-model="formData.width"
-				style="width: 450px; margin-left: 20px"
 			>
 				<el-option
 					v-for="(option, index) in size"
@@ -114,8 +113,8 @@ const generatePicture = async function () {
 
 			<p>高度</p>
 			<el-select
+				class="select"
 				v-model="formData.width"
-				style="width: 450px; margin-left: 20px"
 			>
 				<el-option
 					v-for="(option, index) in size"
@@ -125,7 +124,7 @@ const generatePicture = async function () {
 
 			<p>提示词相关性</p>
 			<el-slider
-				style="width: 450px; margin-left: 20px"
+				class="step"
 				v-model="formData.cfgScale"
 				:min="1"
 				:max="30"
@@ -134,11 +133,10 @@ const generatePicture = async function () {
 			></el-slider>
 
 			<el-button
-				class="buto"
+				class="button"
 				:disabled="!canGenerate"
 				:loading="loadingImages"
 				type="success"
-				style="width: 400px"
 				@click="generatePicture"
 				>一键生成</el-button
 			>
@@ -151,7 +149,6 @@ const generatePicture = async function () {
 <style scoped>
 .textToImageFunction {
 	position: relative;
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;
@@ -181,11 +178,26 @@ h1.textToImageTitle {
 p {
 	margin: 20px 20px 5px 20px;
 }
-
-.buto {
-	position: absolute;
-	bottom: 50px;
-	left: 50%;
-	transform: translate(-55%);
+.text {
+	display: block;
+	width: 90%;
+	height: 20%;
+	margin: auto;
+}
+.select {
+	display: block;
+	width: 90%;
+	margin: auto;
+}
+.step {
+	display: flex;
+	width: 90%;
+	align-items: center;
+	margin: auto;
+}
+.button {
+	display: block;
+	width: 70%;
+	margin: 5vh auto;
 }
 </style>

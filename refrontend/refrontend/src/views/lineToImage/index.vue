@@ -101,8 +101,8 @@ const generatePicture = async () => {
 	<div class="lineToImageFunction">
 		<h1 class="lineToImageTitle">线稿成图</h1>
 		<el-tabs
+			class="select"
 			type="border-card"
-			style="width: 450px; margin: 10px auto"
 		>
 			<el-tab-pane label="上传线稿">
 				<div class="fileInput">
@@ -117,8 +117,8 @@ const generatePicture = async () => {
 		</el-tabs>
 		<p>样式描述</p>
 		<el-input
+			class="select"
 			v-model="requestBody.prompt"
-			style="width: 450px; margin: 10px 20px"
 			:rows="3"
 			resize="none"
 			type="textarea"
@@ -127,7 +127,7 @@ const generatePicture = async () => {
 		<p>文件类型</p>
 		<el-radio-group
 			v-model="requestBody.rspImgType"
-			style="margin: 0 0 20px 25px"
+			style="margin: 0 15%"
 		>
 			<el-radio
 				value="base64"
@@ -145,7 +145,6 @@ const generatePicture = async () => {
 			:disabled="!canGenerate"
 			:loading="loadingImages"
 			type="success"
-			style="width: 400px"
 			@click="generatePicture"
 			>一键生成</el-button
 		>
@@ -157,7 +156,6 @@ const generatePicture = async () => {
 <style scoped>
 .lineToImageFunction {
 	position: relative;
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;
@@ -168,7 +166,6 @@ const generatePicture = async () => {
 }
 
 .lineToImageRes {
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;
@@ -202,11 +199,15 @@ p {
 	margin: 0;
 	margin-top: 10px;
 }
+.select {
+	display: block;
+	width: 70%;
+	margin: 3vh auto;
+}
 
 .button {
-	position: absolute;
-	bottom: 50px;
-	left: 50%;
-	transform: translate(-50%);
+	display: block;
+	width: 60%;
+	margin: 3vh auto;
 }
 </style>

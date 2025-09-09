@@ -54,7 +54,6 @@ const fusion = async () => {
 		<div class="feature">
 			<el-input
 				v-model="text"
-				style="width: 350px; margin: 10px 80px"
 				:rows="4"
 				resize="none"
 				type="textarea"
@@ -62,11 +61,11 @@ const fusion = async () => {
 			/>
 		</div>
 		<el-button
+			class="button"
 			:disabled="!canGenerate"
 			:loading="loadingImages"
 			@click="fusion"
 			type="success"
-			style="width: 350px; margin: 60px 0 0 80px"
 			>一键生成</el-button
 		>
 	</div>
@@ -76,7 +75,6 @@ const fusion = async () => {
 </template>
 <style scoped>
 .imageFusionFunction {
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;
@@ -108,16 +106,26 @@ p {
 }
 .sketch {
 	margin: 10px 0 20px 80px;
-	width: 350px;
-	height: 130px;
+	width: 70%;
+	height: 18%;
 	border-radius: 5%;
 	border: #65d6f5 1px dashed;
 }
 .reference {
 	margin: 10px 0 20px 80px;
-	width: 350px;
-	height: 130px;
+	width: 70%;
+	height: 18%;
 	border-radius: 5%;
 	border: #65d6f5 1px dashed;
+}
+.feature {
+	margin: 10px 0 20px 80px;
+	width: 70%;
+	height: 16%;
+}
+.button {
+	display: block;
+	width: 60%;
+	margin: 0 auto;
 }
 </style>

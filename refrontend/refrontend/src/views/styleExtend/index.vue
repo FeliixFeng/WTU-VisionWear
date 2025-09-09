@@ -102,14 +102,14 @@ const generatePicture = async function () {
 		<h1 class="styleExtendTitle">风格延伸</h1>
 		<div class="DataInput">
 			<p>源图像</p>
-			<div class="sourceImage">
+			<div class="sourceImage select">
 				<drag @updateUml="changeSourceImage" />
 			</div>
 			<p>样式预设</p>
 			<el-select
+				class="select"
 				v-model="formData.style"
 				placeholder="请选择预设样式"
-				style="width: 350px; margin-left: 80px"
 			>
 				<el-option
 					v-for="(option, index) in styleOptions"
@@ -119,9 +119,9 @@ const generatePicture = async function () {
 			</el-select>
 			<p>参考模式</p>
 			<el-select
+				class="select"
 				v-model="formData.genMode"
 				placeholder="请选择参考模式"
-				style="width: 350px; margin-left: 80px"
 			>
 				<el-option
 					v-for="(option, index) in referenceMode"
@@ -137,12 +137,11 @@ const generatePicture = async function () {
 				:rules="rules"
 			>
 				<el-form-item
-					style="margin-left: 80px"
+					class="select"
 					prop="prompt"
 				>
 					<el-input
 						v-model="formData.prompt"
-						style="width: 350px"
 						:rows="3"
 						resize="none"
 						type="textarea"
@@ -152,35 +151,34 @@ const generatePicture = async function () {
 			</el-form>
 			<p>高清处理效果</p>
 			<p>图像尺寸</p>
-			<el-slider
-				class="dispose"
-				style="width: 150px; display: inline-block"
-				v-model="formData.gpen"
-				:min="0"
-				:max="1"
-				:step="0.01"
-				:format-tooltip="(value) => value.toFixed(2)"
-			></el-slider>
-			<div class="slider-value">{{ formData.gpen.toFixed(2) }}</div>
-			<el-select
-				class="size"
-				:value-key="'label'"
-				v-model="formData.size"
-				placeholder="选择图像尺寸"
-				style="width: 168px; margin-left: 0"
-			>
-				<el-option
-					v-for="(option, index) in sizes"
-					:label="option.label"
-					:value="option"
-				/>
-			</el-select>
+			<div class="line">
+				<el-slider
+					class="dispose"
+					v-model="formData.gpen"
+					:min="0"
+					:max="1"
+					:step="0.01"
+					:format-tooltip="(value) => value.toFixed(2)"
+				></el-slider>
+				<div class="slider-value">{{ formData.gpen.toFixed(2) }}</div>
+				<el-select
+					class="size"
+					:value-key="'label'"
+					v-model="formData.size"
+					placeholder="选择图像尺寸"
+				>
+					<el-option
+						v-for="(option, index) in sizes"
+						:label="option.label"
+						:value="option"
+					/>
+				</el-select>
+			</div>
 			<el-button
 				class="button"
 				:disabled="!canGenerate"
 				:loading="loadingImages"
 				type="success"
-				style="width: 350px"
 				@click="generatePicture"
 				>一键生成</el-button
 			>
@@ -193,7 +191,6 @@ const generatePicture = async function () {
 </template>
 <style scoped>
 .styleExtendFunction {
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;
@@ -203,7 +200,6 @@ const generatePicture = async function () {
 	background-color: white;
 }
 .styleExtendRes {
-	float: left;
 	width: 36vw;
 	height: 91vh;
 	border-radius: 15px;
@@ -222,8 +218,7 @@ h1.styleExtendTitle {
 }
 .sourceImage {
 	margin: 10px 0 20px 80px;
-	width: 350px;
-	height: 130px;
+	height: 18vh;
 	border-radius: 5%;
 	border: #65d6f5 1px dashed;
 }
@@ -231,40 +226,39 @@ h1.styleExtendTitle {
 	position: relative;
 }
 .slider-value {
-	position: absolute;
-	bottom: -28px;
-	left: 150px;
-	display: inline-block;
 	width: 50px;
 	color: var(--el-text-color-secondary);
 	font-size: 12px;
-	margin-top: 2px;
-	margin-left: 30px;
 }
-
+.select {
+	display: block;
+	margin: auto;
+	width: 80%;
+}
 p {
 	margin: 20px 20px 5px 20px;
+}
+.line {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
 }
 .DataInput p:nth-last-of-type(-n + 2) {
 	display: inline-block;
 	margin: 20px 0 5px 20px;
 }
 .DataInput p:last-of-type {
-	margin-left: 150px;
+	margin-left: 35%;
 }
 .dispose {
-	position: absolute;
-	bottom: -50px;
-	left: 25px;
+	width: 40%;
 }
 .size {
-	position: absolute;
-	bottom: -40px;
-	right: 95px;
+	width: 40%;
 }
 .button {
-	position: absolute;
-	bottom: -115px;
-	left: 80px;
+	display: block;
+	width: 60%;
+	margin: 3vh auto;
 }
 </style>

@@ -23,11 +23,6 @@ const iconList = [
 	// 	url: "/partialRedrawing",
 	// },
 	{
-		name: "风格迁移",
-		icon: "icon-fenggeqianyi1",
-		url: "/styleTransfer",
-	},
-	{
 		name: "风格延伸",
 		icon: "icon-fenggeqianyi2",
 		url: "/styleExtend",

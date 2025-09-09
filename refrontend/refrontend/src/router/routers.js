@@ -22,11 +22,6 @@ const constantRouters = [
 			// 	name: "partialRedrawing",
 			// },
 			{
-				path: "/styleTransfer",
-				component: () => import("@/views/styleTransfer/index.vue"),
-				name: "styleTransfer",
-			},
-			{
 				path: "/imageFusion",
 				component: () => import("@/views/imageFusion/index.vue"),
 				name: "imageFusion",

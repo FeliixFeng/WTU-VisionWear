@@ -1,4 +1,4 @@
-package com.wtu.DTO.user;
+package com.wtu.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

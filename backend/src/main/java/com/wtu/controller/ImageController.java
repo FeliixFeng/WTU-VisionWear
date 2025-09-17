@@ -1,8 +1,8 @@
 package com.wtu.controller;
-import com.wtu.DTO.image.*;
-import com.wtu.VO.ImageFusionVO;
-import com.wtu.VO.DoodleToImageByTYVO;
-import com.wtu.VO.SketchToImageVO;
+import com.wtu.dto.image.*;
+import com.wtu.vo.ImageFusionVO;
+import com.wtu.vo.DoodleToImageByTYVO;
+import com.wtu.vo.SketchToImageVO;
 import com.wtu.exception.BusinessException;
 import com.wtu.result.Result;
 import com.wtu.service.ImageService;

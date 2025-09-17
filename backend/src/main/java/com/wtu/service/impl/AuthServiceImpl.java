@@ -2,9 +2,9 @@ package com.wtu.service.impl;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.wtu.DTO.user.LoginDTO;
-import com.wtu.DTO.user.RegisterDTO;
-import com.wtu.VO.LoginVO;
+import com.wtu.dto.user.LoginDTO;
+import com.wtu.dto.user.RegisterDTO;
+import com.wtu.vo.LoginVO;
 import com.wtu.entity.User;
 import com.wtu.exception.AuthException;
 import com.wtu.exception.BusinessException;

@@ -1,4 +1,4 @@
-package com.wtu.DTO.image;
+package com.wtu.dto.image;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

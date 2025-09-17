@@ -1,6 +1,6 @@
 package com.wtu.controller;
-import com.wtu.DTO.user.ChangeInfoDTO;
-import com.wtu.DTO.user.ChangePasswordDTO;
+import com.wtu.dto.user.ChangeInfoDTO;
+import com.wtu.dto.user.ChangePasswordDTO;
 import com.wtu.entity.User;
 import com.wtu.result.Result;
 import com.wtu.service.ImageService;

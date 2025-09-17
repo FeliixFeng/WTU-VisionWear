@@ -1,4 +1,4 @@
-package com.wtu.VO;
+package com.wtu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

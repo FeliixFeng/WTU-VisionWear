@@ -1,10 +1,10 @@
 package com.wtu.controller;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.alibaba.fastjson.JSON;
-import com.wtu.DTO.user.LoginDTO;
-import com.wtu.DTO.user.RegisterDTO;
-import com.wtu.DTO.user.WxSignatureDTO;
-import com.wtu.VO.LoginVO;
+import com.wtu.dto.user.LoginDTO;
+import com.wtu.dto.user.RegisterDTO;
+import com.wtu.dto.user.WxSignatureDTO;
+import com.wtu.vo.LoginVO;
 import com.wtu.entity.WeChatUser;
 import com.wtu.exception.AuthException;
 import com.wtu.result.Result;

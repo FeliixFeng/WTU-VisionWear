@@ -1,4 +1,4 @@
-package com.wtu.VO;
+package com.wtu.vo;
 
 import lombok.*;
 

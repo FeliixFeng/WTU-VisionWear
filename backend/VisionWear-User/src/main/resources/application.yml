@@ -16,8 +16,8 @@ spring:
     username: ${vision.datasource.image.username}
     password: ${vision.datasource.image.password}
   cloud:
-    nacos:
-        server-addr: 8.155.5.178:8848
+      nacos:
+        server-addr: ${nacos.server-addr}
 
 mybatis-plus:
   configuration:

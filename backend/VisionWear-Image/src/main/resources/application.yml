@@ -18,7 +18,7 @@ spring:
     password: ${vision.datasource.user.password}
   cloud:
     nacos:
-        server-addr: 8.155.5.178:8848
+        server-addr: ${nacos.server-addr}
 
 logging:
   level:

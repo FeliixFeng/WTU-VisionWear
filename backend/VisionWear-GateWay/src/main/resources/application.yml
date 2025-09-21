@@ -8,7 +8,7 @@ spring:
     active: dev
   cloud:
     nacos:
-        server-addr: 8.155.5.178:8848
+      server-addr: ${nacos.server-addr}
     gateway:
       routes:
         - id: user-service

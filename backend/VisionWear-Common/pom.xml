@@ -12,19 +12,12 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.wtu</groupId>
     <artifactId>VisionWear-Common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
 
     <dependencies>
-        <!-- Spring Web，包含 RestTemplate、ClientHttpRequestFactory 等 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
         <!--jakarta-->
         <dependency>
             <groupId>jakarta.servlet</groupId>

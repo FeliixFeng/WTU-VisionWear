@@ -1,0 +1,23 @@
+server:
+  port: 8082  # 图片服务端口
+
+spring:
+  application:
+    name: VisionWear-Image
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+  cloud:
+    nacos:
+        server-addr: 8.155.5.178:8848
+
+logging:
+  level:
+    com:
+      wtu:
+        mapper: debug
+        service: info
+        controller: info 

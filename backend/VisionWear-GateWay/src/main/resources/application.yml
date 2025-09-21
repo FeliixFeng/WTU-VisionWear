@@ -1,0 +1,33 @@
+server:
+  port: 8081  # 网关端口
+
+spring:
+  application:
+    name: VisionWear-GateWay
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+        server-addr: 8.155.5.178:8848
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://VisionWear-User
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=2
+        - id: image-service
+          uri: lb://VisionWear-Image
+          predicates:
+            - Path=/api/image/**
+          filters:
+            - StripPrefix=2
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: debug 

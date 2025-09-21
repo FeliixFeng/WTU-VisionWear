@@ -3,10 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- 指定父工程 -->
     <parent>
         <groupId>com.wtu</groupId>
         <artifactId>backend</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <!-- 默认会到上一级目录查找父 POM -->
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.wtu</groupId>
@@ -14,18 +17,12 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <dependencies>
-        <!-- Swagger -->
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-        </dependency>
 
-        <!-- Lombok -->
+    <dependencies>
+        <!-- Spring Web，包含 RestTemplate、ClientHttpRequestFactory 等 -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <!--jakarta-->
@@ -33,9 +30,6 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
-
-
-
 
         <!--OkHttp-->
         <dependency>
@@ -87,7 +81,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.wtu.visionwearcommon.VisionWearCommonApplication</mainClass>
-                    <skip>true</skip>
+<!--                    <skip>true</skip>-->
                 </configuration>
 <!--                <executions>
                     <execution>

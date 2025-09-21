@@ -52,7 +52,7 @@
         <hutool.version>5.8.22</hutool.version>
         <mysql.version>8.3.0</mysql.version>
         <fastJson.version>1.2.62</fastJson.version>
-        <knife4j-openapi3-jakarta-spring-boot-starter.vsersion>4.4.0</knife4j-openapi3-jakarta-spring-boot-starter.vsersion>
+        <knife4j-openapi3-jakarta-spring-boot-starter.version>4.4.0</knife4j-openapi3-jakarta-spring-boot-starter.version>
         <io.jsonwebtoken.version>0.9.1</io.jsonwebtoken.version>
         <com.squareup.okhttp3.version>4.12.0</com.squareup.okhttp3.version>
         <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
@@ -64,10 +64,20 @@
         <tencentcloud-sdk-java-common.version>3.1.1223</tencentcloud-sdk-java-common.version>
         <tencentcloud-sdk-java-aiart.version>3.1.1223</tencentcloud-sdk-java-aiart.version>
         <springdoc-openapi-ui.version>1.6.15</springdoc-openapi-ui.version>
+        <spring-boot.version>3.2.2</spring-boot.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <!--            -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
             <!-- SpringCloud-->
             <dependency>
@@ -76,6 +86,13 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Boot Test -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <scope>test</scope>
             </dependency>
 
             <!-- SpringCloud Alibaba-->
@@ -100,7 +117,6 @@
                 <version>${fastJson.version}</version>
             </dependency>
 
-
             <!-- mysql -->
             <dependency>
                 <groupId>com.mysql</groupId>
@@ -108,6 +124,7 @@
                 <version>${mysql.version}</version>
                 <scope>runtime</scope>
             </dependency>
+
 
             <!-- Lombok -->
             <dependency>
@@ -124,18 +141,11 @@
                 <version>${hutool.version}</version> <!-- 或者最新版 -->
             </dependency>
 
-            <!-- Spring Boot Test -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <scope>test</scope>
-            </dependency>
-
             <!-- Swagger -->
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-                <version>${knife4j-openapi3-jakarta-spring-boot-starter.vsersion}</version>
+                <version>${knife4j-openapi3-jakarta-spring-boot-starter.version}</version>
             </dependency>
             <!--JsonWebToken-->
             <dependency>
@@ -170,6 +180,12 @@
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
+            </dependency>
+
+            <!--  校验 Starter 依赖，用于注解无法识别  -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
             </dependency>
 
 
@@ -215,7 +231,6 @@
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${aliyun-sdk-oss.version}</version>
             </dependency>
-
 
             <!-- 用于处理图像 -->
             <dependency>

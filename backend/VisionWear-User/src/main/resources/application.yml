@@ -15,6 +15,9 @@ spring:
     url: jdbc:mysql://${vision.datasource.host}:${vision.datasource.port}/${vision.datasource.database}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: ${vision.datasource.username}
     password: ${vision.datasource.password}
+  cloud:
+    nacos:
+        server-addr: 8.155.5.178:8848
 
 mybatis-plus:
   configuration:

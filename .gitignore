@@ -49,4 +49,12 @@ docker-compose.override.yml
 
 # 忽略敏感数据配置文件
 application-*.yml
-
+# 忽略环境特定配置文件
+application-dev.yml
+application-prod.yml
+application-test.yml
+application-local.yml
+bootstrap-dev.yml
+bootstrap-prod.yml
+bootstrap-test.yml
+bootstrap-local.yml

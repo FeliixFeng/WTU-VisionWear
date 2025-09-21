@@ -3,10 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- 指定父工程 -->
     <parent>
         <groupId>com.wtu</groupId>
         <artifactId>backend</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <!-- 默认会到上一级目录查找父 POM -->
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <packaging>jar</packaging>
@@ -14,6 +17,11 @@
     <artifactId>VisionWear-GateWay</artifactId>
 
     <dependencies>
+        <!--nacos服务注册发现-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
 
         <!--VisionWear Common-->
         <dependency>
@@ -41,23 +49,10 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
-        <!--nacos discovery-->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-        </dependency>
-
         <!--负载均衡-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
         </dependency>
 
     </dependencies>
@@ -79,7 +74,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.wtu.visionweargateway.VisionWearGateWayApplication</mainClass>
-                    <skip>true</skip>
+<!--                    <skip>true</skip>-->
                 </configuration>
             </plugin>
         </plugins>

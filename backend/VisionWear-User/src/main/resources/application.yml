@@ -12,9 +12,9 @@ spring:
       max-request-size: 20MB
   datasource:
     driver-class-name: ${vision.datasource.driver-class-name}
-    url: jdbc:mysql://${vision.datasource.host}:${vision.datasource.port}/${vision.datasource.database}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: ${vision.datasource.username}
-    password: ${vision.datasource.password}
+    url: ${vision.datasource.image.url}
+    username: ${vision.datasource.image.username}
+    password: ${vision.datasource.image.password}
   cloud:
     nacos:
         server-addr: 8.155.5.178:8848

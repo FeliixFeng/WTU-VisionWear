@@ -1,10 +1,9 @@
 package com.wtu.controller;
+import com.wtu.client.ImageClient;
 import com.wtu.dto.user.ChangeInfoDTO;
 import com.wtu.dto.user.ChangePasswordDTO;
 import com.wtu.entity.User;
 import com.wtu.result.Result;
-import com.wtu.service.ImageService;
-import com.wtu.service.MaterialService;
 import com.wtu.service.UserService;
 import com.wtu.utils.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,10 +23,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    // IOC 注入
-    private final ImageService imageService;
+    private final ImageClient imageClient;
 
-    private final MaterialService materialService;
+/*    private final MaterialService materialService;*/
     private final UserService userService;
 
     @GetMapping(value = "/getAllImage")
@@ -37,17 +35,17 @@ public class UserController {
         Long userId = UserContext.getCurrentUserId(httpServletRequest);
 
         // 获取用户生成的所有图片URL
-        List<String> imageUrls = imageService.getAllImageUrls(userId);
+        List<String> imageUrls = imageClient.getAllImageUrls(userId).getData();
 
 
         return Result.success(imageUrls);
     }
 
-    @GetMapping("/getMaterial")
+/*    @GetMapping("/getMaterial")
     @Operation(summary = "获取素材库的图片")
     public Result<List<String>> getMaterial(){
         return Result.success(materialService.getMaterial());
-    }
+    }*/
 
     @PostMapping("/changePassword")
     @Operation(summary = "修改用户密码")

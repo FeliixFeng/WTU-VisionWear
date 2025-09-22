@@ -17,6 +17,11 @@ spring:
     username: ${vision.datasource.image.username}
     password: ${vision.datasource.image.password}
 
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+
 
 logging:
   level:
@@ -24,4 +29,5 @@ logging:
       wtu:
         mapper: debug
         service: info
-        controller: info 
+        controller: info
+

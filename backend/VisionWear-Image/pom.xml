@@ -97,6 +97,14 @@
             <version>${tencentcloud-sdk-java-aiart.version}</version>
         </dependency>
 
+    <!--VisionWear-Api-->
+        <dependency>
+            <groupId>com.wtu</groupId>
+            <artifactId>VisionWear-Api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+
         <!-- 阿里云百炼文生图 -->
         <dependency>
             <groupId>com.alibaba</groupId>

@@ -12,7 +12,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <packaging>jar</packaging>
     <groupId>com.wtu</groupId>
     <artifactId>VisionWear-User</artifactId>
     <name>VisionWear-User</name>
@@ -73,6 +72,13 @@
         <dependency>
             <groupId>com.wtu</groupId>
             <artifactId>VisionWear-Common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!--VisionWear Api-->
+        <dependency>
+            <groupId>com.wtu</groupId>
+            <artifactId>VisionWear-Api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

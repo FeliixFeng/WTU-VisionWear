@@ -196,4 +196,11 @@ public class ImageController {
         }
     }
 
+    @GetMapping
+    @Operation(description = "获取所有图片URL")
+    public Result<List<String>> getAllImageUrls(Long userId){
+        return Result.success(imageService.getAllImageUrls(userId));
+    }
+
+
 }

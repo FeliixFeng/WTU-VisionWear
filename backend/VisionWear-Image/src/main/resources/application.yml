@@ -13,12 +13,10 @@ spring:
 
   datasource:
     driver-class-name: ${vision.datasource.driver-class-name}
-    url: ${vision.datasource.user.url}
-    username: ${vision.datasource.user.username}
-    password: ${vision.datasource.user.password}
-  cloud:
-    nacos:
-        server-addr: ${nacos.server-addr}
+    url: ${vision.datasource.image.url}
+    username: ${vision.datasource.image.username}
+    password: ${vision.datasource.image.password}
+
 
 logging:
   level:

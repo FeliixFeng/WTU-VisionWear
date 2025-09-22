@@ -48,10 +48,8 @@ public class AliOssUtil {
                     objectName,
                     new ByteArrayInputStream(bytes));
         } catch (OSSException oe) {
-            log.error("OSS上传文件失败", oe);
             throw new RuntimeException("OSS上传文件失败: " + oe.getErrorMessage());
         } catch (ClientException ce) {
-            log.error("OSS客户端异常", ce);
             throw new RuntimeException("OSS客户端异常: " + ce.getMessage());
         } finally {
             // 关闭OSSClient
@@ -97,12 +95,9 @@ public class AliOssUtil {
         try {
             // 删除对象
             ossClient.deleteObject(bucketName, objectName);
-            log.info("已删除OSS对象: {}", objectName);
         } catch (OSSException oe) {
-            log.error("OSS删除文件失败", oe);
             throw new RuntimeException("OSS删除文件失败: " + oe.getErrorMessage());
         } catch (ClientException ce) {
-            log.error("OSS客户端异常", ce);
             throw new RuntimeException("OSS客户端异常: " + ce.getMessage());
         } finally {
             // 关闭OSSClient

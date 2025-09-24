@@ -16,11 +16,6 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <dependencies>
-        <!--nacos服务注册发现-->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-        </dependency>
         <!-- hutool -->
         <dependency>
             <groupId>cn.hutool</groupId>

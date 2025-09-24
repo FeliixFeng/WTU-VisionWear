@@ -13,7 +13,6 @@
     </parent>
 
     <packaging>jar</packaging>
-    <groupId>com.wtu</groupId>
     <artifactId>VisionWear-GateWay</artifactId>
 
     <dependencies>

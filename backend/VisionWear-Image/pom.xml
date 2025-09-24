@@ -139,7 +139,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.wtu.visionwearimage.VisionWearImageApplication</mainClass>
+                    <mainClass>com.wtu.ImageApplication</mainClass>
 <!--                    <skip>true</skip>-->
                 </configuration>
             </plugin>

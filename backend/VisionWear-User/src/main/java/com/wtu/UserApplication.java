@@ -1,4 +1,4 @@
-package com.wtu.visionwearuser;
+package com.wtu;
 
 import com.wtu.client.ImageClient;
 import org.springframework.boot.SpringApplication;
@@ -7,8 +7,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients(clients = {ImageClient.class})
-public class VisionWearUserApplication {
+public class UserApplication {
     public static void main(String[] args) {
-        SpringApplication.run(VisionWearUserApplication.class, args);
+        SpringApplication.run(UserApplication.class, args);
     }
 }

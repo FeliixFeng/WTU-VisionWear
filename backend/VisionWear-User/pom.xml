@@ -100,7 +100,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.wtu.visionwearuser.VisionWearUserApplication</mainClass>
+                    <mainClass>com.wtu.UserApplication</mainClass>
 <!--                    <skip>true</skip>-->
                 </configuration>
 <!--                <executions>

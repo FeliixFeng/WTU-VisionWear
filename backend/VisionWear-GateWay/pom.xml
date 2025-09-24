@@ -17,11 +17,6 @@
     <artifactId>VisionWear-GateWay</artifactId>
 
     <dependencies>
-        <!--nacos服务注册发现-->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-        </dependency>
 
         <!--VisionWear Common-->
         <dependency>
@@ -30,19 +25,16 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-        <!--jakarta-->
+        <!--nacos服务注册发现-->
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
 
-        <!--JsonWebToken-->
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>${io.jsonwebtoken.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <!--网关-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -73,7 +65,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.wtu.visionweargateway.VisionWearGateWayApplication</mainClass>
+                    <mainClass>com.wtu.visionweargateway.GateWayApplication</mainClass>
 <!--                    <skip>true</skip>-->
                 </configuration>
             </plugin>

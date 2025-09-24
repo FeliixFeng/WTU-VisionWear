@@ -1,5 +1,5 @@
 server:
-  port: 8081  # 网关端口
+  port: 8080  # 网关端口
 
 spring:
   application:
@@ -30,4 +30,10 @@ spring:
 
 logging:
   level:
-    org.springframework.cloud.gateway: debug 
+    org.springframework.cloud.gateway: debug
+
+vision:
+  jwt:
+    secretKey: ${vision.jwt.secret-key}
+    ttl: ${vision.jwt.ttl}
+    tokenName: ${vision.jwt.token-name}

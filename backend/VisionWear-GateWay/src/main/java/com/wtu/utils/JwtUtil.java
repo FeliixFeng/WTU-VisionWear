@@ -4,7 +4,6 @@ import com.wtu.exception.AuthException;
 import io.jsonwebtoken.*;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.security.SignatureException;
 import java.util.Date;
 import java.util.Map;
 

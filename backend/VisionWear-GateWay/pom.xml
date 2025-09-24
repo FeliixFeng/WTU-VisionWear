@@ -65,7 +65,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.wtu.visionweargateway.GateWayApplication</mainClass>
+                    <mainClass>com.wtu.GateWayApplication</mainClass>
 <!--                    <skip>true</skip>-->
                 </configuration>
             </plugin>

@@ -46,6 +46,13 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
+        <!-- hutool -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version> <!-- 或者最新版 -->
+        </dependency>
+
     </dependencies>
 
     <build>

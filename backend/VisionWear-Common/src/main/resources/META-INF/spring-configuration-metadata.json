@@ -1,0 +1,42 @@
+{
+  "groups": [
+    {
+      "name": "visionWear.db"
+    },
+    {
+      "name": "visionWear.mq"
+    },
+    {
+      "name": "visionWear.swagger"
+    },
+    {
+      "name": "viison.",
+      "type": "java.lang.String",
+      "sourceType": "com.hmall.config.JwtProperties"
+    },
+    {
+      "name": "hm.auth",
+      "type": "com.hmall.config.MvcConfig",
+      "sourceType": "com.hmall.config.AuthProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "vision.api.url",
+      "type": "java.lang.String",
+      "description": "Vision API 的服务端点地址。"
+    },
+    {
+      "name": "vision.api.key",
+      "type": "java.lang.String",
+      "description": "访问 Vision API 所需的认证密钥。"
+    },
+    {
+      "name": "vision.api.timeout",
+      "type": "java.lang.Integer",
+      "description": "调用 Vision API 的超时时间（毫秒）。",
+      "defaultValue": 5000
+    }
+  ],
+  "hints": []
+}

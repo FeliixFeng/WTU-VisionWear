@@ -51,7 +51,7 @@ public class ImageServiceImpl implements ImageService {
     // 线稿生图
     // 根据需求调整地域
     private static final String TENCENT_REGION = "ap-shanghai";
-    // IOC 注入
+
     private final RestTemplate restTemplate;
     private final ImageStorageService imageStorageService;
     private final ImageMapper imageMapper;

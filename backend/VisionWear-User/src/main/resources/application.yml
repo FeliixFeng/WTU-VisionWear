@@ -15,9 +15,6 @@ spring:
     url: ${vision.datasource.user.url}
     username: ${vision.datasource.user.username}
     password: ${vision.datasource.user.password}
-  cloud:
-      nacos:
-        server-addr: ${nacos.server-addr}
 
 mybatis-plus:
   configuration:
@@ -50,7 +47,7 @@ vision:
   api:
     key: ${vision.api.secret-key}
     url: ${vision.api.url}
-    timeout: ${vision.api.timeout}
+
   maxSize: 10485760
 
 wtu:

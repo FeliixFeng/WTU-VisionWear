@@ -1,4 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.wtu.config.HttpClientConfig,\
-  com.wtu.config.StableDiffusionConfig,\
-  com.wtu.config.SwaggerPrintConfig
+  com.wtu.config.SwaggerPrintConfig,\
+  com.wtu.config.RestTemplateConfig

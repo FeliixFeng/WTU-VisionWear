@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: VisionWear-User # 服务名称
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 8.155.5.178:8848
+      config:
+        file-extension: yml # 文件后缀名
+        shared-configs: # 共享配置
+          - dataId: shared.jdbc.yml # 共享mybatis配置
+          - dataId: shared.log.yml # 共享日志配置
+          - dataId: shared.swagger.yml # 共享日志配置
+          - dataId: shared-seata.yml # 共享seata配置

@@ -4,11 +4,11 @@ server:
 spring:
   application:
     name: VisionWear-GateWay
-  profiles:
-    active: dev
   cloud:
     nacos:
-      server-addr: ${nacos.server-addr}
+      server-addr: 8.155.5.178:8848
+  profiles:
+    active: dev
     gateway:
       routes:
         - id: user-service

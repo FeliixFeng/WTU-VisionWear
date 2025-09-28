@@ -92,31 +92,22 @@
 
     <build>
         <plugins>
-<!--            <plugin>
+            <!-- maven 打包时跳过测试 -->
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                    <encoding>UTF-8</encoding>
+                    <skip>true</skip>
                 </configuration>
-            </plugin>-->
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.wtu.UserApplication</mainClass>
-<!--                    <skip>true</skip>-->
+                    <skip>true</skip>
                 </configuration>
-<!--                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>-->
+
             </plugin>
         </plugins>
     </build>

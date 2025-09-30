@@ -42,4 +42,9 @@ logging:
         mapper: debug
         service: info
         controller: info
-
+wtu:
+  alioss:
+    endpoint: ${vision.alioss.endpoint}
+    access-key-id: ${vision.alioss.access-key-id}
+    access-key-secret: ${vision.alioss.access-key-secret}
+    bucket-name: ${vision.alioss.bucket-name}

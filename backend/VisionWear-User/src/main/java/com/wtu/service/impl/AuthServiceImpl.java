@@ -4,6 +4,7 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wtu.dto.user.LoginDTO;
 import com.wtu.dto.user.RegisterDTO;
+import com.wtu.properties.JwtProperties;
 import com.wtu.vo.LoginVO;
 import com.wtu.entity.User;
 import com.wtu.exception.AuthException;

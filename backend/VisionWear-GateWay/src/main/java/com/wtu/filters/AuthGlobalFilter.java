@@ -2,7 +2,6 @@ package com.wtu.filters;
 
 import cn.hutool.http.HttpStatus;
 import com.wtu.exception.AuthException;
-import com.wtu.properties.JwtProperties;
 import com.wtu.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +48,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        log.info("开始拦截------");
         ServerHttpRequest request = exchange.getRequest();
         //判断是否需要拦截
         if (isExcluded(request.getPath().toString())){

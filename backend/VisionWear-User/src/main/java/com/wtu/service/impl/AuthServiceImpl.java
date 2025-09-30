@@ -10,7 +10,6 @@ import com.wtu.exception.AuthException;
 import com.wtu.exception.BusinessException;
 import com.wtu.exception.ExceptionUtils;
 import com.wtu.mapper.UserMapper;
-import com.wtu.properties.JwtProperties;
 import com.wtu.service.AuthService;
 import com.wtu.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;

@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -31,8 +32,8 @@ import java.util.Collections;
 @Tag(name = "认证模块")
 @Slf4j
 public class AuthController {
-    // IOC 注入
-    private final AuthService authService;
+    @Autowired
+    private  AuthService authService;
 
     @Operation(summary = "用户注册")
     @PostMapping("/register")

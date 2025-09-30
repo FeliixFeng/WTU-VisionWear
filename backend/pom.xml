@@ -66,10 +66,17 @@
         <tencentcloud-sdk-java-aiart.version>3.1.1223</tencentcloud-sdk-java-aiart.version>
         <springdoc-openapi-ui.version>1.6.15</springdoc-openapi-ui.version>
         <spring-boot.version>3.2.2</spring-boot.version>
+        <feign-slf4j.version>11.8</feign-slf4j.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- knife4j Slf4j -->
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-slf4j</artifactId>
+                <version>${feign-slf4j.version}</version>
+            </dependency>
 
             <!--            -->
             <dependency>
@@ -142,7 +149,7 @@
                 <version>${hutool.version}</version> <!-- 或者最新版 -->
             </dependency>
 
-            <!-- Swagger -->
+            <!-- knife4j -->
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>

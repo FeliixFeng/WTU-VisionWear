@@ -29,11 +29,24 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
 
-        <!-- Swagger -->
+        <!-- knife4j -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
+
+        <!-- knife4j Slf4j -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-slf4j</artifactId>
+        </dependency>
+
+        <!-- SpringDoc OpenAPI Starter -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+        </dependency>
+
 
         <!--nacos服务注册发现-->
         <dependency>

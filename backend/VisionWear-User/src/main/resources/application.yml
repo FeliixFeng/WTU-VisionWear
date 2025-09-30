@@ -10,6 +10,8 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     driver-class-name: ${vision.datasource.driver-class-name}
     url: ${vision.datasource.user.url}
@@ -23,13 +25,19 @@ mybatis-plus:
 
 springdoc:
   api-docs:
-    path: /v3/api-docs
+    path: /v3/api-docs # 开放API规范JSON的访问路径
   swagger-ui:
-    path: /swagger-ui.html
+    path: /swagger-ui.html # Swagger UI的路径（Knife4j增强后主要用doc.html）
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.wtu.controller # 【重要】改为你的Controller包路径
+
 
 knife4j:
   enable: true
   production: false
+
 
 logging:
   level:
@@ -38,6 +46,7 @@ logging:
         mapper: debug
         service: info
         controller: info
+
 
 vision:
   jwt:

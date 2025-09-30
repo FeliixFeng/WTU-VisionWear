@@ -18,5 +18,5 @@ import java.util.List;
 public interface ImageClient {
 
     @GetMapping("/api/image")
-    Result<List<String>> getAllImageUrls(@RequestParam("userId") Long userId);
+    Result<List<String>> getAllImageUrls(@RequestParam(value = "userId") Long userId);
 }

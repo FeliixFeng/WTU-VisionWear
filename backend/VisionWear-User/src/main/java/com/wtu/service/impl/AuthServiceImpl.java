@@ -97,6 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 2. 判空 + 加密后密码比对
             String password = DigestUtil.md5Hex(dto.getPassword());
+            log.info("dto:{}",dto);
             if (user == null || !user.getPassWord().equals(password)) {
                 throw new AuthException("用户名或密码错误");
             }

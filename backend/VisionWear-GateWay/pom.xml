@@ -36,6 +36,12 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+
         <!--负载均衡-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

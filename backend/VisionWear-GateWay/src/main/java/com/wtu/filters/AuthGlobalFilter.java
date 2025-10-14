@@ -1,7 +1,6 @@
 package com.wtu.filters;
 
 import cn.hutool.http.HttpStatus;
-import com.wtu.exception.AuthException;
 import com.wtu.properties.JwtProperties;
 import com.wtu.utils.JwtUtil;
 import io.jsonwebtoken.Claims;

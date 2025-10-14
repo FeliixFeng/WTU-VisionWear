@@ -13,8 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ImageFusionVO {
     private String requestId;
-    private String jobId;  // 新增字段
-    private List<GeneratedImage> images; // 可为空
+    private String jobId;  // 任务ID
+    private List<GeneratedImage> images; // 生成的图片列表（未完成时为空）
+    private Integer progress; // 任务进度 0-100
     private long generationTimeMs;
 
     @Data

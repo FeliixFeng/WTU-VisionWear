@@ -435,33 +435,27 @@ public class ImageServiceImpl implements ImageService {
 
             String status = responseJson.path("status").asText();
 
-            //只对状态查询一次，后续通过进度判断任务是否完成
+            // 检查任务状态
             if ("FAILED".equals(status)) {
                 String msg = responseJson.path("message").asText();
-                throw new BusinessException("查询失败: " + msg);
-            } else {
-                //采用指数退避方式进行异步处理.
-                long baseInterval = 2000; // 初始间隔2秒
-                long maxInterval = 60000; // 最大间隔60秒
-                long currentInterval = baseInterval;
-                int maxAttempts = 30; // 最大轮询次数
-                int attempts = 0;
-
-                while (attempts < maxAttempts) {
-                    String progress = getFusionProgress(jobId, userId);
-                    if (Integer.parseInt(progress) < 100) {
-                        log.info("当前进度为:{}", progress);
-                        Thread.sleep(currentInterval);
-                        currentInterval = Math.min(currentInterval * 2, maxInterval);
-                        attempts++;
-                    } else {
-                        break;
-                    }
-
-                }
+                throw new BusinessException("任务失败: " + msg);
             }
 
             JsonNode dataNode = responseJson.path("data");
+            String progress = dataNode.path("progress").asText("0");
+            
+            // 如果任务未完成，返回进度信息
+            if (Integer.parseInt(progress) < 100) {
+                log.info("任务 {} 当前进度: {}%", jobId, progress);
+                return ImageFusionVO.builder()
+                        .requestId(UUID.randomUUID().toString())
+                        .jobId(jobId)
+                        .progress(Integer.parseInt(progress))
+                        .generationTimeMs(0)
+                        .build();
+            }
+
+            // 任务完成，获取图片
             String cdnImage = dataNode.path("cdnImage").asText(null);
             if (cdnImage == null || cdnImage.isEmpty()) {
                 throw new BusinessException("未获取到图片地址");
@@ -477,7 +471,9 @@ public class ImageServiceImpl implements ImageService {
 
             return ImageFusionVO.builder()
                     .requestId(UUID.randomUUID().toString())
+                    .jobId(jobId)
                     .images(Collections.singletonList(generatedImage))
+                    .progress(100)
                     .generationTimeMs(0)
                     .build();
         } catch (BusinessException e) {

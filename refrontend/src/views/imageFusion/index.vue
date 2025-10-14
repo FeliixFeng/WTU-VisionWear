@@ -3,6 +3,7 @@ import showResultPicture from "@/components/showResultPicture.vue"
 import { useImageFusionStore } from "@/store/imageFusionStore.js"
 import { useAuthStore } from "@/store/users"
 import { ref, computed } from "vue"
+import { ElMessage } from 'element-plus'
 
 defineOptions({
 	name: "imageFusion",
@@ -15,9 +16,18 @@ const referenceUml = ref("")
 const text = ref("")
 const resultImageUrl = ref("")
 const loadingImages = ref(false)
+const progress = ref(0) // 进度条
+const showProgress = ref(false) // 是否显示进度条
 
 const canGenerate = computed(() => {
 	return sketchUml.value !== "" && referenceUml.value !== ""
+})
+
+// 进度条颜色
+const progressColor = computed(() => {
+	if (progress.value < 30) return '#f56c6c'
+	if (progress.value < 70) return '#e6a23c'
+	return '#67c23a'
 })
 const changeSketch = (url) => {
 	sketchUml.value = url
@@ -28,15 +38,45 @@ const changeReference = (url) => {
 const fusion = async () => {
 	const formData = {
 		urlList: [sketchUml.value, referenceUml.value],
-		textFeature: text,
+		textFeature: text.value,
 	}
 	loadingImages.value = true
-	const res1 = await imageFusionStore.doImageFusion(formData)
-	const jobId = res1.data.jobId
-	const res2 = await imageFusionStore.getFusionResultUrl(jobId)
-	resultImageUrl.value = res2.images[0].imageUrl
-	authStore.updateMyImages()
-	loadingImages.value = false
+	showProgress.value = true
+	progress.value = 0
+	resultImageUrl.value = "" // 清空之前的结果
+	
+	try {
+		// 1. 提交融合任务
+		const res1 = await imageFusionStore.doImageFusion(formData)
+		const jobId = res1.data.jobId
+		
+		if (!jobId) {
+			throw new Error('未获取到任务ID')
+		}
+		
+		ElMessage.success('任务已提交，正在处理中...')
+		
+		// 2. 轮询获取结果（带进度更新）
+		const res2 = await imageFusionStore.getFusionResultUrl(jobId, (currentProgress) => {
+			progress.value = currentProgress
+		})
+		
+		// 3. 显示结果
+		if (res2 && res2.images && res2.images.length > 0) {
+			resultImageUrl.value = res2.images[0].imageUrl
+			authStore.updateMyImages()
+			ElMessage.success('图片融合完成！')
+		} else {
+			throw new Error('未获取到生成结果')
+		}
+	} catch (error) {
+		ElMessage.error('图片融合失败: ' + error.message)
+		console.error('融合失败:', error)
+	} finally {
+		loadingImages.value = false
+		showProgress.value = false
+		progress.value = 0
+	}
 }
 </script>
 <template>
@@ -68,6 +108,19 @@ const fusion = async () => {
 			type="success"
 			>一键生成</el-button
 		>
+		<!-- 进度条 -->
+		<div v-if="showProgress" class="progress-container">
+			<el-progress 
+				:percentage="progress" 
+				:color="progressColor"
+				:stroke-width="20"
+			>
+				<template #default="{ percentage }">
+					<span class="progress-text">{{ percentage }}%</span>
+				</template>
+			</el-progress>
+			<p class="progress-tip">正在生成中，请稍候...</p>
+		</div>
 	</div>
 	<div class="imageFusionRes">
 		<showResultPicture :resultUrl="resultImageUrl" />
@@ -127,5 +180,22 @@ p {
 	display: block;
 	width: 60%;
 	margin: 0 auto;
+}
+.progress-container {
+	margin: 20px 40px;
+	padding: 15px;
+	background-color: #f5f7fa;
+	border-radius: 8px;
+}
+.progress-text {
+	font-size: 14px;
+	font-weight: bold;
+	color: #333;
+}
+.progress-tip {
+	text-align: center;
+	margin-top: 10px;
+	font-size: 13px;
+	color: #909399;
 }
 </style>

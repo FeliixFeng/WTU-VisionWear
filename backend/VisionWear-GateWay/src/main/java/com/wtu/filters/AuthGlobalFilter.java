@@ -71,10 +71,17 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         Long userId = null;
         String userName = null;
         try{
-            userId = (Long) claims.get("userId");
+            // 处理userId的类型转换（可能是Integer或Long）
+            Object userIdObj = claims.get("userId");
+            if (userIdObj instanceof Integer) {
+                userId = ((Integer) userIdObj).longValue();
+            } else if (userIdObj instanceof Long) {
+                userId = (Long) userIdObj;
+            }
             userName = (String)claims.get("userName");
-        }catch (AuthException e){
+        }catch (Exception e){
             //拦截
+            log.error("解析token失败: {}", e.getMessage());
             ServerHttpResponse response = exchange.getResponse();
             response.setStatusCode(org.springframework.http.HttpStatus.valueOf(HttpStatus.HTTP_UNAUTHORIZED));
             return response.setComplete();

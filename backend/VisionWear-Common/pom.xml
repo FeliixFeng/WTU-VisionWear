@@ -129,10 +129,22 @@
             <artifactId>fastjson</artifactId>
         </dependency>
 
-        <!--JsonWebToken-->
+        <!--JsonWebToken API-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+
+        <!--JsonWebToken Implementation-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+        </dependency>
+
+        <!--JsonWebToken Jackson-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
         </dependency>
 
     </dependencies>

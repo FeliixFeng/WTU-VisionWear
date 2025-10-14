@@ -58,3 +58,8 @@ bootstrap-dev.yml
 bootstrap-prod.yml
 bootstrap-test.yml
 bootstrap-local.yml
+/backend/VisionWear-User/HELP.md
+/backend/VisionWear-Api/.gitignore
+/backend/VisionWear-Common/HELP.md
+/backend/VisionWear-GateWay/HELP.md
+/backend/VisionWear-Image/HELP.md

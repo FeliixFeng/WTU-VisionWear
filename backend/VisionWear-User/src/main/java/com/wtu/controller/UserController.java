@@ -30,14 +30,12 @@ public class UserController {
 
     @GetMapping(value = "/getAllImage")
     @Operation(summary = "获取用户生成的所有图片URL")
-    public Result<List<String>> getAllImage(HttpServletRequest httpServletRequest) {
+    public Result<List<String>> getAllImage() {
         //从token 获取当前用户ID
-        Long userId = UserContext.getCurrentUserId(httpServletRequest);
+        Long userId = UserContext.getCurrentUserId();
 
         // 获取用户生成的所有图片URL
         List<String> imageUrls = imageClient.getAllImageUrls(userId).getData();
-
-
         return Result.success(imageUrls);
     }
 
@@ -56,9 +54,9 @@ public class UserController {
     
     @PostMapping("/changeInfo")
     @Operation(summary = "修改用户信息")
-    public Result<String> changeInfo(@Valid @RequestBody ChangeInfoDTO changeInfoDTO, HttpServletRequest request) {
+    public Result<String> changeInfo(@Valid @RequestBody ChangeInfoDTO changeInfoDTO) {
         //从token获取当前用户ID
-        Long userId = UserContext.getCurrentUserId(request);
+        Long userId = UserContext.getCurrentUserId();
         userService.changeUserInfo(changeInfoDTO, userId);
         return Result.success("用户信息修改成功!");
     }

@@ -54,7 +54,7 @@
         <mysql.version>8.3.0</mysql.version>
         <fastJson.version>1.2.62</fastJson.version>
         <knife4j-openapi3-jakarta-spring-boot-starter.version>4.4.0</knife4j-openapi3-jakarta-spring-boot-starter.version>
-        <io.jsonwebtoken.version>0.9.1</io.jsonwebtoken.version>
+        <io.jsonwebtoken.version>0.12.6</io.jsonwebtoken.version>
         <com.squareup.okhttp3.version>4.12.0</com.squareup.okhttp3.version>
         <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
         <aliyun-sdk-oss.version>3.10.2</aliyun-sdk-oss.version>
@@ -155,11 +155,27 @@
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j-openapi3-jakarta-spring-boot-starter.version}</version>
             </dependency>
-            <!--JsonWebToken-->
+            <!--JsonWebToken API-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
+                <artifactId>jjwt-api</artifactId>
                 <version>${io.jsonwebtoken.version}</version>
+            </dependency>
+
+            <!--JsonWebToken Implementation-->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${io.jsonwebtoken.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!--JsonWebToken Jackson-->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${io.jsonwebtoken.version}</version>
+                <scope>runtime</scope>
             </dependency>
 
             <!--OkHttp-->

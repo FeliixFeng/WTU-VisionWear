@@ -39,11 +39,11 @@ public class ImageController {
 
     @PostMapping("/doubao/text-to-image")
     @Operation(summary = "文生图功能")
-    public Result<List<String>> textToImage(@RequestBody @Valid TextToImageDTO request,
-                                            HttpServletRequest httpServletRequest) {
+    public Result<List<String>> textToImage(@RequestBody @Valid TextToImageDTO request) {
         try {
-            //从token 获取当前用户ID
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            // 从ThreadLocal获取当前用户ID
+            Long userId = UserContext.getCurrentUserId();
+            log.info("当前用户ID: {}", userId);
             // 调用用户服务的textToImage方法生成图像
             List<String> ids = imageService.textToImage(request, userId);
             List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
@@ -56,10 +56,9 @@ public class ImageController {
 
     @PostMapping("/tongyi/text-to-image")
     @Operation(summary = "通义万象文生图功能")
-    public Result<List<String>> textToImageByTongyi(@RequestBody @Valid TextToImageByTYDTO request,
-                                                    HttpServletRequest httpServletRequest) {
+    public Result<List<String>> textToImageByTongyi(@RequestBody @Valid TextToImageByTYDTO request) {
         try {
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            Long userId = UserContext.getCurrentUserId();
             List<String> ids = imageService.textToImageByTongyi(request, userId);
             List<String> urls = ids.stream().map(imageStorageService::getImageUrl).collect(Collectors.toList());
             return Result.success(urls);
@@ -71,10 +70,9 @@ public class ImageController {
 
     @PostMapping("/doubao/image-to-image")
     @Operation(summary = "图生图功能")
-    public Result<List<String>> imageToImage(@RequestBody ImageToImageDTO request,
-                                             HttpServletRequest httpServletRequest) {
+    public Result<List<String>> imageToImage(@RequestBody ImageToImageDTO request) {
         try {
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            Long userId = UserContext.getCurrentUserId();
             // 调用用户服务的imageToImage方法生成图像
             List<String> ids = imageService.imageToImage(request, userId);
             List<String> urls = ids.
@@ -95,12 +93,11 @@ public class ImageController {
 
     @PostMapping("/doubao/styleConversion")
     @Operation(summary = "图片风格转换功能")
-    public Result<String> styleConversion(@RequestBody StyleConversionDTO request,
-                                             HttpServletRequest httpServletRequest) {
+    public Result<String> styleConversion(@RequestBody StyleConversionDTO request) {
         try {
             //service层处理id与URL转换，Controller层直接返回即可.
             return Result.success(imageService.styleConversion(request,
-                    UserContext.getCurrentUserId(httpServletRequest)));
+                    UserContext.getCurrentUserId()));
         } catch (Exception e) {
             throw new BusinessException("图片风格转换失败: " + e.getMessage());
         }
@@ -108,9 +105,9 @@ public class ImageController {
 
     @PostMapping("/image-fusion")
     @Operation(summary = "图片融合功能")
-    public Result<ImageFusionVO> imageFusion(@RequestBody @Valid ImageFusionDTO request, HttpServletRequest httpServletRequest) {
+    public Result<ImageFusionVO> imageFusion(@RequestBody @Valid ImageFusionDTO request) {
         try {
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            Long userId = UserContext.getCurrentUserId();
             ImageFusionVO response = imageService.imageFusion(request, userId);
 
             return Result.success(response);
@@ -121,16 +118,16 @@ public class ImageController {
 
     @GetMapping("/image-fusion/progress")
     @Operation(summary = "获取图片融合进度")
-    public Result<String> getFusionProgress(@RequestParam String jobId, HttpServletRequest httpServletRequest) {
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+    public Result<String> getFusionProgress(@RequestParam String jobId ) {
+            Long userId = UserContext.getCurrentUserId();
             return Result.success(imageService.getFusionProgress(jobId, userId));
     }
 
     @GetMapping("/image-fusion/result")
     @Operation(summary = "获取图片融合结果")
-    public Result<ImageFusionVO> getFusionResult(@RequestParam String jobId, HttpServletRequest httpServletRequest) {
+    public Result<ImageFusionVO> getFusionResult(@RequestParam String jobId) {
         try {
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            Long userId = UserContext.getCurrentUserId();
             ImageFusionVO response = imageService.queryImageByJobId(jobId, userId);
             return Result.success(response);
         } catch (Exception e) {
@@ -141,10 +138,9 @@ public class ImageController {
     @PostMapping
     @Operation(summary = "通义万象涂鸦作图功能")
     public Result<DoodleToImageByTYVO> DoodleToImageByTongyi(
-            @RequestBody @Valid DoodleToImageByTYDTO request,
-            HttpServletRequest httpServletRequest) {
+            @RequestBody @Valid DoodleToImageByTYDTO request) {
         try {
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            Long userId = UserContext.getCurrentUserId();
             DoodleToImageByTYVO vo = imageService.DoodleToImageByTongyi(request, userId);
             return Result.success(vo);
         } catch (Exception e) {
@@ -154,10 +150,9 @@ public class ImageController {
 
     @PostMapping("/sketch-to-image")
     @Operation(summary = "线稿生图功能")
-    public Result<List<String>> sketchToImage(@RequestBody @Validated SketchToImageDTO request,
-                                              HttpServletRequest httpServletRequest) {
+    public Result<List<String>> sketchToImage(@RequestBody @Validated SketchToImageDTO request) {
         try {
-            Long userId = UserContext.getCurrentUserId(httpServletRequest);
+            Long userId = UserContext.getCurrentUserId();
             SketchToImageVO response = imageService.sketchToImage(request, userId);
             List<String> ids = response.getImages().stream()
                     .map(SketchToImageVO.GeneratedImage::getImageId)
@@ -198,7 +193,7 @@ public class ImageController {
 
     @GetMapping
     @Operation(description = "获取所有图片URL")
-    public Result<List<String>> getAllImageUrls(Long userId){
+    public Result<List<String>> getAllImageUrls(@RequestHeader Long userId){
         return Result.success(imageService.getAllImageUrls(userId));
     }
 

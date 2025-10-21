@@ -149,6 +149,13 @@
                 <version>${hutool.version}</version> <!-- 或者最新版 -->
             </dependency>
 
+            <!-- Redis -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
             <!-- knife4j -->
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>

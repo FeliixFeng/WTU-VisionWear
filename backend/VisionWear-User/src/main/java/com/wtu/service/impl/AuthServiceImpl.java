@@ -13,6 +13,7 @@ import com.wtu.exception.ExceptionUtils;
 import com.wtu.mapper.UserMapper;
 import com.wtu.service.AuthService;
 import com.wtu.utils.JwtUtil;
+import com.wtu.utils.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     // IOC 注入
     private final UserMapper userMapper;
     private final JwtProperties jwtProperties;
+    private final RedisUtil redisUtil;
 
     @Override
     public String register(RegisterDTO dto) {
@@ -111,25 +115,59 @@ public class AuthServiceImpl implements AuthService {
             user.setLastLogin(LocalDateTime.now());
             userMapper.updateById(user);
 
-            // 5. 生成 token
+            // 5. 生成 Access Token（短期，15分钟）
             Map<String, Object> claims = new HashMap<>();
             claims.put("userId", user.getUserId());
             claims.put("userName", user.getUserName());
+            String accessToken = JwtUtil.createJwt(
+                    jwtProperties.getSecretKey(), 
+                    jwtProperties.getTtl(), 
+                    claims
+            );
 
-            String token = JwtUtil.createJwt(jwtProperties.getSecretKey(), jwtProperties.getTtl(), claims);
+            // 6. 生成 Refresh Token（UUID）
+            String refreshToken = UUID.randomUUID().toString().replace("-", "");
 
-            // 6. 封装返回对象
+            // 7. 将 Token 信息存入 Redis
+            saveTokenToRedis(user.getUserId(), user.getUserName(), accessToken, refreshToken);
+
+            // 8. 封装返回对象
             LoginVO loginVO = LoginVO.builder()
                     .userId(user.getUserId())
                     .userName(user.getUserName())
-                    .token(token)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
                     .build();
 
+            log.info("用户 {} 登录成功", user.getUserName());
             return loginVO;
         } catch (AuthException e) {
             throw e;
         } catch (Exception e) {
             throw new BusinessException("登录失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 将 Token 信息保存到 Redis
+     */
+    private void saveTokenToRedis(Long userId, String userName, String accessToken, String refreshToken) {
+        // 1. 保存用户登录信息（Hash结构）
+        String userKey = "user:login:" + userId;
+        Map<String, Object> loginInfo = new HashMap<>();
+        loginInfo.put("accessToken", accessToken);
+        loginInfo.put("refreshToken", refreshToken);
+        loginInfo.put("loginTime", LocalDateTime.now().toString());
+        loginInfo.put("lastActiveTime", LocalDateTime.now().toString());
+        loginInfo.put("userName", userName);
+        
+        redisUtil.hSetAll(userKey, loginInfo);
+        redisUtil.expire(userKey, jwtProperties.getRefreshTtl(), TimeUnit.MILLISECONDS);
+
+        // 2. 保存 Refresh Token 映射（String结构）
+        String tokenKey = "token:refresh:" + refreshToken;
+        redisUtil.set(tokenKey, userId, jwtProperties.getRefreshTtl(), TimeUnit.MILLISECONDS);
+
+        log.info("用户 {} 的 Token 已保存到 Redis", userId);
     }
 }

@@ -40,4 +40,6 @@ vision:
   jwt:
     secretKey: ${vision.jwt.secret-key}
     ttl: ${vision.jwt.ttl}
-    tokenName: ${vision.jwt.token-name}
+    refreshTtl: ${vision.jwt.refresh-ttl}
+    accessTokenName: ${vision.jwt.access-token-name}
+    refreshTokenName: ${vision.jwt.refresh-token-name}

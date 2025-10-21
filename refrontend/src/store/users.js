@@ -19,7 +19,9 @@ export const useAuthStore = defineStore("users", () => {
 		try {
 			const loginInfo = await authLogin(form)
 			dbUtils.clear()
-			dbUtils.set("token", loginInfo.data.token)
+			// 存储 accessToken 和 refreshToken
+			dbUtils.set("accessToken", loginInfo.data.accessToken)
+			dbUtils.set("refreshToken", loginInfo.data.refreshToken)
 			const userData = loginInfo.data
 			dbUtils.set("userData", userData)
 			// 导航到登录页或其他适当的页面

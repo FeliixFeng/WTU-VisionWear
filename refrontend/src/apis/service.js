@@ -14,7 +14,10 @@ const instance = axios.create({
 instance.interceptors.request.use(
 	(config) => {
 		// 在请求发送之前可以进行一些处理，例如设置 token、添加请求头等
-		config.headers.token = dbUtils.get("token")
+		const accessToken = dbUtils.get("accessToken")
+		if (accessToken) {
+			config.headers.Authorization = accessToken
+		}
 		if (config.data instanceof FormData) {
 			delete config.headers["Content-Type"]
 		}

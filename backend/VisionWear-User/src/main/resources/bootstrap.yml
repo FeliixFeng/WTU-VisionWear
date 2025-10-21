@@ -11,5 +11,6 @@ spring:
         shared-configs: # 共享配置
           - dataId: shared.jdbc.yml # 共享mybatis配置
           - dataId: shared.log.yml # 共享日志配置
-          - dataId: shared.swagger.yml # 共享日志配置
+          - dataId: shared.swagger.yml # 共享swagger配置
           - dataId: shared-seata.yml # 共享seata配置
+          - dataId: shared-redis.yml # 共享redis配置

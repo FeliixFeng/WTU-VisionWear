@@ -31,7 +31,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 	NProgress.start()
-	const isLoggedIn = dbUtils.get("token")
+	const isLoggedIn = dbUtils.get("accessToken")
 	if (isLoggedIn) {
 		if (to.name === "login") {
 			NProgress.done()

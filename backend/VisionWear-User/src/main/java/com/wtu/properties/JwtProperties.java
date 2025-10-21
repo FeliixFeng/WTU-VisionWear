@@ -8,9 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "vision.jwt")
 public class JwtProperties {
-
     //属性值在application.yml里设置，这个类用来读取和封装
     private String secretKey;
-    private long ttl;
-    private String tokenName;
+    private long ttl; // Access Token 过期时间
+    private long refreshTtl; // Refresh Token 过期时间
+    private String accessTokenName; // Access Token 在请求头中的名称
+    private String refreshTokenName; // Refresh Token 在请求头中的名称
 }

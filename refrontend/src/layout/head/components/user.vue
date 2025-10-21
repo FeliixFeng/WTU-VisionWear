@@ -176,7 +176,8 @@ export default {
 		},
 		logout() {
 			// 实现登出功能，并重定向到首页
-			localStorage.removeItem("token") // 删除token
+			localStorage.removeItem("accessToken") // 删除 accessToken
+			localStorage.removeItem("refreshToken") // 删除 refreshToken
 			sessionStorage.clear() // 清除会话数据
 
 			// 触发登出事件，允许父组件响应

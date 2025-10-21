@@ -13,8 +13,11 @@ import lombok.NoArgsConstructor;
 @Schema(description = "登录响应信息")
 public class LoginVO {
 
-    @Schema(description = "JWT 令牌")
-    private String token;
+    @Schema(description = "Access Token（短期令牌，15分钟）")
+    private String accessToken;
+
+    @Schema(description = "Refresh Token（长期令牌，7天）")
+    private String refreshToken;
 
     @Schema(description = "用户名")
     private String userName;

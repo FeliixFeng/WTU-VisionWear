@@ -49,7 +49,8 @@ export function handleApiError(
 			errorMessage = "登录已过期或没有权限，请重新登录"
 
 			// 清除本地存储的认证信息
-			localStorage.removeItem("token")
+			localStorage.removeItem("accessToken")
+			localStorage.removeItem("refreshToken")
 			localStorage.removeItem("userName")
 			localStorage.removeItem("userId")
 

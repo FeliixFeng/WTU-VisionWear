@@ -201,14 +201,14 @@ const handleLogin = async () => {
 		// 使用authStore进行登录
 		const data = await authStore.login(loginForm.value)
 
-		// 保存记住我的状态 (authStore.login()里面已经存储了我的状态)
-		// if (rememberMe.value) {
-		// 	localStorage.setItem("rememberMe", "true")
-		// 	localStorage.setItem("savedUsername", loginForm.value.username)
-		// } else {
-		// 	localStorage.removeItem("rememberMe")
-		// 	localStorage.removeItem("savedUsername")
-		// }
+		// 保存记住我的状态
+		if (rememberMe.value) {
+			localStorage.setItem("rememberMe", "true")
+			localStorage.setItem("savedUsername", loginForm.value.username)
+		} else {
+			localStorage.removeItem("rememberMe")
+			localStorage.removeItem("savedUsername")
+		}
 
 		// 检查是否有重定向参数
 		const redirect = router.currentRoute.value.query.redirect

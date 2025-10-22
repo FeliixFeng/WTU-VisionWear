@@ -52,6 +52,8 @@ instance.interceptors.response.use(
 					})
 				}
 			} else {
+				// 失败时显示后端返回的具体错误信息
+				MyNotification.error(response.data.msg || "操作失败")
 				return Promise.resolve({
 					status: false,
 					message: "fail",

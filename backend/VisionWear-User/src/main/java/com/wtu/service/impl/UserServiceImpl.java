@@ -103,6 +103,16 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.hasText(changeInfoDTO.getPhone())) {
             user.setPhone(changeInfoDTO.getPhone());
         }
+        
+        // 处理头像
+        if (StringUtils.hasText(changeInfoDTO.getAvatar())) {
+            user.setAvatar(changeInfoDTO.getAvatar());
+        }
+        
+        // 处理生日
+        if (StringUtils.hasText(changeInfoDTO.getBirthday())) {
+            user.setBirthday(java.time.LocalDate.parse(changeInfoDTO.getBirthday()));
+        }
 
         // 更新用户信息
         int result = userMapper.updateById(user);

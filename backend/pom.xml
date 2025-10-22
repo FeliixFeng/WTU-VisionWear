@@ -12,6 +12,7 @@
     <modules>
         <module>VisionWear-User</module>
         <module>VisionWear-Image</module>
+        <module>VisionWear-Community</module>
         <module>VisionWear-Common</module>
         <module>VisionWear-GateWay</module>
         <module>VisionWear-Api</module>

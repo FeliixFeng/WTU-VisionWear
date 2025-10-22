@@ -17,6 +17,10 @@ spring:
           uri: lb://VisionWear-Image
           predicates:
             - Path=/api/image/**
+        - id: community-service
+          uri: lb://VisionWear-Community
+          predicates:
+            - Path=/api/community/**
 
   profiles:
     active: dev

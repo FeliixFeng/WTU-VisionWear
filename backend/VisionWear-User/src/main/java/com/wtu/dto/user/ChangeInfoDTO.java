@@ -26,4 +26,10 @@ public class ChangeInfoDTO {
     @Schema(description = "用户昵称")
     private String nickName;
 
+    @Schema(description = "用户头像URL")
+    private String avatar;
+
+    @Schema(description = "用户生日")
+    private String birthday;
+
 } 

@@ -1,5 +1,15 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, defineProps, defineEmits } from "vue"
+import { ElMessage } from "element-plus"
+
+const props = defineProps({
+	currentAvatar: {
+		type: String,
+		default: "",
+	},
+})
+
+const emit = defineEmits(["update:avatar"])
 
 const showInputImg = ref(false)
 const inputRef = ref()

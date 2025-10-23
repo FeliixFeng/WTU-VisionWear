@@ -21,13 +21,13 @@ spring:
 
 springdoc:
   api-docs:
-    path: /v3/api-docs # 开放API规范JSON的访问路径
+    enabled: true
   swagger-ui:
     path: /swagger-ui.html # Swagger UI的路径（Knife4j增强后主要用doc.html）
   group-configs:
     - group: 'default'
       paths-to-match: '/**'
-      packages-to-scan: com.wtu.controller # 【重要】改为你的Controller包路径
+      packages-to-scan: com.wtu.controller # 扫描所有 Controller
 
   cloud:
     openfeign:

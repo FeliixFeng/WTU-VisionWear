@@ -69,6 +69,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         log.info("准备获取 Access Token，请求头名称: {}", jwtProperties.getAccessTokenName());
         String accessToken = getTokenFromRequest(request, jwtProperties.getAccessTokenName());
         log.info("获取到的 Access Token: {}", accessToken != null ? "存在" : "不存在");
+        System.out.println(accessToken);
         
         try {
             // 尝试解析 Access Token

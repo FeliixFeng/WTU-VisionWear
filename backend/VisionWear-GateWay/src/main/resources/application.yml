@@ -9,18 +9,55 @@ spring:
       server-addr: 8.155.5.178:8848
     gateway:
       routes:
+        # ==================== Swagger 文档路由（必须放在业务路由前面）====================
+        
+        # User 服务 - 认证模块文档
+        - id: user-swagger-auth
+          uri: lb://VisionWear-User
+          predicates:
+            - Path=/v3/api-docs/auth
+        
+        # User 服务 - 用户模块文档
+        - id: user-swagger-user
+          uri: lb://VisionWear-User
+          predicates:
+            - Path=/v3/api-docs/user
+        
+        # Image 服务文档
+        - id: image-swagger
+          uri: lb://VisionWear-Image
+          predicates:
+            - Path=/v3/api-docs/image
+          filters:
+            - RewritePath=/v3/api-docs/image, /v3/api-docs
+        
+        # Community 服务文档
+        - id: community-swagger
+          uri: lb://VisionWear-Community
+          predicates:
+            - Path=/v3/api-docs/community
+          filters:
+            - RewritePath=/v3/api-docs/community, /v3/api-docs
+        
+        # ==================== 业务路由 ====================
+        
+        # User 服务业务路由
         - id: user-service
           uri: lb://VisionWear-User
           predicates:
             - Path=/api/user/**,/api/auth/**
+        
+        # Image 服务业务路由
         - id: image-service
           uri: lb://VisionWear-Image
           predicates:
             - Path=/api/image/**
+        
+        # Community 服务业务路由
         - id: community-service
           uri: lb://VisionWear-Community
           predicates:
-            - Path=/api/community/**
+            - Path=/community/**
 
   profiles:
     active: dev
@@ -34,12 +71,24 @@ logging:
 knife4j:
   gateway:
     enabled: true
-    # 指定服务发现的模式聚合微服务文档，并且是默认 default 分组
-    strategy: discover
-    discover:
-      # OpenAPI 3.0 规范
-      version: openapi3
-      enabled: true
+    strategy: manual  # 使用手动模式
+    routes:
+      - name: 认证模块
+        url: /v3/api-docs/auth
+        service-name: VisionWear-User
+        order: 1
+      - name: 用户模块
+        url: /v3/api-docs/user
+        service-name: VisionWear-User
+        order: 2
+      - name: 图片模块
+        url: /v3/api-docs/image
+        service-name: VisionWear-Image
+        order: 3
+      - name: 社区模块
+        url: /v3/api-docs/community
+        service-name: VisionWear-Community
+        order: 4
 vision:
   jwt:
     secretKey: ${vision.jwt.secret-key}

@@ -9,7 +9,7 @@ const props = defineProps({
 	},
 })
 
-const emit = defineEmits(["update:avatar"])
+const emit = defineEmits(["updateAvatar"])
 
 const showInputImg = ref(false)
 const inputRef = ref()
@@ -175,7 +175,10 @@ const close = () => {
 	preCtx.clearRect(0, 0, 150, 150)
 	inputRef.value.value = null
 }
-const save = () => {}
+const save = () => {
+	emit("updateAvatar", resultUrl.value)
+	close()
+}
 </script>
 <template>
 	<div class="headPortrait">

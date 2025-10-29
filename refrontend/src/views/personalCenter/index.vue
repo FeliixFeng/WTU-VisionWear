@@ -14,6 +14,7 @@ const createTime = ref("") //注册日期
 const uesrInformationStore = useUesrInformationStore()
 const formRef = ref()
 const PasswordRef = ref()
+const pswResult = ref()
 const formData = ref({
 	avatar: "", //头像url
 	nickName: "", //昵称
@@ -140,7 +141,7 @@ const changPswd = (pswdData) => {
 	PasswordRef.value.validate(async (valid) => {
 		// 确保信息填写正确才发送请求
 		if (valid) {
-			uesrInformationStore.doChangePassword(pswdData)
+			pswResult.value = await uesrInformationStore.doChangePassword(pswdData)
 		}
 	})
 }
@@ -152,13 +153,19 @@ const save = () => {
 		if (valid) {
 			//修改信息
 			console.log("修改后的数据：", formData.value)
+			uesrInformationStore.doChangeUserInfo(formData.value)
+			initializeForm()
 			// 修改密码
-			if (showPasswordForm) {
+			if (showPasswordForm.value) {
 				changPswd(PasswordInformation.value)
 				showPasswordForm.value = false
 			}
 		}
 	})
+}
+
+const updateAvatar = (newAvatarUrl) => {
+	formData.value.avatar = newAvatarUrl
 }
 
 onBeforeMount(async () => {
@@ -176,7 +183,7 @@ onBeforeMount(async () => {
 				class="iconfont icon-fanhui return"
 				@click="ret"
 			></i>
-			<avatarUpload></avatarUpload>
+			<avatarUpload @updateAvatar="updateAvatar"></avatarUpload>
 			<div class="data">
 				<el-form
 					ref="formRef"
@@ -201,6 +208,7 @@ onBeforeMount(async () => {
 							aria-label="Pick a date"
 							placeholder="选择你的生日"
 							style="width: 100%"
+							value-format="YYYY-MM-DD"
 						/>
 					</el-form-item>
 					<el-form-item

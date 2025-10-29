@@ -170,4 +170,30 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("用户 {} 的 Token 已保存到 Redis", userId);
     }
+    
+    @Override
+    public void logout(Long userId) {
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+        
+        try {
+            // 1. 获取用户登录信息
+            String userKey = "user:login:" + userId;
+            
+            // 2. 获取 Refresh Token 并删除其映射
+            Object refreshTokenObj = redisUtil.hGet(userKey, "refreshToken");
+            if (refreshTokenObj != null) {
+                String tokenKey = "token:refresh:" + refreshTokenObj.toString();
+                redisUtil.delete(tokenKey);
+                log.info("已删除用户 {} 的 Refresh Token 映射", userId);
+            }
+            
+            // 3. 删除用户登录信息
+            redisUtil.delete(userKey);
+            
+            log.info("用户 {} 退出登录成功", userId);
+        } catch (Exception e) {
+            log.error("用户 {} 退出登录失败: {}", userId, e.getMessage());
+            throw new BusinessException("退出登录失败: " + e.getMessage());
+        }
+    }
 }

@@ -79,7 +79,13 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             
             log.info("Access Token 有效，用户ID: {}", userId);
             
-            // Token 有效，直接放行
+            // ✅ 检查 Token 是否为最新（防止被挤下线）
+            if (!isLatestToken(userId, accessToken)) {
+                log.warn("用户 {} 的 Token 已失效（被其他设备登录挤下线）", userId);
+                return kickedOut(exchange);
+            }
+            
+            // Token 有效且是最新的，放行
             return chain.filter(addUserInfoToRequest(exchange, userId, userName));
             
         } catch (ExpiredJwtException e) {
@@ -202,6 +208,37 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(org.springframework.http.HttpStatus.valueOf(HttpStatus.HTTP_UNAUTHORIZED));
         return response.setComplete();
+    }
+    
+    /**
+     * 检查 Token 是否为最新（防止被挤下线）
+     */
+    private boolean isLatestToken(Long userId, String accessToken) {
+        try {
+            String userKey = "user:login:" + userId;
+            Object latestToken = redisUtil.hGet(userKey, "accessToken");
+            return latestToken != null && latestToken.toString().equals(accessToken);
+        } catch (Exception e) {
+            log.error("检查 Token 是否为最新时出错: {}", e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * 返回 403 被挤下线响应
+     */
+    private Mono<Void> kickedOut(ServerWebExchange exchange) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(org.springframework.http.HttpStatus.FORBIDDEN);
+        
+        // 设置响应头，告诉前端是"被挤下线"
+        response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
+        response.getHeaders().add("X-Kicked-Out", "true");
+        
+        String body = "{\"code\":0,\"msg\":\"您的账号已在其他设备登录\",\"data\":null}";
+        return response.writeWith(
+            Mono.just(response.bufferFactory().wrap(body.getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+        );
     }
 
     public boolean isExcluded(String path){

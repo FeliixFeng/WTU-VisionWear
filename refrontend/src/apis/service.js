@@ -31,6 +31,13 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
 	(response) => {
+		// ✅ 检查是否有新的 Access Token（Token 自动刷新）
+		const newAccessToken = response.headers["new-access-token"]
+		if (newAccessToken) {
+			console.log("检测到新的 Access Token，正在更新...")
+			dbUtils.set("accessToken", newAccessToken)
+		}
+		
 		if (response.status === 200) {
 			if (response.data.code == 1) {
 				// 在接收到响应数据之前可以进行一些处理，例如解析响应数据、错误处理等
@@ -115,6 +122,29 @@ const handleRequestError = (error) => {
 					error: "jwt expired",
 					message: "账号已过期,请重新登录",
 				})
+			
+			case 403:
+				// ✅ 处理被挤下线的情况
+				const isKickedOut = error.response.headers['x-kicked-out'] === 'true'
+				if (isKickedOut) {
+					dbUtils.clear()
+					router.push({ path: "/login" })
+					MyNotification.warning({
+						title: "账号异地登录",
+						message: "您的账号已在其他设备登录，如非本人操作，请及时修改密码",
+						duration: 5000
+					})
+					return Promise.reject({
+						error: "kicked_out",
+						message: "您的账号已在其他设备登录",
+					})
+				} else {
+					MyNotification.error(error.response.data.message || "无权限访问")
+					return Promise.reject({
+						error: "forbidden",
+						message: error.response.data.message || "无权限访问",
+					})
+				}
 
 			case 404:
 				console.error("404:", error.response.data.message)

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: VisionWear-GateWay # 服务名称
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 8.155.5.178:8848
+      config:
+        file-extension: yml # 文件后缀名
+        shared-configs: # 共享配置
+          - dataId: shared-redis.yml # 共享redis配置（必须，Gateway 需要 Redis）
+

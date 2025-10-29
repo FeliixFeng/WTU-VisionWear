@@ -10,4 +10,10 @@ public interface AuthService {
     String register(@Valid RegisterDTO dto);
 
     LoginVO login(@Valid LoginDTO dto);
+    
+    /**
+     * 用户退出登录
+     * @param userId 用户ID
+     */
+    void logout(Long userId);
 }

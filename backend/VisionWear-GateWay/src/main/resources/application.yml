@@ -5,8 +5,6 @@ spring:
   application:
     name: VisionWear-GateWay
   cloud:
-    nacos:
-      server-addr: 8.155.5.178:8848
     gateway:
       routes:
         # ==================== Swagger 文档路由（必须放在业务路由前面）====================

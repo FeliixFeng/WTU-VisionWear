@@ -12,3 +12,10 @@ export const authLogin = (data) => {
 		return res
 	})
 }
+
+/**
+ * 用户退出登录
+ */
+export const authLogout = () => {
+	return service.post("/auth/logout")
+}

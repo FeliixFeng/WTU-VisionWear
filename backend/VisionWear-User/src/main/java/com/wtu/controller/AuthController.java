@@ -9,6 +9,7 @@ import com.wtu.entity.WeChatUser;
 import com.wtu.exception.AuthException;
 import com.wtu.result.Result;
 import com.wtu.service.AuthService;
+import com.wtu.utils.UserContext;
 import com.wtu.utils.WeChatUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,6 +52,19 @@ public class AuthController {
     public Result<LoginVO> login(@RequestBody LoginDTO dto) {
         LoginVO loginVO = authService.login(dto);
         return Result.success(loginVO);
+    }
+    
+    @Operation(summary = "用户退出登录")
+    @PostMapping("/logout")
+    public Result<Void> logout() {
+        // ✅ 从 ThreadLocal 获取 userId（UserInfoInterceptor 已设置）
+        Long userId = UserContext.getCurrentUserId();
+        if (userId == null) {
+            throw new AuthException("未登录");
+        }
+        
+        authService.logout(userId);
+        return Result.success(null, "退出登录成功");
     }
 
     @Operation(summary = "微信登录校验")

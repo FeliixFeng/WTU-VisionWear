@@ -21,6 +21,7 @@ import com.volcengine.service.visual.model.response.ImageStyleConversionResponse
 import com.wtu.dto.image.*;
 import com.wtu.vo.DoodleToImageByTYVO;
 import com.wtu.vo.ImageFusionVO;
+import com.wtu.vo.SketchToImageByTYVO;
 import com.wtu.vo.SketchToImageVO;
 import com.wtu.entity.Image;
 import com.wtu.exception.BusinessException;
@@ -152,6 +153,88 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             log.error("文本生成图像失败", e);
             throw new BusinessException("文本生成图像失败: " + e.getMessage());
+        }
+    }
+
+    // 通义-线稿成图功能（使用wanx2.1-imageedit模型）
+    @Override
+    public SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId) {
+        ExceptionUtils.requireNonNull(request, "请求参数不能为空");
+        ExceptionUtils.requireNonNull(request.getPrompt(), "生成提示词不能为空");
+        ExceptionUtils.requireNonNull(request.getBaseImageUrl(), "基础图像URL不能为空");
+        ExceptionUtils.requireNonNull(userId, "用户ID不能为空");
+
+        long startTime = System.currentTimeMillis();
+        String requestId = UUID.randomUUID().toString();
+
+        String baseImageUrl = request.getBaseImageUrl();
+
+        try {
+            // 构建parameters参数
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("is_sketch", request.getIsSketch());
+            if (request.getPromptExtend() != null) {
+                parameters.put("prompt_extend", request.getPromptExtend());
+            }
+
+            // 构建SDK调用参数
+            ImageSynthesisParam.ImageSynthesisParamBuilder builder = ImageSynthesisParam.builder()
+                    .apiKey(aliyunApiKey)
+                    .model(request.getModel())
+                    .function(ImageSynthesis.ImageEditFunction.DOODLE)
+                    .prompt(request.getPrompt())
+                    .baseImageUrl(baseImageUrl)
+                    .n(request.getN())
+                    .size(request.getSize())
+                    .parameters(parameters);
+
+            // 如果有种子参数，添加到builder
+            if (request.getSeed() != null && request.getSeed() > 0) {
+                builder.seed(request.getSeed());
+            }
+
+            ImageSynthesisParam param = builder.build();
+
+            // 调用SDK
+            ImageSynthesis imageSynthesis = new ImageSynthesis();
+            ImageSynthesisResult result = imageSynthesis.call(param);
+
+            if (result == null || result.getOutput() == null || result.getOutput().getResults() == null) {
+                throw new BusinessException("未能获取到图像生成结果");
+            }
+
+            List<SketchToImageByTYVO.GeneratedImage> imageList = new ArrayList<>();
+            for (var img : result.getOutput().getResults()) {
+                String imageUrl = img.get("url");
+                int width = img.containsKey("width") ? Integer.parseInt(img.get("width")) : 0;
+                int height = img.containsKey("height") ? Integer.parseInt(img.get("height")) : 0;
+                long seed = img.containsKey("seed") ? Long.parseLong(img.get("seed")) : 0L;
+
+                String imageId = imageStorageService.saveImageFromUrl(imageUrl, userId);
+
+                imageList.add(SketchToImageByTYVO.GeneratedImage.builder()
+                        .imageId(imageId)
+                        .imageUrl(imageUrl)
+                        .width(width)
+                        .height(height)
+                        .seed(seed)
+                        .build());
+            }
+
+            return SketchToImageByTYVO.builder()
+                    .requestId(requestId)
+                    .images(imageList)
+                    .prompt(request.getPrompt())
+                    .baseImageUrl(baseImageUrl)
+                    .generationTimeMs(System.currentTimeMillis() - startTime)
+                    .build();
+
+        } catch (ApiException | NoApiKeyException e) {
+            log.error("通义万象SDK调用失败", e);
+            throw new BusinessException("通义万象SDK调用失败: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("线稿成图失败", e);
+            throw new BusinessException("线稿成图失败: " + e.getMessage());
         }
     }
 

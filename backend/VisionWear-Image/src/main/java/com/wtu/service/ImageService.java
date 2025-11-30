@@ -2,6 +2,7 @@ package com.wtu.service;
 import com.wtu.dto.image.*;
 import com.wtu.vo.ImageFusionVO;
 import com.wtu.vo.DoodleToImageByTYVO;
+import com.wtu.vo.SketchToImageByTYVO;
 import com.wtu.vo.SketchToImageVO;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface ImageService {
      *
      * @param request 文生图请求
      * @param userId  用户ID
-     * @return
+     * @return 文生图响应
      */
     List<String> textToImageByTongyi(TextToImageByTYDTO request, Long userId) throws Exception;
 
@@ -51,10 +52,19 @@ public interface ImageService {
      *
      * @param request 涂鸦生图请求
      * @param userId  用户ID
-     * @return
+     * @return 涂鸦生图响应
      */
     DoodleToImageByTYVO DoodleToImageByTongyi(DoodleToImageByTYDTO request, Long userId) throws Exception;
 
+
+    /**
+     * 通义万象线稿成图功能（使用wanx2.1-imageedit模型）
+     *
+     * @param request 线稿成图请求
+     * @param userId  用户ID
+     * @return 线稿成图响应
+     */
+    SketchToImageByTYVO sketchToImageByTongyi(SketchToImageByTYDTO request, Long userId) throws Exception;
 
     /**
      * 图像融合

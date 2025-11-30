@@ -2,6 +2,7 @@ package com.wtu.controller;
 import com.wtu.dto.image.*;
 import com.wtu.vo.DoodleToImageByTYVO;
 import com.wtu.vo.ImageFusionVO;
+import com.wtu.vo.SketchToImageByTYVO;
 import com.wtu.vo.SketchToImageVO;
 import com.wtu.exception.BusinessException;
 import com.wtu.result.Result;
@@ -163,6 +164,21 @@ public class ImageController {
             return Result.success(urls);
         } catch (Exception e) {
             throw new BusinessException("线稿生图失败: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/tongyi/sketch-to-image")
+    @Operation(summary = "通义万象线稿成图功能")
+    public Result<SketchToImageByTYVO> sketchToImageByTongyi(
+            @RequestBody @Valid SketchToImageByTYDTO request) {
+        try {
+            Long userId = UserContext.getCurrentUserId();
+            SketchToImageByTYVO vo = imageService.sketchToImageByTongyi(request, userId);
+            return Result.success(vo);
+        } catch (Exception e) {
+            log.error("通义万象线稿成图失败", e);
+            throw new BusinessException("通义万象线稿成图失败: " + e.getMessage());
         }
     }
 

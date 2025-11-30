@@ -19,6 +19,7 @@ spring:
     username: ${vision.datasource.image.username}
     password: ${vision.datasource.image.password}
 
+
 springdoc:
   api-docs:
     enabled: true
